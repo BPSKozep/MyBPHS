@@ -1,3 +1,4 @@
+import "@fontsource-variable/inter";
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 
