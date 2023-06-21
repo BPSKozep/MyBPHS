@@ -9,7 +9,14 @@ module.exports = {
         "./src/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                sans: '"Montserrat Variable"',
+                serif: '"Roboto Slab Variable"',
+                mono: '"Source Code Pro Variable"',
+                handwriting: '"Lily Script One"',
+            },
+        },
     },
     plugins: [],
 };
