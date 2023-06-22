@@ -10,10 +10,14 @@
         "prepare": "husky install"
     },
     "dependencies": {
+        "@emotion/react": "^11.11.1",
+        "@emotion/styled": "^11.11.0",
         "@fontsource-variable/montserrat": "^5.0.4",
         "@fontsource-variable/roboto-slab": "^5.0.3",
         "@fontsource-variable/source-code-pro": "^5.0.4",
         "@fontsource/lily-script-one": "^5.0.3",
+        "@mui/icons-material": "^5.11.16",
+        "@mui/material": "^5.13.5",
         "next": "13.0.6",
         "react": "18.2.0",
         "react-dom": "18.2.0"
