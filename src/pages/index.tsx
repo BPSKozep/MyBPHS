@@ -11,22 +11,22 @@ export default function Home() {
 
             <div className="flex justify-center items-center absolute h-[93vh] w-full">
                 <div className="inline-grid gap-4 grid-cols-1 grid-rows-4 sm:grid-cols-2 sm:grid-rows-2 text-white m-3">
-                    <div className="border flex bg-slate-800 p-5 rounded-md">
+                    <div className="border flex bg-slate-800 p-7 rounded-md hover:bg-slate-700 hover:scale-105 transition-all delay-100 duration-300">
                         <span className="text-center w-full text-xl font-bold">
                             Kreditek
                         </span>
                     </div>
-                    <div className="border flex bg-slate-800 p-5 rounded-md">
+                    <div className="border flex bg-slate-800 p-7 rounded-md hover:bg-slate-700 hover:scale-105 transition-all delay-100 duration-300">
                         <span className="text-center w-full text-xl font-bold">
                             Hiányzások
                         </span>
                     </div>
-                    <div className="border flex bg-slate-800 p-5 rounded-md">
+                    <div className="border flex bg-slate-800 p-7 rounded-md hover:bg-slate-700 hover:scale-105 transition-all delay-100 duration-300">
                         <span className="text-center w-full text-xl font-bold">
                             Ebédrendelés
                         </span>
                     </div>
-                    <div className="border flex bg-slate-800 p-5 rounded-md">
+                    <div className="border flex bg-slate-800 p-7 rounded-md hover:bg-slate-700 hover:scale-105 transition-all delay-100 duration-300">
                         <span className="text-center w-full text-xl font-bold">
                             Kreditek
                         </span>
