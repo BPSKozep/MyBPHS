@@ -27,12 +27,12 @@ export default function Home() {
                     </div>
                     <div className="border flex bg-slate-800 p-7 rounded-md cursor-pointer hover:bg-slate-700 hover:scale-105 transition-all delay-50 duration-200">
                         <span className="text-center w-full text-xl font-bold">
-                            Ebédrendelés
+                            Órarend
                         </span>
                     </div>
                     <div className="border flex bg-slate-800 p-7 rounded-md cursor-pointer hover:bg-slate-700 hover:scale-105 transition-all delay-50 duration-200">
                         <span className="text-center w-full text-xl font-bold">
-                            Kreditek
+                            Ebédrendelés
                         </span>
                     </div>
                 </div>
