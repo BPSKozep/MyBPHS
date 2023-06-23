@@ -7,14 +7,19 @@ import type { AppProps } from "next/app";
 import { trpc } from "utils/trpc";
 import { wrapper } from "store/store";
 import { Provider } from "react-redux";
+import { SessionProvider } from "next-auth/react";
 
 function App({ Component, ...rest }: AppProps) {
     const { store, props } = wrapper.useWrappedStore(rest);
-    const { pageProps } = props;
+    const {
+        pageProps: { session, ...pageProps },
+    } = props;
 
     return (
         <Provider store={store}>
-            <Component {...pageProps} />
+            <SessionProvider session={session}>
+                <Component {...pageProps} />
+            </SessionProvider>
         </Provider>
     );
 }
