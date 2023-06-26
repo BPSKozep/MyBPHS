@@ -6,12 +6,12 @@ import Link from "next/link";
 function Credits() {
     return (
         <>
-            <header className="flex items-center justify-center h-[7vh]">
-                <div className="flex items-center cursor-default text-white">
+            <header className="flex h-[7vh] items-center justify-center">
+                <div className="flex cursor-default items-center text-white">
                     <Link href="/" className="absolute left-7">
                         <FontAwesomeIcon icon={faHome} />
                     </Link>
-                    <h1 className="text-center text-xl sm:text-2xl font-black text-white">
+                    <h1 className="text-center text-xl font-black text-white sm:text-2xl">
                         Kreditek
                     </h1>
                 </div>

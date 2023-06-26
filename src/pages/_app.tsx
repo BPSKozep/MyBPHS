@@ -22,14 +22,14 @@ function App({ Component, ...rest }: AppProps) {
     return (
         <Provider store={store}>
             <SessionProvider session={session}>
-                <div className="bg-slate-800 h-[7vh]"></div>
+                <div className="h-[7vh] bg-slate-800"></div>
                 <AnimatePresence>
                     <motion.div
                         key={router.route}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="top-0 bottom-0 left-0 right-0 absolute"
+                        className="absolute bottom-0 left-0 right-0 top-0"
                     >
                         <Component {...pageProps} />
                     </motion.div>

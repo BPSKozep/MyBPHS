@@ -9,13 +9,13 @@ function Forbidden() {
     const router = useRouter();
 
     return (
-        <div className="absolute flex h-full w-full justify-center items-center text-white text-2xl font-bold flex-col gap-5">
+        <div className="absolute flex h-full w-full flex-col items-center justify-center gap-5 text-2xl font-bold text-white">
             <span className="text-center">
                 A bejelentkezés nem engedélyezett!
             </span>
 
             <div
-                className="bg-blue-500 p-3 rounded-full hover:p-5 hover:shadow-lg transition-all"
+                className="rounded-full bg-blue-500 p-3 transition-all hover:p-5 hover:shadow-lg"
                 onClick={() => {
                     setClicked(true);
                     setTimeout(() => {
