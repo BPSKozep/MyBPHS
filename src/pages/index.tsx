@@ -8,17 +8,17 @@ export default function Home() {
         <>
             <motion.header
                 animate={false}
-                className="flex bg-slate-800 items-center justify-center h-[7vh]"
+                className="flex h-[7vh] items-center justify-center bg-slate-800"
             >
-                <h1 className="text-center text-xl sm:text-2xl font-bold text-white">
+                <h1 className="text-center text-xl font-bold text-white sm:text-2xl">
                     Üdvözlünk a{" "}
                     <span className="font-handwriting text-amber-400">My</span>
                     <span className="font-black">BPHS</span>-ben!
                 </h1>
             </motion.header>
 
-            <div className="flex justify-center items-center absolute h-[93vh] w-full">
-                <div className="inline-grid gap-4 grid-cols-1 grid-rows-4 sm:grid-cols-2 sm:grid-rows-2 text-white m-3">
+            <div className="absolute flex h-[93vh] w-full items-center justify-center">
+                <div className="m-3 inline-grid grid-cols-1 grid-rows-4 gap-4 text-white sm:grid-cols-2 sm:grid-rows-2">
                     <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileFocus={{ scale: 1.1 }}
@@ -31,33 +31,48 @@ export default function Home() {
                         onClick={() =>
                             setTimeout(() => router.push("/credits"), 350)
                         }
-                        className="border flex bg-slate-700 p-7 rounded-md cursor-pointer"
+                        className="flex cursor-pointer rounded-md border bg-slate-700 p-7"
                     >
-                        <span className="text-center w-full text-xl font-bold">
+                        <span className="w-full text-center text-xl font-bold">
                             Kreditek
                         </span>
                     </motion.button>
                     <motion.button
-                        className="border border-gray-400 flex bg-slate-700 text-gray-300 p-7 rounded-md cursor-not-allowed"
+                        whileHover={{ rotateZ: [null, 0.5, -0.5, 0] }}
+                        transition={{
+                            duration: 0.5,
+                            times: [0, 0.33, 0.66, 1],
+                        }}
+                        className="flex cursor-not-allowed rounded-md border border-gray-400 bg-slate-700 p-7 text-gray-300"
                         disabled
                     >
-                        <span className="text-center w-full text-xl font-bold">
+                        <span className="w-full text-center text-xl font-bold">
                             Hiányzások
                         </span>
                     </motion.button>
                     <motion.button
-                        className="border border-gray-400 flex bg-slate-700 text-gray-300 p-7 rounded-md cursor-not-allowed"
+                        whileHover={{ rotateZ: [null, 0.5, -0.5, 0] }}
+                        transition={{
+                            duration: 0.5,
+                            times: [0, 0.33, 0.66, 1],
+                        }}
+                        className="flex cursor-not-allowed rounded-md border border-gray-400 bg-slate-700 p-7 text-gray-300"
                         disabled
                     >
-                        <span className="text-center w-full text-xl font-bold">
+                        <span className="w-full text-center text-xl font-bold">
                             Órarend
                         </span>
                     </motion.button>
                     <motion.button
-                        className="border border-gray-400 flex bg-slate-700 text-gray-300 p-7 rounded-md cursor-not-allowed"
+                        whileHover={{ rotateZ: [null, 0.5, -0.5, 0] }}
+                        transition={{
+                            duration: 0.5,
+                            times: [0, 0.33, 0.66, 1],
+                        }}
+                        className="flex cursor-not-allowed rounded-md border border-gray-400 bg-slate-700 p-7 text-gray-300"
                         disabled
                     >
-                        <span className="text-center w-full text-xl font-bold">
+                        <span className="w-full text-center text-xl font-bold">
                             Ebédrendelés
                         </span>
                     </motion.button>
