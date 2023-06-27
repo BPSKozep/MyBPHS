@@ -65,12 +65,16 @@ function CreditBar({ progress }: { progress: number }) {
 
                     <div className="absolute left-0 right-0 top-1/2 mx-[2.5%] flex h-1.5 w-[95%] -translate-y-1/2 items-center justify-evenly rounded-lg bg-[#8F8F8F]">
                         {credits.map((credit: string, index) => (
-                            <motion.div
-                                whileHover={{ scale: 1.3 }}
-                                transition={{ duration: 0.1 }}
-                                className={`${creditClasses[credit]} z-50`}
+                            <div
+                                className="flex h-5 w-5 items-center justify-center"
                                 key={index}
-                            ></motion.div>
+                            >
+                                <motion.div
+                                    whileHover={{ scale: 1.3 }}
+                                    transition={{ duration: 0.1 }}
+                                    className={`${creditClasses[credit]} z-50`}
+                                ></motion.div>
+                            </div>
                         ))}
                     </div>
 
