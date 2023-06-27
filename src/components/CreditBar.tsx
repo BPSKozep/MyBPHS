@@ -72,7 +72,7 @@ function CreditBar({ progress }: { progress: number }) {
                                 <motion.div
                                     whileHover={{ scale: 1.3 }}
                                     transition={{ duration: 0.1 }}
-                                    className={`${creditClasses[credit]} z-50`}
+                                    className={`${creditClasses[credit]}`}
                                 ></motion.div>
                             </div>
                         ))}
