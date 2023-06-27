@@ -45,14 +45,12 @@ function CreditBar({ progress }: { progress: number }) {
                             } bg-[#133B57] [transform-origin:0%_50%]`}
                             initial={{ width: 0 }}
                             animate={{
-                                width: `${
-                                    progress === 0
-                                        ? 0
-                                        : Math.min(
-                                              Math.max(97 * progress, 1.12),
-                                              97 * 1
-                                          )
-                                }%`,
+                                width: `${(() => {
+                                    if (progress === 0 || progress === 1)
+                                        return progress * 100 * 0.97;
+
+                                    return 0.97 * (progress * 97.75 + 1);
+                                })()}%`,
                             }}
                         ></motion.div>
                     </div>
@@ -73,10 +71,11 @@ function CreditBar({ progress }: { progress: number }) {
                             className="absolute h-10 w-1.5 rounded-lg bg-[#3F9E7C]"
                             initial={{ left: 0 }}
                             animate={{
-                                left: `${Math.min(
-                                    Math.max(progress * 100, 1),
-                                    100
-                                )}%`,
+                                left: `${(() => {
+                                    if (progress === 1) return progress * 100;
+
+                                    return progress * 97.75 + 1;
+                                })()}%`,
                             }}
                         ></motion.div>
                     </div>
