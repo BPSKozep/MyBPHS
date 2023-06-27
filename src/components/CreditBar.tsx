@@ -64,9 +64,23 @@ function CreditBar({ progress }: { progress: number }) {
                     </div>
 
                     <div className="absolute left-0 right-0 top-1/2 mx-[2.5%] flex h-1.5 w-[95%] -translate-y-1/2 items-center justify-evenly rounded-lg bg-[#8F8F8F]">
+                        <motion.div
+                            className="absolute left-0 h-1.5 rounded-lg bg-[#838EC7]"
+                            initial={{ width: 0 }}
+                            animate={{
+                                width: `${(() => {
+                                    const clampedProgress = Math.min(
+                                        Math.max(progress * 100, 0),
+                                        100
+                                    );
+
+                                    return clampedProgress;
+                                })()}%`,
+                            }}
+                        ></motion.div>
                         {credits.map((credit: string, index) => (
                             <div
-                                className="flex h-5 w-5 items-center justify-center"
+                                className="z-10 flex h-5 w-5 items-center justify-center"
                                 key={index}
                             >
                                 <motion.div
