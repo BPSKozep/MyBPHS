@@ -46,10 +46,18 @@ function CreditBar({ progress }: { progress: number }) {
                             initial={{ width: 0 }}
                             animate={{
                                 width: `${(() => {
-                                    if (progress === 0 || progress === 1)
-                                        return progress * 100 * 0.97;
+                                    const clampedProgress = Math.min(
+                                        Math.max(progress * 100, 0),
+                                        100
+                                    );
 
-                                    return 0.97 * (progress * 97.75 + 1);
+                                    if (
+                                        clampedProgress === 0 ||
+                                        clampedProgress === 100
+                                    )
+                                        return clampedProgress * 0.97;
+
+                                    return 0.97 * (clampedProgress * 0.98 + 1);
                                 })()}%`,
                             }}
                         ></motion.div>
@@ -68,13 +76,19 @@ function CreditBar({ progress }: { progress: number }) {
 
                     <div className="pointer-events-none absolute left-0 top-1/2 mx-[1.5%] h-10 w-[97%] -translate-y-1/2">
                         <motion.div
-                            className="absolute h-10 w-1.5 rounded-lg bg-[#3F9E7C]"
+                            className="absolute h-10 w-1.5 -translate-x-1/2 rounded-lg bg-[#3F9E7C]"
                             initial={{ left: 0 }}
                             animate={{
                                 left: `${(() => {
-                                    if (progress === 1) return progress * 100;
+                                    const clampedProgress = Math.min(
+                                        Math.max(progress * 100, 0),
+                                        100
+                                    );
 
-                                    return progress * 97.75 + 1;
+                                    if (clampedProgress === 100)
+                                        return clampedProgress;
+
+                                    return clampedProgress * 0.98 + 1;
                                 })()}%`,
                             }}
                         ></motion.div>
