@@ -36,11 +36,11 @@ const credits = [
 function CreditBar({ progress }: { progress: number }) {
     return (
         <>
-            <div className="flex h-40 w-[80vw] flex-col items-stretch overflow-hidden rounded-lg">
-                <div className="relative h-[70%] bg-[#242424]">
+            <div className="flex h-40 w-[80vw] flex-col items-stretch overflow-auto rounded-lg">
+                <div className="relative h-[70%] min-w-[65rem] bg-[#242424]">
                     <div className="rounded-full bg-red-300">
                         <motion.div
-                            className={`pointer-events-none absolute left-0 top-1/2 mx-[1.5%] h-10 w-[97%]  -translate-y-1/2 ${
+                            className={`pointer-events-none absolute left-0 top-1/2 mx-[1.5%] h-10 w-[97%] -translate-y-1/2 ${
                                 progress === 0 ? "rounded-lg" : "rounded-l-lg"
                             } bg-[#133B57] [transform-origin:0%_50%]`}
                             initial={{ width: 0 }}
@@ -112,7 +112,7 @@ function CreditBar({ progress }: { progress: number }) {
                         ></motion.div>
                     </div>
                 </div>
-                <div className="box-border flex h-[30%] items-center justify-between bg-[#565E85] px-[2.5%]">
+                <div className="box-border flex h-[30%] min-w-[65rem] items-center justify-between bg-[#565E85] px-[2.5%]">
                     {months.map((month) => (
                         <span
                             className="w-[10%] text-center font-extrabold text-white"
