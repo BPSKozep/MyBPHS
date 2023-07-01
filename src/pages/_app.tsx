@@ -29,7 +29,7 @@ function App({ Component, ...rest }: AppProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute bottom-0 left-0 right-0 top-0"
+                        className="relative bottom-0 left-0 right-0 top-0"
                     >
                         <Component {...pageProps} />
                     </motion.div>
