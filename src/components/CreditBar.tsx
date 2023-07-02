@@ -38,7 +38,7 @@ function CreditBar({ progress }: { progress: number }) {
         <>
             <div className="flex h-40 w-[80vw] flex-col items-stretch overflow-auto rounded-lg">
                 <div className="relative h-[70%] min-w-[65rem] bg-[#242424]">
-                    <div className="rounded-full bg-red-300">
+                    <div className="rounded-full">
                         <motion.div
                             className={`pointer-events-none absolute left-0 top-1/2 mx-[1.5%] h-10 w-[97%] -translate-y-1/2 ${
                                 progress === 0 ? "rounded-lg" : "rounded-l-lg"
