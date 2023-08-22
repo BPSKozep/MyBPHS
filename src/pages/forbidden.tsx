@@ -27,10 +27,7 @@ function Forbidden() {
                     animate={{ rotate: clicked ? 360 : 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <FontAwesomeIcon
-                        icon={faHome}
-                        className={`transition-all`}
-                    />
+                    <FontAwesomeIcon icon={faHome} className="transition-all" />
                 </motion.div>
             </div>
         </div>
