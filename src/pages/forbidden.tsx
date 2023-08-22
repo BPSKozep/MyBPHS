@@ -15,7 +15,7 @@ function Forbidden() {
             </span>
 
             <div
-                className="rounded-full bg-blue-500 p-3 transition-all hover:p-5 hover:shadow-lg"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-500 transition-all hover:h-20 hover:w-20 hover:shadow-lg"
                 onClick={() => {
                     setClicked(true);
                     setTimeout(() => {
