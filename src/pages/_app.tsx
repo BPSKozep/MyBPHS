@@ -10,6 +10,7 @@ import { Provider } from "react-redux";
 import { SessionProvider } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
+import OnlyAuthed from "components/OnlyAuthed";
 
 function App({ Component, ...rest }: AppProps) {
     const { store, props } = wrapper.useWrappedStore(rest);
@@ -22,18 +23,20 @@ function App({ Component, ...rest }: AppProps) {
     return (
         <Provider store={store}>
             <SessionProvider session={session}>
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={router.route}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative bottom-0 left-0 right-0 top-0"
-                    >
-                        <Component {...pageProps} />
-                    </motion.div>
-                </AnimatePresence>
+                <OnlyAuthed>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={router.route}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="relative bottom-0 left-0 right-0 top-0"
+                        >
+                            <Component {...pageProps} />
+                        </motion.div>
+                    </AnimatePresence>
+                </OnlyAuthed>
             </SessionProvider>
         </Provider>
     );
