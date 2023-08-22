@@ -23,7 +23,7 @@ function App({ Component, ...rest }: AppProps) {
     return (
         <Provider store={store}>
             <SessionProvider session={session}>
-                <OnlyAuthed>
+                <OnlyAuthed enable={router.route !== "/forbidden"}>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={router.route}
