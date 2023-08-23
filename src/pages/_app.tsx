@@ -7,12 +7,14 @@ import type { AppProps } from "next/app";
 import { trpc } from "utils/trpc";
 import { wrapper } from "store/store";
 import { Provider } from "react-redux";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import OnlyAuthed from "components/OnlyAuthed";
 
 function MainHeader() {
+    const { data } = useSession();
+
     return (
         <header className="flex h-16 flex-shrink-0 items-center justify-center bg-slate-800">
             <h1 className="text-center text-2xl font-bold text-white">
@@ -21,6 +23,12 @@ function MainHeader() {
                 <span className="font-black">BPHS</span>
                 <span className="hidden sm:inline">-ben!</span>
             </h1>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+                src={data?.user?.image || ""}
+                alt="Profile picture"
+                className="absolute right-10 w-10 rounded-full"
+            />
         </header>
     );
 }
