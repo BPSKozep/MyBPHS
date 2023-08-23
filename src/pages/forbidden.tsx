@@ -9,7 +9,7 @@ function Forbidden() {
     const router = useRouter();
 
     return (
-        <div className="absolute flex h-full w-full flex-col items-center justify-center gap-5 text-2xl font-bold text-white">
+        <div className="relative flex h-[93vh] w-full flex-col items-center justify-center gap-5 text-2xl font-bold text-white">
             <span className="text-center">
                 A bejelentkezés nem engedélyezett!
             </span>

@@ -24,6 +24,15 @@ function App({ Component, ...rest }: AppProps) {
         <Provider store={store}>
             <SessionProvider session={session}>
                 <OnlyAuthed enable={router.route !== "/forbidden"}>
+                    <header className="flex h-[7vh] items-center justify-center bg-slate-800">
+                        <h1 className="text-center text-xl font-bold text-white sm:text-2xl">
+                            Üdvözlünk a{" "}
+                            <span className="font-handwriting text-amber-400">
+                                My
+                            </span>
+                            <span className="font-black">BPHS</span>-ben!
+                        </h1>
+                    </header>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={router.route}
@@ -31,7 +40,7 @@ function App({ Component, ...rest }: AppProps) {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.3 }}
-                            className="absolute bottom-0 left-0 right-0 top-0"
+                            className="relative bottom-0 left-0 right-0 top-0"
                         >
                             <Component {...pageProps} />
                         </motion.div>

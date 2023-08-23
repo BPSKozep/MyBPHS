@@ -6,14 +6,6 @@ export default function Home() {
 
     return (
         <>
-            <header className="flex h-[7vh] items-center justify-center bg-slate-800">
-                <h1 className="text-center text-xl font-bold text-white sm:text-2xl">
-                    Üdvözlünk a{" "}
-                    <span className="font-handwriting text-amber-400">My</span>
-                    <span className="font-black">BPHS</span>-ben!
-                </h1>
-            </header>
-
             <div className="relative flex h-[93vh] w-full items-center justify-center">
                 <div className="m-3 inline-grid grid-cols-1 grid-rows-4 gap-4 text-white sm:grid-cols-2 sm:grid-rows-2">
                     <motion.button
