@@ -6,7 +6,7 @@ export default function Home() {
 
     return (
         <>
-            <div className="relative flex h-[93vh] w-full items-center justify-center">
+            <div className="flex h-full w-full items-center justify-center">
                 <div className="m-3 inline-grid grid-cols-1 grid-rows-4 gap-4 text-white sm:grid-cols-2 sm:grid-rows-2">
                     <motion.button
                         whileHover={{ scale: 1.1 }}
