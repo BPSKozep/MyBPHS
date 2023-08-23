@@ -42,7 +42,7 @@ function BigLinkButton({
                 damping: 20,
             }}
             onClick={() => setTimeout(() => router.push(url), 350)}
-            className="flex cursor-pointer rounded-md border bg-slate-700 p-7"
+            className="flex cursor-pointer rounded-md border-2 bg-slate-700 p-7"
         >
             <span className="w-full text-center text-xl font-bold">
                 {title}
