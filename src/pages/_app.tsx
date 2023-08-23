@@ -16,7 +16,7 @@ function MainHeader() {
     const { data } = useSession();
 
     return (
-        <header className="flex h-16 flex-shrink-0 items-center justify-center bg-slate-800">
+        <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
             <h1 className="text-center text-2xl font-bold text-white">
                 <span className="hidden sm:inline">Üdvözlünk a </span>
                 <span className="font-handwriting text-amber-400">My</span>
@@ -28,6 +28,7 @@ function MainHeader() {
                 src={data?.user?.image || ""}
                 alt="Profile picture"
                 className="absolute right-10 w-10 rounded-full"
+                draggable="false"
             />
         </header>
     );

@@ -5,7 +5,7 @@ import React from "react";
 
 function PageHeader({ title }: { title: string }) {
     return (
-        <header className="flex h-16 flex-shrink-0 items-center justify-center">
+        <header className="flex h-16 flex-shrink-0 select-none items-center justify-center">
             <div className="flex cursor-default items-center text-white">
                 <Link href="/" className="absolute left-7">
                     <FontAwesomeIcon icon={faHome} />
