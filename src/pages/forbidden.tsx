@@ -10,9 +10,7 @@ function Forbidden() {
 
     return (
         <div className="relative flex h-[93vh] w-full flex-col items-center justify-center gap-5 text-2xl font-bold text-white">
-            <span className="text-center">
-                A bejelentkezés nem engedélyezett!
-            </span>
+            <span className="text-center">Hozzáférés megtagadva!</span>
 
             <div
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-500 transition-all hover:h-20 hover:w-20 hover:shadow-lg"
