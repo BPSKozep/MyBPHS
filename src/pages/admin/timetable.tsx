@@ -2,7 +2,7 @@ import { faCheck, faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PageWithHeader from "components/PageWithHeader";
 import TimetableEditor from "components/TimetableEditor";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { trpc } from "utils/trpc";
 import { motion } from "framer-motion";
 import { useDebounce } from "use-debounce";
@@ -19,6 +19,11 @@ function Timetable() {
 
     const { data } = trpc.group.get.useQuery(debouncedGroupName);
     const { mutate } = trpc.group.update.useMutation();
+
+    const timetableOnChange = useCallback(
+        (newTimetable: (string | null)[][]) => setTimetable(newTimetable),
+        []
+    );
 
     useEffect(() => {
         setTimetable(data?.timetable || EMPTY_TIMETABLE);
@@ -121,7 +126,7 @@ function Timetable() {
                 </div>
                 <TimetableEditor
                     timetable={timetable}
-                    onChange={(newTimetable) => setTimetable(newTimetable)}
+                    onChange={timetableOnChange}
                 />
             </div>
         </PageWithHeader>
