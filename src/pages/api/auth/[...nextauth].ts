@@ -1,5 +1,7 @@
-import NextAuth, { CallbacksOptions, NextAuthOptions } from "next-auth";
+import mongooseConnect from "clients/mongoose";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { User } from "models";
 
 export const authOptions = {
     providers: [
@@ -9,18 +11,16 @@ export const authOptions = {
         }),
     ],
     callbacks: {
-        signIn({ profile }) {
-            if (
-                profile?.email &&
-                process.env.ALLOWED_DOMAINS?.split(",").includes(
-                    profile.email.split("@")[1]
-                )
-            )
-                return true;
+        async signIn({ profile }) {
+            await mongooseConnect();
+
+            const user = await User.findOne({ email: profile?.email });
+
+            if (user) return true;
 
             return "/forbidden";
         },
-    } as CallbacksOptions,
+    },
 } as NextAuthOptions;
 
 export default NextAuth(authOptions);
