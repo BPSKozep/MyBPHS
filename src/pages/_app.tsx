@@ -23,13 +23,15 @@ function MainHeader() {
                 <span className="font-black">BPHS</span>
                 <span className="hidden sm:inline">-ben!</span>
             </h1>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-                src={data?.user?.image || ""}
-                alt="Profile picture"
-                className="absolute right-10 w-10 rounded-full"
-                draggable="false"
-            />
+            <div className="absolute right-10 flex w-10 items-center justify-end">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                    src={data?.user?.image || ""}
+                    alt="Profile picture"
+                    className="rounded-full"
+                    draggable="false"
+                />
+            </div>
         </header>
     );
 }
