@@ -6,5 +6,7 @@ export async function checkRoles(session: Session, allowedRoles: string[]) {
         email: session.user?.email,
     });
 
-    return allowedRoles.some((role) => requester?.roles.indexOf(role) !== -1);
+    return allowedRoles.some(
+        (role) => requester && requester.roles.indexOf(role) !== -1
+    );
 }
