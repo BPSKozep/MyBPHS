@@ -2,6 +2,7 @@ import mongooseConnect from "clients/mongoose";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { User } from "models";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export const authOptions = {
     providers: [
@@ -23,4 +24,6 @@ export const authOptions = {
     },
 } as NextAuthOptions;
 
-export default NextAuth(authOptions);
+export default async function auth(req: NextApiRequest, res: NextApiResponse) {
+    return await NextAuth(req, res, authOptions);
+}
