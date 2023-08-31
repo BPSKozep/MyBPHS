@@ -7,6 +7,7 @@ import { IGroup } from "models/Group.model";
 import { Document } from "mongoose";
 import { IGroupOverride } from "models/GroupOverride.model";
 import { checkRoles } from "utils/authorization";
+import { IUser } from "models/User.model";
 
 const userRouter = router({
     get: procedure
@@ -41,7 +42,9 @@ const userRouter = router({
                 });
             }
 
-            return await User.findOne({ email: input }).select("-_id -__v");
+            return await User.findOne({ email: input }).select<IUser>(
+                "-_id -__v"
+            );
         }),
     getTimetable: procedure
         .input(z.string().email())

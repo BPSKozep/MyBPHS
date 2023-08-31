@@ -4,6 +4,7 @@ import { procedure, router } from "../trpc";
 import { Group } from "models";
 import { TRPCError } from "@trpc/server";
 import { checkRoles } from "utils/authorization";
+import { IGroup } from "models/Group.model";
 
 const groupRouter = router({
     get: procedure
@@ -37,7 +38,9 @@ const groupRouter = router({
                 });
             }
 
-            return await Group.findOne({ name: input }).select("-_id -__v");
+            return await Group.findOne({ name: input }).select<IGroup>(
+                "-_id -__v"
+            );
         }),
     update: procedure
         .input(
