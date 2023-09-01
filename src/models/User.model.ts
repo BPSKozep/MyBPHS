@@ -1,11 +1,11 @@
 import mongoose, { model, Schema } from "mongoose";
-import type { Model } from "mongoose";
+import type { Model, Types } from "mongoose";
 
 export interface IUser {
     name: string;
     email: string;
     roles: string[];
-    groups: Schema.Types.ObjectId[];
+    groups: Types.ObjectId[];
 }
 
 const userSchema = new Schema<IUser>({

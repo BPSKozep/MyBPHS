@@ -2,14 +2,14 @@ import mongoose, { model, Schema, Types } from "mongoose";
 import type { Model } from "mongoose";
 
 export interface IGroupOverride {
-    group: Schema.Types.ObjectId;
+    group: Types.ObjectId;
     timetable: string[][];
     priority: number;
 }
 
 const groupOverrideSchema = new Schema<IGroupOverride>({
     group: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Group",
     },
     timetable: {
