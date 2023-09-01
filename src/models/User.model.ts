@@ -2,6 +2,7 @@ import mongoose, { model, Schema } from "mongoose";
 import type { Model, Types } from "mongoose";
 
 export interface IUser {
+    _id: Types.ObjectId;
     name: string;
     email: string;
     roles: string[];

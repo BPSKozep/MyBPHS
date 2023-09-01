@@ -2,6 +2,7 @@ import mongoose, { model, Schema, Types } from "mongoose";
 import type { Model } from "mongoose";
 
 export interface IGroupOverride {
+    _id: Types.ObjectId;
     group: Types.ObjectId;
     timetable: string[][];
     priority: number;
