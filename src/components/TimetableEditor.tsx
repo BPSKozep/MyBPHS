@@ -59,7 +59,8 @@ function TimetableEditor({
                                                     JSON.stringify(oldValue)
                                                 );
 
-                                                copy[j][i] = e.target.value;
+                                                copy[j][i] =
+                                                    e.target.value || null;
 
                                                 return copy;
                                             })
