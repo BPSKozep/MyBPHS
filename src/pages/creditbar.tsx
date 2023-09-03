@@ -19,7 +19,7 @@ function CreditBarDemo() {
             >
                 Set
             </button>
-            <div className="absolute flex h-full w-full items-center justify-center">
+            <div className="absolute flex h-full w-full items-center justify-center overflow-hidden px-5">
                 <CreditBar progress={progress} />
             </div>
         </>

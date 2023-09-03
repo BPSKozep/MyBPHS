@@ -36,7 +36,7 @@ const credits = [
 function CreditBar({ progress }: { progress: number }) {
     return (
         <>
-            <div className="flex h-40 w-[80vw] flex-col items-stretch overflow-auto rounded-lg">
+            <div className="flex h-40 flex-col items-stretch overflow-auto rounded-lg">
                 <div className="relative h-[70%] min-w-[65rem] bg-[#242424]">
                     <div className="rounded-full">
                         <motion.div
