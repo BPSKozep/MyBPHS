@@ -19,8 +19,22 @@ function CreditBarDemo() {
             >
                 Set
             </button>
-            <div className="absolute flex h-full w-full items-center justify-center overflow-hidden px-5">
-                <CreditBar progress={progress} />
+            <div className="absolute flex h-full w-full items-center justify-center px-5">
+                <CreditBar
+                    progress={progress}
+                    credits={[
+                        "COMPLETED",
+                        "COMPLETED",
+                        "FAILED",
+                        "COMPLETED",
+                        "PENDING",
+                        "PENDING",
+                        "PENDING",
+                        "PENDING",
+                        "PENDING",
+                        "PENDING",
+                    ]}
+                />
             </div>
         </>
     );

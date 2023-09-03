@@ -14,26 +14,21 @@ const months = [
     "Június",
 ];
 
-const creditClasses: { [key: string]: string } = {
-    completed: "bg-[#21B290] h-5 w-5 rounded-full",
-    failed: "bg-[#B23B21] h-[1.15rem] w-[1.15rem] rounded-full",
-    pending: "bg-[#C3C182] h-4 w-4 rounded-full",
+type CreditStatus = "COMPLETED" | "FAILED" | "PENDING";
+
+const creditClasses = {
+    COMPLETED: "bg-[#21B290] h-5 w-5 rounded-full",
+    FAILED: "bg-[#B23B21] h-[1.15rem] w-[1.15rem] rounded-full",
+    PENDING: "bg-[#C3C182] h-4 w-4 rounded-full",
 };
 
-const credits = [
-    "completed",
-    "completed",
-    "failed",
-    "completed",
-    "pending",
-    "pending",
-    "pending",
-    "pending",
-    "pending",
-    "pending",
-];
-
-function CreditBar({ progress }: { progress: number }) {
+function CreditBar({
+    progress,
+    credits,
+}: {
+    progress: number;
+    credits: CreditStatus[];
+}) {
     return (
         <>
             <div className="flex h-40 flex-col items-stretch overflow-auto rounded-lg">
@@ -78,7 +73,7 @@ function CreditBar({ progress }: { progress: number }) {
                                 })()}%`,
                             }}
                         ></motion.div>
-                        {credits.map((credit: string, index) => (
+                        {credits.map((credit: CreditStatus, index) => (
                             <div
                                 className="z-10 flex h-5 w-5 items-center justify-center"
                                 key={index}
