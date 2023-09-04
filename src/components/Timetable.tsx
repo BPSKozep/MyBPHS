@@ -8,8 +8,8 @@ function Timetable({
     timeslots: string[];
 }) {
     return (
-        <div className="overflow-hidden rounded-md">
-            <table className="text-white">
+        <div className="overflow-auto rounded-md">
+            <table className="overflow-scroll text-white">
                 <thead>
                     <tr className="bg-[#565e85]">
                         <th className="p-3">Óra</th>
