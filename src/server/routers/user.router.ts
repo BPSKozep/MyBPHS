@@ -3,7 +3,7 @@ import { procedure, router } from "../trpc";
 
 import { User } from "models";
 import { TRPCError } from "@trpc/server";
-import { IGroup } from "models/Group.model";
+import Group, { IGroup } from "models/Group.model";
 import { Document } from "mongoose";
 import { IGroupOverride } from "models/GroupOverride.model";
 import { checkRoles } from "utils/authorization";
@@ -141,6 +141,81 @@ const userRouter = router({
             }
 
             return compiled_timetable;
+        }),
+    batchUpdateGroups: procedure
+        .input(
+            z.object({
+                mode: z.enum(["add", "remove", "replace"]),
+                update: z
+                    .object({
+                        email: z.string().email(),
+                        newGroups: z.string().array(),
+                    })
+                    .array(),
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "administrator",
+                "teacher",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            if (input.mode === "replace") {
+                for (const request of input.update) {
+                    await User.findOneAndUpdate(
+                        { email: request.email },
+                        {
+                            $set: {
+                                groups: await Group.find({
+                                    name: { $in: request.newGroups },
+                                }),
+                            },
+                        }
+                    );
+                }
+            } else if (input.mode === "add") {
+                for (const request of input.update) {
+                    await User.findOneAndUpdate(
+                        { email: request.email },
+                        {
+                            $push: {
+                                groups: {
+                                    $each: await Group.find({
+                                        name: { $in: request.newGroups },
+                                    }),
+                                },
+                            },
+                        }
+                    );
+                }
+            } else if (input.mode === "remove") {
+                for (const request of input.update) {
+                    await User.findOneAndUpdate(
+                        { email: request.email },
+                        {
+                            $pullAll: {
+                                groups: await Group.find({
+                                    name: { $in: request.newGroups },
+                                }),
+                            },
+                        }
+                    );
+                }
+            }
         }),
 });
 
