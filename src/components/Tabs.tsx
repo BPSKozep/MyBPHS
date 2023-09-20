@@ -33,7 +33,7 @@ function Tabs({
                     />
                     <label
                         htmlFor={key}
-                        className={`box-border inline-block p-3 text-sm font-bold sm:text-base ${
+                        className={`box-border inline-block p-3 px-5 text-sm font-bold sm:text-base ${
                             selectedTab === key
                                 ? "bg-[#434a68]"
                                 : "bg-[#565e85]"
