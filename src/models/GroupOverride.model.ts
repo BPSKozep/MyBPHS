@@ -6,6 +6,7 @@ export interface IGroupOverride {
     group: Types.ObjectId;
     timetable: string[][];
     priority: number;
+    override: boolean;
 }
 
 const groupOverrideSchema = new Schema<IGroupOverride>({
@@ -19,6 +20,10 @@ const groupOverrideSchema = new Schema<IGroupOverride>({
     },
     priority: {
         type: Number,
+        required: true,
+    },
+    override: {
+        type: Boolean,
         required: true,
     },
 });

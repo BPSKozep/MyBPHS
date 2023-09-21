@@ -79,6 +79,7 @@ const userRouter = router({
                 timetable: (string | null)[][];
                 priority: number;
                 override: boolean;
+                isOverride: boolean;
             }[] = [];
 
             for (const group of user?.groups || []) {
@@ -87,7 +88,8 @@ const userRouter = router({
                 timetables.push({
                     timetable: groupObj.timetable,
                     priority: groupObj.priority,
-                    override: false,
+                    override: groupObj.override,
+                    isOverride: false,
                 });
 
                 for (const override of group.overrides) {
@@ -96,7 +98,8 @@ const userRouter = router({
                     timetables.push({
                         timetable: overrideObj.timetable,
                         priority: overrideObj.priority,
-                        override: true,
+                        override: overrideObj.override,
+                        isOverride: true,
                     });
                 }
             }
@@ -121,9 +124,14 @@ const userRouter = router({
                 return 0;
             });
 
-            const compiled_timetable: (string | null)[][] = [];
+            let compiled_timetable: (string | null)[][] = [];
 
             for (const timetable of timetables) {
+                if (timetable.override) {
+                    compiled_timetable = timetable.timetable;
+                    continue;
+                }
+
                 for (const [i, day] of timetable.timetable.entries()) {
                     if (compiled_timetable[i] === undefined) {
                         compiled_timetable.push([]);

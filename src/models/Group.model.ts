@@ -6,6 +6,7 @@ export interface IGroup {
     name: string;
     timetable: (string | null)[][];
     priority: number;
+    override: boolean;
 }
 
 const groupSchema = new Schema<IGroup>({
@@ -19,6 +20,10 @@ const groupSchema = new Schema<IGroup>({
     },
     priority: {
         type: Number,
+        required: true,
+    },
+    override: {
+        type: Boolean,
         required: true,
     },
 });

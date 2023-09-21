@@ -15,6 +15,7 @@ const groupRouter = router({
                     name: z.string(),
                     timetable: z.string().nullable().array().array(),
                     priority: z.number(),
+                    override: z.boolean(),
                 })
                 .nullable()
         )
@@ -50,6 +51,7 @@ const groupRouter = router({
                     name: z.string(),
                     timetable: z.string().nullable().array().array(),
                     priority: z.number(),
+                    override: z.boolean(),
                 }),
             })
         )

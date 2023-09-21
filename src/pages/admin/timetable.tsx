@@ -65,6 +65,7 @@ function Timetable() {
                                         name: groupName,
                                         timetable,
                                         priority: Number(priority),
+                                        override: false,
                                     },
                                 })
                             }
