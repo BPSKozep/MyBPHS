@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ObjectValues } from "utils/types";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { sleep } from "utils/sleep";
+import sleep from "utils/sleep";
 
 const COLORS = {
     DEFAULT: "#565e85",
