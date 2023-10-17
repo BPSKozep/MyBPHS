@@ -44,7 +44,7 @@ function IconSubmitButton({
 
     return (
         <motion.button
-            className="bg- h-12 w-12 rounded-2xl p-3 text-white"
+            className="h-12 w-12 rounded-2xl p-3 text-white"
             initial={{
                 scale: 1,
                 backgroundColor: COLORS.DEFAULT,
