@@ -4,7 +4,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import { trpc } from "utils/trpc";
 import { useDebounce } from "use-debounce";
 import OnlyRoles from "components/OnlyRoles";
-import SaveButton from "components/SaveButton";
+import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import IconSubmitButton from "components/IconSubmitButton";
 
 const EMPTY_TIMETABLE = Array(5).fill([]);
 
@@ -57,8 +59,9 @@ function Timetable() {
                             }}
                             placeholder="Prioritás"
                         />
-                        <SaveButton
-                            onClick={() =>
+                        <IconSubmitButton
+                            icon={<FontAwesomeIcon icon={faFloppyDisk} />}
+                            onClick={() => {
                                 mutate({
                                     name: groupName,
                                     newValue: {
@@ -67,8 +70,10 @@ function Timetable() {
                                         priority: Number(priority),
                                         override: false,
                                     },
-                                })
-                            }
+                                });
+
+                                return true;
+                            }}
                         />
                     </div>
                     <TimetableEditor
