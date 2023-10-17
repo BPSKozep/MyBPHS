@@ -48,7 +48,7 @@ function App({ Component, ...rest }: AppProps) {
         <Provider store={store}>
             <SessionProvider session={session}>
                 <OnlyAuthed enable={router.route !== "/forbidden"}>
-                    <div className="flex h-[100vh] w-[100vw] flex-col">
+                    <div className="box-border flex h-[100vh] w-full flex-col">
                         <MainHeader />
                         <AnimatePresence mode="wait">
                             <motion.div
