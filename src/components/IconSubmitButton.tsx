@@ -55,18 +55,16 @@ function IconSubmitButton({
                 rotate: buttonRotation,
             }}
             transition={{
-                scale: {
-                    type: "spring",
-                    damping: 9,
-                    stiffness: 200,
-                },
+                /* FIXME: Temporarily disable spring, see: https://github.com/framer/motion/issues/2369 */
+                // scale: {
+                //     type: "spring",
+                //     damping: 9,
+                //     stiffness: 200,
+                // },
                 rotate: {
                     type: "spring",
                     damping: 20,
                     stiffness: 300,
-                },
-                backgroundColor: {
-                    type: "tween",
                 },
             }}
             whileHover={{
