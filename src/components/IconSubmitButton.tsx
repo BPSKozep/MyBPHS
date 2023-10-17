@@ -1,7 +1,6 @@
 import { ReactNode, useState } from "react";
 import { motion } from "framer-motion";
 import { ObjectValues } from "utils/types";
-import { Awaitable } from "next-auth";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { sleep } from "utils/sleep";
@@ -38,7 +37,9 @@ function IconSubmitButton({
     onClick,
     icon,
 }: {
-    onClick: () => Awaitable<ObjectValues<typeof RESULT>>;
+    onClick: () =>
+        | Promise<ObjectValues<typeof RESULT>>
+        | ObjectValues<typeof RESULT>;
     icon: ReactNode;
 }) {
     const [isPressed, setIsPressed] = useState(false);
