@@ -5,11 +5,6 @@ import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { sleep } from "utils/sleep";
 
-const RESULT = {
-    SUCCESS: "SUCCESS",
-    FAILURE: "FAILURE",
-} as const;
-
 const COLORS = {
     DEFAULT: "#565e85",
     PENDING: "var(--sky-600)",
@@ -37,9 +32,7 @@ function IconSubmitButton({
     onClick,
     icon,
 }: {
-    onClick: () =>
-        | Promise<ObjectValues<typeof RESULT>>
-        | ObjectValues<typeof RESULT>;
+    onClick: () => Promise<boolean> | boolean;
     icon: ReactNode;
 }) {
     const [isPressed, setIsPressed] = useState(false);
@@ -92,18 +85,12 @@ function IconSubmitButton({
 
                 setButtonRotation((rotation) => rotation + 360);
 
-                switch (result) {
-                    case RESULT.SUCCESS: {
-                        setButtonColor(COLORS.SUCCESS);
-                        setCurrentIcon(<FontAwesomeIcon icon={faCheck} />);
-                        break;
-                    }
-
-                    case RESULT.FAILURE: {
-                        setButtonColor(COLORS.ERROR);
-                        setCurrentIcon(<FontAwesomeIcon icon={faXmark} />);
-                        break;
-                    }
+                if (result) {
+                    setButtonColor(COLORS.SUCCESS);
+                    setCurrentIcon(<FontAwesomeIcon icon={faCheck} />);
+                } else {
+                    setButtonColor(COLORS.ERROR);
+                    setCurrentIcon(<FontAwesomeIcon icon={faXmark} />);
                 }
 
                 await sleep(1500);
