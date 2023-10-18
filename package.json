@@ -26,7 +26,7 @@
         "@trpc/next": "^10.32.0",
         "@trpc/react-query": "^10.32.0",
         "@trpc/server": "^10.32.0",
-        "framer-motion": "^10.16.1",
+        "framer-motion": "^10.16.4",
         "mongoose": "^7.5.0",
         "next": "13.4.7",
         "next-auth": "^4.22.1",
