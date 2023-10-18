@@ -1,6 +1,8 @@
+import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import IconSubmitButton from "components/IconSubmitButton";
 import OnlyRoles from "components/OnlyRoles";
 import PageWithHeader from "components/PageWithHeader";
-import SaveButton from "components/SaveButton";
 import React, { useState } from "react";
 import { trpc } from "utils/trpc";
 
@@ -43,16 +45,19 @@ function Groups() {
                         placeholder="Csoportok (minden soron egy)"
                         onChange={(e) => setGroups(e.target.value)}
                     ></textarea>
-                    <SaveButton
-                        onClick={() =>
+                    <IconSubmitButton
+                        icon={<FontAwesomeIcon icon={faFloppyDisk} />}
+                        onClick={() => {
                             mutate({
                                 mode: updateMode,
                                 update: students.split("\n").map((student) => ({
                                     email: student,
                                     newGroups: groups.split("\n"),
                                 })),
-                            })
-                        }
+                            });
+
+                            return true;
+                        }}
                     />
                 </div>
             </PageWithHeader>
