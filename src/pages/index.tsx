@@ -1,9 +1,6 @@
 import BigLinkButton from "components/BigLinkButton";
-import breakpoints from "utils/breakpoints";
 
 export default function Home() {
-    console.log(breakpoints);
-
     return (
         <>
             <div className="flex h-full w-full items-center justify-center">
