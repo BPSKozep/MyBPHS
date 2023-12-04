@@ -1,8 +1,5 @@
 export default function transpose2DArray<ArrayType>(
-    array: ArrayType[][],
-    disabled: boolean
+    array: ArrayType[][]
 ): ArrayType[][] {
-    if (disabled) return array;
-
     return array[0].map((_, index) => array.map((row) => row[index]));
 }
