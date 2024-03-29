@@ -7,6 +7,7 @@ export interface IUser {
     email: string;
     roles: string[];
     groups: Types.ObjectId[];
+    nfcId: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -25,6 +26,10 @@ const userSchema = new Schema<IUser>({
     },
     groups: {
         type: [{ type: Schema.Types.ObjectId, ref: "Group" }],
+    },
+    nfcId: {
+        type: String,
+        required: true,
     },
 });
 
