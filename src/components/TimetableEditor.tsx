@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import Tabs from "./Tabs";
 
 const TIMESLOTS = [
     "9:00-9:45",
@@ -11,7 +12,15 @@ const TIMESLOTS = [
     "15:15-16:00",
 ];
 
-const DAYS = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+
+const DAY_TABS = {
+    monday: "H",
+    tuesday: "K",
+    wednesday: "Sz",
+    thursday: "Cs",
+    friday: "P",
+};
 
 function TimetableEditor({
     timetable,
@@ -22,6 +31,10 @@ function TimetableEditor({
 }) {
     const [currentTimetable, setCurrentTimetable] = useState(timetable);
 
+    const [selectedDay, setSelectedDay] = useState("monday");
+
+    const dayIndex = useMemo(() => DAYS.indexOf(selectedDay), [selectedDay]);
+
     useEffect(() => {
         setCurrentTimetable(timetable);
     }, [timetable]);
@@ -31,48 +44,54 @@ function TimetableEditor({
     }, [currentTimetable, onChange]);
 
     return (
-        <div className="overflow-hidden rounded-md">
-            <table className="text-white">
-                <thead>
-                    <tr className="bg-[#565e85]">
-                        <th className="p-3">Óra</th>
-                        {DAYS.map((day, i) => (
-                            <th className="p-3" key={i}>
-                                {day}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {TIMESLOTS.map((timeslot, i) => (
-                        <tr className="bg-[#242424] even:bg-[#2e2e2e]" key={i}>
-                            <th className="p-3">{timeslot}</th>
-                            {DAYS.map((_, j) => (
-                                <td className="p-2 text-center" key={j}>
+        <div className="flex flex-col items-center gap-4">
+            <Tabs
+                options={DAY_TABS}
+                defaultOption={selectedDay}
+                onChange={(newDay) => setSelectedDay(newDay)}
+            />
+            <div className="overflow-hidden rounded-md">
+                <table className="text-white">
+                    <tbody>
+                        {TIMESLOTS.map((timeslot, i) => (
+                            <tr
+                                className="bg-[#242424] even:bg-[#2e2e2e]"
+                                key={i}
+                            >
+                                <th className="p-3">
+                                    <input
+                                        className="w-28 rounded-xl bg-[#565656] px-3 py-1 text-center"
+                                        value={timeslot}
+                                    />
+                                </th>
+
+                                <td className="p-2 text-center">
                                     <input
                                         className="inline-block w-52 rounded-xl bg-[#3A445D] px-3 py-1 text-center font-bold placeholder:font-normal"
                                         placeholder="Lyukasóra"
-                                        value={currentTimetable[j]?.[i] || ""}
+                                        value={
+                                            currentTimetable[dayIndex]?.[i] ||
+                                            ""
+                                        }
                                         onChange={(e) =>
                                             setCurrentTimetable((oldValue) => {
                                                 const copy = JSON.parse(
                                                     JSON.stringify(oldValue)
                                                 );
 
-                                                copy[j][i] =
+                                                copy[dayIndex][i] =
                                                     e.target.value || null;
 
                                                 return copy;
                                             })
                                         }
-                                        tabIndex={j + 1}
                                     />
                                 </td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
