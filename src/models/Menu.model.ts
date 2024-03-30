@@ -9,7 +9,7 @@ export interface IMenu {
 }
 
 const menuSchema = new Schema<IMenu>({
-    options: [{ type: Map, of: String, required: true }],
+    options: [{ type: Object, of: String, required: true }],
     week: { type: Number, required: true, index: true },
     year: { type: Number, required: true, index: true },
 });
