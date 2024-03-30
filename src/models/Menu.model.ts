@@ -15,8 +15,8 @@ const menuSchema = new Schema<IMenu>({
             value: { type: String, required: true },
         },
     ],
-    week: { type: Number, required: true },
-    year: { type: Number, required: true },
+    week: { type: Number, required: true, index: true },
+    year: { type: Number, required: true, index: true },
 });
 
 const Menu: Model<IMenu> = mongoose.models.Menu || model("Menu", menuSchema);
