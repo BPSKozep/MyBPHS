@@ -1,8 +1,7 @@
 import mongoose, { model, Schema } from "mongoose";
-import type { Model, Types } from "mongoose";
+import type { Model } from "mongoose";
 
 export interface IGroup {
-    _id: Types.ObjectId;
     name: string;
     timetable: (string | null)[][];
     priority: number;
