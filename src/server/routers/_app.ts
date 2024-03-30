@@ -2,10 +2,12 @@ import { router } from "server/trpc";
 
 import userRouter from "./user.router";
 import groupRouter from "./group.router";
+import menuRouter from "./menu.order";
 
 export const appRouter = router({
     user: userRouter,
     group: groupRouter,
+    menu: menuRouter,
 });
 
 // export type definition of API
