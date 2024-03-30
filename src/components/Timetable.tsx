@@ -1,4 +1,15 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
+import Tabs from "./Tabs";
+
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+
+const DAY_TABS = {
+    monday: "H",
+    tuesday: "K",
+    wednesday: "Sz",
+    thursday: "Cs",
+    friday: "P",
+};
 
 function Timetable({
     timetable,
@@ -7,36 +18,40 @@ function Timetable({
     timetable: (string | null)[][];
     timeslots: string[];
 }) {
+    const [selectedDay, setSelectedDay] = useState("monday");
+
+    const dayIndex = useMemo(() => DAYS.indexOf(selectedDay), [selectedDay]);
+
     return (
-        <div className="overflow-auto rounded-md">
-            <table className="overflow-scroll text-white">
-                <thead>
-                    <tr className="bg-[#565e85]">
-                        <th className="p-3">Óra</th>
-                        <th className="p-3">Hétfő</th>
-                        <th className="p-3">Kedd</th>
-                        <th className="p-3">Szerda</th>
-                        <th className="p-3">Csütörtök</th>
-                        <th className="p-3">Péntek</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {timeslots.map((timeslot, i) => (
-                        <tr className="bg-[#242424] even:bg-[#2e2e2e]" key={i}>
-                            <th className="p-3">{timeslot}</th>
-                            {timetable.map((day, j) => (
-                                <td className="p-2 text-center" key={j}>
-                                    {day[i] && (
+        <div className="flex flex-col items-center gap-4">
+            <Tabs
+                options={DAY_TABS}
+                defaultOption={selectedDay}
+                onChange={(newDay) => setSelectedDay(newDay)}
+            />
+            <div className="overflow-auto rounded-md">
+                <table className="overflow-scroll text-white">
+                    <thead></thead>
+                    <tbody>
+                        {timeslots.map((timeslot, i) => (
+                            <tr
+                                className="bg-[#242424] even:bg-[#2e2e2e]"
+                                key={i}
+                            >
+                                <th className="p-3">{timeslot}</th>
+
+                                <td className="p-2 text-center">
+                                    {timetable[dayIndex][i] && (
                                         <div className="inline-block rounded-xl bg-[#3A445D] px-3 py-1">
-                                            {day[i]}
+                                            {timetable[dayIndex][i]}
                                         </div>
                                     )}
                                 </td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
