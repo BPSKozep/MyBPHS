@@ -14,3 +14,18 @@ export default function menuCombine(
         ...(include_no_order ? globalOptions : globalOptionsOmitted),
     };
 }
+
+export function menuCombines(
+    menus: Menu[],
+    include_no_order: boolean = true
+): Menu[] {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { i_am_not_want_food: _, ...globalOptionsOmitted } = globalOptions;
+
+    return menus.map((menu) => {
+        return {
+            ...menu,
+            ...(include_no_order ? globalOptions : globalOptionsOmitted),
+        };
+    });
+}
