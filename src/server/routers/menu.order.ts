@@ -4,12 +4,20 @@ import { Menu } from "models";
 import { IMenu } from "models/Menu.model";
 import { TRPCError } from "@trpc/server";
 import { getWeek, getWeekYear } from "utils/isoweek";
+import { checkRoles } from "utils/authorization";
 
 const menuRouter = router({
     get: procedure
         .input(z.strictObject({ week: z.number(), year: z.number() }))
         .output(z.record(z.string()).array())
-        .query(async ({ input }) => {
+        .query(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
             const menu = await Menu.findOne({
                 week: input.week,
                 year: input.year,
@@ -31,7 +39,23 @@ const menuRouter = router({
                 options: z.record(z.string()).array(),
             })
         )
-        .mutation(async ({ input }) => {
+        .mutation(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
             const date = new Date();
 
             const week = input.week || getWeek(date);
