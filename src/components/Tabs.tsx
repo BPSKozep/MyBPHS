@@ -5,7 +5,7 @@ function Tabs({
     defaultOption,
     onChange,
 }: {
-    options: { [key: string]: string };
+    options: Record<string, string>;
     defaultOption: string;
     onChange: (selected: string) => void;
 }) {

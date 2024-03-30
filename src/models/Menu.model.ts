@@ -3,7 +3,7 @@ import type { Model, Types } from "mongoose";
 
 export interface IMenu {
     _id?: Types.ObjectId;
-    options: { [key: string]: string }[];
+    options: Record<string, string>[];
     week: number;
     year: number;
 }
