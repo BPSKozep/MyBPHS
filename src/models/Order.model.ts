@@ -5,7 +5,7 @@ export interface IOrder {
     _id?: Types.ObjectId;
     user: mongoose.Types.ObjectId;
     menu: mongoose.Types.ObjectId;
-    order: { dayOfWeek: number; chosen: string; completed: boolean }[];
+    order: { chosen: string; completed: boolean }[];
 }
 
 const OrderSchema = new Schema<IOrder>({
@@ -23,10 +23,6 @@ const OrderSchema = new Schema<IOrder>({
     },
     order: [
         {
-            dayOfWeek: {
-                type: Number,
-                required: true,
-            },
             chosen: {
                 type: String,
                 required: true,
