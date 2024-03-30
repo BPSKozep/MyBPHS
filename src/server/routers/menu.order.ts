@@ -3,6 +3,7 @@ import { procedure, router } from "../trpc";
 import { Menu } from "models";
 import { IMenu } from "models/Menu.model";
 import { TRPCError } from "@trpc/server";
+import { getWeek, getWeekYear } from "utils/isoweek";
 
 const menuRouter = router({
     get: procedure
@@ -25,8 +26,8 @@ const menuRouter = router({
     create: procedure
         .input(
             z.strictObject({
-                week: z.number(),
-                year: z.number(),
+                week: z.number().optional(),
+                year: z.number().optional(),
                 options: z.record(z.string()).array(),
             })
         )
@@ -43,9 +44,14 @@ const menuRouter = router({
                 });
             }
 
+            const date = new Date();
+
+            const week = getWeek(date);
+            const year = getWeekYear(date);
+
             await new Menu<IMenu>({
-                week: input.week,
-                year: input.year,
+                week: input.week || week,
+                year: input.year || year,
                 options: input.options,
             }).save();
         }),
