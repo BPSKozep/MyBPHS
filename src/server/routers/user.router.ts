@@ -152,7 +152,7 @@ const userRouter = router({
         }),
     batchUpdateGroups: procedure
         .input(
-            z.object({
+            z.strictObject({
                 mode: z.enum(["add", "remove", "replace"]),
                 update: z
                     .object({
