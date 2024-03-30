@@ -81,12 +81,12 @@ function IconSubmitButton({
 
                 const result = await onClick();
 
-                setButtonRotation((rotation) => rotation + 360);
-
                 if (result) {
+                    setButtonRotation((rotation) => rotation + 360);
                     setButtonColor(COLORS.SUCCESS);
                     setCurrentIcon(<FontAwesomeIcon icon={faCheck} />);
                 } else {
+                    setButtonRotation((rotation) => rotation - 180);
                     setButtonColor(COLORS.ERROR);
                     setCurrentIcon(<FontAwesomeIcon icon={faXmark} />);
                 }
@@ -95,7 +95,10 @@ function IconSubmitButton({
 
                 setButtonColor(COLORS.DEFAULT);
                 setCurrentIcon(icon);
-                setButtonRotation((rotation) => rotation + 45);
+
+                const rotateBack = ((Number(result) + 1) * 2 - 3) * 45;
+
+                setButtonRotation((rotation) => rotation + rotateBack);
                 setIsPressed(false);
             }}
         >
