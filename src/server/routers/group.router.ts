@@ -45,9 +45,9 @@ const groupRouter = router({
         }),
     update: procedure
         .input(
-            z.object({
+            z.strictObject({
                 name: z.string(),
-                newValue: z.object({
+                newValue: z.strictObject({
                     name: z.string(),
                     timetable: z.string().nullable().array().array(),
                     priority: z.number(),
