@@ -1,7 +1,8 @@
-import mongoose, { model, Schema, Types } from "mongoose";
-import type { Model } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
+import type { Model, Types } from "mongoose";
 
 export interface IGroupOverride {
+    _id?: Types.ObjectId;
     group: Types.ObjectId;
     timetable: string[][];
     priority: number;

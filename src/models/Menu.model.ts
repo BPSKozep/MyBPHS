@@ -1,7 +1,8 @@
 import mongoose, { model, Schema } from "mongoose";
-import type { Model } from "mongoose";
+import type { Model, Types } from "mongoose";
 
 export interface IMenu {
+    _id?: Types.ObjectId;
     options: { [key: string]: string }[];
     week: number;
     year: number;
