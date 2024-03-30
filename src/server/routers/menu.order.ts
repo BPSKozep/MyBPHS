@@ -32,9 +32,14 @@ const menuRouter = router({
             })
         )
         .mutation(async ({ input }) => {
+            const date = new Date();
+
+            const week = input.week || getWeek(date);
+            const year = input.year || getWeekYear(date);
+
             const menu = await Menu.exists({
-                week: input.week,
-                year: input.year,
+                week,
+                year,
             });
 
             if (menu) {
@@ -44,14 +49,9 @@ const menuRouter = router({
                 });
             }
 
-            const date = new Date();
-
-            const week = getWeek(date);
-            const year = getWeekYear(date);
-
             await new Menu<IMenu>({
-                week: input.week || week,
-                year: input.year || year,
+                week,
+                year,
                 options: input.options,
             }).save();
         }),
