@@ -23,11 +23,7 @@ const menuRouter = router({
                 year: input.year,
             });
 
-            if (!menu)
-                throw new TRPCError({
-                    code: "NOT_FOUND",
-                    message: "Menu does not exist.",
-                });
+            if (!menu) return [];
 
             return menu.options;
         }),

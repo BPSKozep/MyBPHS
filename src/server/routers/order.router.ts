@@ -265,10 +265,7 @@ const orderRouter = router({
             });
 
             if (!menu) {
-                throw new TRPCError({
-                    code: "NOT_FOUND",
-                    message: "Menu not found",
-                });
+                return [];
             }
 
             const aggregateResult = await Order.aggregate([
