@@ -9,111 +9,113 @@ import menuCombine from "utils/menuCombine";
 import { IOrder } from "models/Order.model";
 
 const orderRouter = router({
-    getOrder: procedure.input(z.string()).query(async ({ input, ctx }) => {
-        if (!ctx.session) {
-            throw new TRPCError({
-                code: "UNAUTHORIZED",
-                message: "Unauthorized",
+    getOrCreateOrderByNfc: procedure
+        .input(z.string())
+        .query(async ({ input, ctx }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "administrator",
+                "lunch-system",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const currentDate = new Date();
+
+            const year = getWeekYear(currentDate);
+            const week = getWeek(currentDate);
+
+            const day = currentDate.getDay() - 1;
+
+            const menu = await Menu.findOne({
+                week,
+                year,
             });
-        }
 
-        const authorized = await checkRoles(ctx.session, [
-            "administrator",
-            "lunch-system",
-        ]);
+            if (!menu) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Menu not found",
+                });
+            }
 
-        if (!authorized) {
-            throw new TRPCError({
-                code: "FORBIDDEN",
-                message: "Access denied to the requested resource",
-            });
-        }
+            const user = await User.findOne({ nfcId: input });
 
-        const currentDate = new Date();
+            if (!user) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+            }
 
-        const year = getWeekYear(currentDate);
-        const week = getWeek(currentDate);
-
-        const day = currentDate.getDay() - 1;
-
-        const menu = await Menu.findOne({
-            week,
-            year,
-        });
-
-        if (!menu) {
-            throw new TRPCError({
-                code: "NOT_FOUND",
-                message: "Menu not found",
-            });
-        }
-
-        const user = await User.findOne({ nfcId: input });
-
-        if (!user) {
-            throw new TRPCError({
-                code: "NOT_FOUND",
-                message: "User not found",
-            });
-        }
-
-        let order = await Order.findOne({
-            menu: menu.id,
-            user: user.id,
-        });
-
-        if (!order) {
-            order = await new Order<IOrder>({
-                order: [
-                    {
-                        chosen: menu.options[0]["a-menu"],
-                        completed: false,
-                    },
-                    {
-                        chosen: menu.options[1]["a-menu"],
-                        completed: false,
-                    },
-                    {
-                        chosen: menu.options[2]["a-menu"],
-                        completed: false,
-                    },
-                    {
-                        chosen: menu.options[3]["a-menu"],
-                        completed: false,
-                    },
-                    {
-                        chosen: menu.options[4]["a-menu"],
-                        completed: false,
-                    },
-                ],
+            let order = await Order.findOne({
                 menu: menu.id,
                 user: user.id,
-            }).save();
-        }
+            });
 
-        const combinedOptions = menuCombine(menu.options[day]);
+            if (!order) {
+                order = await new Order<IOrder>({
+                    order: [
+                        {
+                            chosen: menu.options[0]["a-menu"],
+                            completed: false,
+                        },
+                        {
+                            chosen: menu.options[1]["a-menu"],
+                            completed: false,
+                        },
+                        {
+                            chosen: menu.options[2]["a-menu"],
+                            completed: false,
+                        },
+                        {
+                            chosen: menu.options[3]["a-menu"],
+                            completed: false,
+                        },
+                        {
+                            chosen: menu.options[4]["a-menu"],
+                            completed: false,
+                        },
+                    ],
+                    menu: menu.id,
+                    user: user.id,
+                }).save();
+            }
 
-        const chosen = combinedOptions[order.order[day].chosen];
+            const combinedOptions = menuCombine(menu.options[day]);
 
-        if (order.order[day].completed) {
+            const chosen = combinedOptions[order.order[day].chosen];
+
+            if (order.order[day].completed) {
+                return {
+                    order: `Ebéd már kiadva (${chosen})`,
+                    orderError: true,
+                };
+            }
+
+            if (order.order[day].chosen === "i_am_not_want_food") {
+                return {
+                    order: "Nincs rendelés",
+                    orderError: true,
+                };
+            }
+
             return {
-                order: `Ebéd már kiadva (${chosen})`,
-                orderError: true,
+                order: chosen,
+                orderError: false,
             };
-        }
-
-        if (order.order[day].chosen === "i_am_not_want_food") {
-            return {
-                order: "Nincs rendelés",
-                orderError: true,
-            };
-        }
-
-        return {
-            order: chosen,
-            orderError: false,
-        };
-    }),
+        }),
     setCompleted: procedure
         .input(
             z.strictObject({
