@@ -22,11 +22,7 @@ const orderRouter = router({
             "lunch-system",
         ]);
 
-        const requester = await User.findOne({
-            email: ctx.session.user?.email,
-        });
-
-        if (!authorized && requester?.nfcId !== input) {
+        if (!authorized) {
             throw new TRPCError({
                 code: "FORBIDDEN",
                 message: "Access denied to the requested resource",
