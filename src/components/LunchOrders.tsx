@@ -96,6 +96,15 @@ function Orders() {
                     </h2>
                 )}
 
+                {orderCounts &&
+                    menu &&
+                    menu.length > 0 &&
+                    orderCounts.length === 0 && (
+                        <h2 className="text-center font-bold text-white">
+                            Még nincs rendelés.
+                        </h2>
+                    )}
+
                 {displayTable && (
                     <div className="overflow-hidden rounded-lg">
                         <table className="min-w-full">
