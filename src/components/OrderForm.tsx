@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import transpose2DArray from "utils/transpose";
 import { useMediaQuery } from "react-responsive";
 import createBreakpoint from "utils/createBreakpoint";
@@ -8,21 +8,14 @@ const days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
 function OrderForm({
     options,
+    selectedOptions,
     onChange,
 }: {
     options: Record<string, string>[];
+    selectedOptions: string[];
     onChange: (chosenOptions: string[]) => void;
 }) {
-    const [selectedOptions, setSelectedOptions] = useState<string[]>(
-        Array(5).fill("i_am_not_want_food")
-    );
-
     const isBigScreen = useMediaQuery({ query: createBreakpoint("lg") });
-
-    useEffect(() => {
-        onChange(selectedOptions);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedOptions]);
 
     return (
         <div
@@ -47,13 +40,11 @@ function OrderForm({
                                     : "bg-[#565e85] shadow-md"
                             } px-3 py-2 shadow-md`}
                             onClick={() => {
-                                setSelectedOptions((oldOptions) => {
-                                    const newOptions = [...oldOptions];
+                                const newOptions = [...selectedOptions];
 
-                                    newOptions[dayIndex] = id;
+                                newOptions[dayIndex] = id;
 
-                                    return newOptions;
-                                });
+                                onChange(newOptions);
                             }}
                             key={`option-${dayIndex + option}`}
                         >
@@ -67,13 +58,11 @@ function OrderForm({
                                 : "bg-[#9a5d5d] shadow-md"
                         } px-3 py-2`}
                         onClick={() => {
-                            setSelectedOptions((oldOptions) => {
-                                const newOptions = [...oldOptions];
+                            const newOptions = [...selectedOptions];
 
-                                newOptions[dayIndex] = "i_am_not_want_food";
+                            newOptions[dayIndex] = "i_am_not_want_food";
 
-                                return newOptions;
-                            });
+                            onChange(newOptions);
                         }}
                         key={`no-order-${dayIndex}`}
                     >
