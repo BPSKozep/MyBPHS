@@ -13,7 +13,7 @@ function OrderForm({
 }: {
     options: Record<string, string>[];
     selectedOptions: string[];
-    onChange: (chosenOptions: string[]) => void;
+    onChange: (selectedOptions: string[]) => void;
 }) {
     const isBigScreen = useMediaQuery({ query: createBreakpoint("lg") });
 
