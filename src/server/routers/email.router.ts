@@ -27,6 +27,7 @@ const emailRouter = router({
         await resend.emails.send({
             from: "MyBPHS Ebéd <ebed@bphs.hu>",
             to: [
+                // FIXME: Replace test emails
                 "martin.reicher@budapest.school",
                 "mark.gyoni@budapest.school",
             ],
