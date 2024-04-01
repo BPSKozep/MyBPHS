@@ -19,13 +19,17 @@ function Order() {
 
     const [year, week] = useMemo(() => {
         const date = new Date();
+        date.setDate(date.getDate() + 7);
 
         return [getWeekYear(date), getWeek(date)];
     }, []);
 
     const { data: menu } = trpc.menu.get.useQuery({ year, week });
 
-    const { data: order, refetch: refetchOrder } = trpc.order.get.useQuery({});
+    const { data: order, refetch: refetchOrder } = trpc.order.get.useQuery({
+        year,
+        week,
+    });
 
     const { mutateAsync: createOrder } = trpc.order.create.useMutation();
 
@@ -36,14 +40,20 @@ function Order() {
             <PageWithHeader title="Ebédrendelés">
                 <div className="flex h-full w-full text-white">
                     <div className="m-auto">
-                        <Card>
-                            <div className="flex flex-col items-center justify-center gap-4">
-                                <h1 className="text-center font-bold text-white">
-                                    {orderExists
-                                        ? "Leadott rendelés"
-                                        : "Rendelés"}
-                                </h1>
-                                {menu && (
+                        {(!menu || menu.length === 0) && (
+                            <h1 className="text-lg font-bold">
+                                Nincs még feltöltve a menü.
+                            </h1>
+                        )}
+                        {menu && menu.length > 0 && (
+                            <Card>
+                                <div className="flex flex-col items-center justify-center gap-4">
+                                    <h1 className="text-center font-bold text-white">
+                                        {orderExists
+                                            ? "Leadott rendelés"
+                                            : "Rendelés"}
+                                    </h1>
+
                                     <>
                                         <OrderForm
                                             options={menuCombines(menu, false)}
@@ -62,6 +72,7 @@ function Order() {
                                                 );
                                             }}
                                         />
+
                                         <AnimatePresence>
                                             {!orderExists && (
                                                 <motion.div
@@ -90,8 +101,14 @@ function Order() {
                                                                 await sleep(
                                                                     500
                                                                 );
+
                                                                 await createOrder(
-                                                                    selectedOptions
+                                                                    {
+                                                                        week,
+                                                                        year,
+                                                                        chosenOptions:
+                                                                            selectedOptions,
+                                                                    }
                                                                 );
 
                                                                 sleep(
@@ -110,9 +127,9 @@ function Order() {
                                             )}
                                         </AnimatePresence>
                                     </>
-                                )}
-                            </div>
-                        </Card>
+                                </div>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </PageWithHeader>
