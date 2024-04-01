@@ -27,4 +27,5 @@ Sentry.init({
             blockAllMedia: false,
         }),
     ],
+    environment: process.env.NODE_ENV,
 });
