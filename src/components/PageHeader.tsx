@@ -3,11 +3,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import React from "react";
 
-function PageHeader({ title }: { title: string }) {
+function PageHeader({
+    title,
+    homeLocation = "/",
+}: {
+    title: string;
+    homeLocation: string;
+}) {
     return (
         <header className="static flex h-16 flex-shrink-0 select-none items-center justify-center">
             <div className="flex cursor-default items-center text-white">
-                <Link href="/" className="absolute left-7">
+                <Link href={homeLocation} className="absolute left-7">
                     <FontAwesomeIcon icon={faHome} />
                 </Link>
                 <h1 className="text-center text-xl font-black text-white sm:text-2xl">
