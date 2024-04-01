@@ -106,7 +106,7 @@ function Orders() {
                     )}
 
                 {displayTable && (
-                    <div className="overflow-hidden rounded-lg">
+                    <div className="overflow-auto rounded-lg">
                         <table className="min-w-full">
                             <thead>
                                 <tr>
