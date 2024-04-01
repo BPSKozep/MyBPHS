@@ -9,6 +9,7 @@ import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import sleep from "utils/sleep";
+import { getWeek, getWeekYear } from "utils/isoweek";
 
 export default function LunchAdmin() {
     const [menuOptions, setMenuOptions] = useState(
@@ -43,8 +44,13 @@ export default function LunchAdmin() {
                                         try {
                                             await sleep(500);
 
+                                            const date = new Date();
+                                            date.setDate(date.getDate() + 7);
+
                                             await createMenu({
                                                 options: menuOptions,
+                                                week: getWeek(date),
+                                                year: getWeekYear(date),
                                             });
 
                                             await sendEmail();

@@ -256,13 +256,19 @@ const orderRouter = router({
             await order.save();
         }),
     create: procedure
-        .input(z.string().array())
+        .input(
+            z.strictObject({
+                week: z.number().optional(),
+                year: z.number().optional(),
+                chosenOptions: z.string().array(),
+            })
+        )
         .mutation(async ({ ctx, input }) => {
             const date = new Date();
 
             const menu = await Menu.findOne({
-                week: getWeek(date),
-                year: getWeekYear(date),
+                week: input.week || getWeek(date),
+                year: input.year || getWeekYear(date),
             });
 
             if (!menu) {
@@ -298,7 +304,7 @@ const orderRouter = router({
             await new Order<IOrder>({
                 menu: menu.id,
                 user: user.id,
-                order: input.map((chosen) => {
+                order: input.chosenOptions.map((chosen) => {
                     return {
                         chosen: chosen,
                         completed: false,
