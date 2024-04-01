@@ -19,7 +19,7 @@ function OrderForm({
 
     return (
         <div
-            className={`grid max-w-[60rem] grid-flow-row ${
+            className={`grid max-w-[60rem] grid-flow-row break-words ${
                 isBigScreen ? "grid-cols-5" : "grid-cols-1"
             } gap-3 rounded-lg bg-zinc-700 p-5 shadow-lg`}
         >
