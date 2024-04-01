@@ -73,6 +73,7 @@ const menuRouter = router({
                 week,
                 year,
                 options: input.options,
+                isOpenForOrders: true,
             }).save();
         }),
 });
