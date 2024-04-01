@@ -32,25 +32,32 @@ function OrderForm({
                     >
                         {days[dayIndex]}
                     </h1>,
-                    ...Object.entries(day).map(([id, option]) => (
-                        <button
-                            className={`overflow-auto rounded-lg  ${
-                                selectedOptions[dayIndex] === id
-                                    ? "bg-[#5d9a84] font-bold shadow-lg"
-                                    : "bg-[#565e85] shadow-md"
-                            } px-3 py-2 shadow-md`}
-                            onClick={() => {
-                                const newOptions = [...selectedOptions];
+                    ...Object.entries(day).map(([id, option]) =>
+                        !option ? (
+                            <div
+                                className="hidden lg:block"
+                                key={`option-${dayIndex + option}`}
+                            ></div>
+                        ) : (
+                            <button
+                                className={`overflow-auto rounded-lg ${
+                                    selectedOptions[dayIndex] === id
+                                        ? "bg-[#5d9a84] font-bold shadow-lg"
+                                        : "bg-[#565e85] shadow-md"
+                                } px-3 py-2 shadow-md`}
+                                onClick={() => {
+                                    const newOptions = [...selectedOptions];
 
-                                newOptions[dayIndex] = id;
+                                    newOptions[dayIndex] = id;
 
-                                onChange(newOptions);
-                            }}
-                            key={`option-${dayIndex + option}`}
-                        >
-                            {option}
-                        </button>
-                    )),
+                                    onChange(newOptions);
+                                }}
+                                key={`option-${dayIndex + option}`}
+                            >
+                                {option}
+                            </button>
+                        )
+                    ),
                     <button
                         className={`overflow-auto rounded-lg ${
                             selectedOptions[dayIndex] === "i_am_not_want_food"

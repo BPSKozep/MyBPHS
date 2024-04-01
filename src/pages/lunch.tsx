@@ -8,7 +8,7 @@ import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { trpc } from "utils/trpc";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
-import { menuCombines } from "utils/menuCombine";
+import menuCombine from "utils/menuCombine";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 
@@ -56,7 +56,33 @@ function Order() {
 
                                     <>
                                         <OrderForm
-                                            options={menuCombines(menu, false)}
+                                            options={menu.map((menuDay) => {
+                                                if (
+                                                    !menuDay["a-menu"] &&
+                                                    !menuDay["b-menu"]
+                                                ) {
+                                                    const newMenuDay =
+                                                        menuCombine(
+                                                            menuDay,
+                                                            false
+                                                        );
+
+                                                    Object.keys(
+                                                        newMenuDay
+                                                    ).forEach(
+                                                        (key) =>
+                                                            (newMenuDay[key] =
+                                                                "")
+                                                    );
+
+                                                    return newMenuDay;
+                                                }
+
+                                                return menuCombine(
+                                                    menuDay,
+                                                    false
+                                                );
+                                            })}
                                             selectedOptions={
                                                 orderExists
                                                     ? order.map(
