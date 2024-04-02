@@ -46,6 +46,38 @@ const userRouter = router({
                 "-_id -__v"
             );
         }),
+    getUserByNfcId: procedure
+        .input(z.string())
+        .output(
+            z
+                .object({
+                    name: z.string(),
+                    email: z.string(),
+                    roles: z.string().array(),
+                })
+                .nullable()
+        )
+        .query(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            return await User.findOne({ nfcId: input }).select<IUser>(
+                "-_id -__v"
+            );
+        }),
     createMany: procedure
         .input(
             z.strictObject({
