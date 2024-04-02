@@ -70,8 +70,8 @@ function Order() {
                                     }
                                     className="m-3 w-full md:w-auto"
                                 />
-                                <h1 className="text-lg font-bold">
-                                    {isLoading && "Menü betöltése."}
+                                <h1 className="text-center text-lg font-bold">
+                                    {isLoading && "Menü betöltése..."}
                                     {noMenu && "Nincs még feltöltve a menü."}
                                     {menuClosed &&
                                         "A rendelés már le lett zárva."}

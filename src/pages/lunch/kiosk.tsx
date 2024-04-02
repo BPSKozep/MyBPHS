@@ -98,10 +98,13 @@ function Kiosk() {
                     {isValidNfc && error && (
                         <h1 className="text-5xl font-bold">Hiba történt.</h1>
                     )}
-                    {!isValidNfc && (
+                    {!isValidNfc && !socketFailure && (
                         <h1 className="text-5xl font-bold">
                             Várakozás token olvasására...
                         </h1>
+                    )}
+                    {socketFailure && (
+                        <h1 className="text-5xl font-bold">Socket hiba.</h1>
                     )}
                     {isValidNfc && user && order && (
                         <div className="flex flex-col items-center justify-center gap-y-6">

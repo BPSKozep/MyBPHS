@@ -35,12 +35,14 @@ function Lunch() {
                                 Kérjük jelöljétek azt is, ha mentes ételt kértek
                                 vagy ha egyáltalán nem kértek ebédet.
                             </Text>
-                            <Button
-                                className="flex cursor-pointer justify-center rounded-lg bg-slate-700 p-5 text-xl font-bold text-white"
-                                href="https://my.bphs.hu/lunch"
-                            >
-                                Megrendelem
-                            </Button>
+                            <Section className="text-center">
+                                <Button
+                                    className="w-96 cursor-pointer justify-center rounded-lg bg-slate-700 p-5 text-xl font-bold text-white"
+                                    href="https://my.bphs.hu/lunch"
+                                >
+                                    Megrendelem
+                                </Button>
+                            </Section>
                             <Hr />
                             <Text className="text-lg leading-6 text-white">
                                 — A BPHS Rendszergazda csapata
