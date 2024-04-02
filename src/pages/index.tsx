@@ -21,6 +21,11 @@ export default function Home() {
                     >
                         <BigLinkButton title="Admin" url="/admin" />
                     </OnlyRolesComponent>
+                    <OnlyRolesComponent
+                        roles={["lunch-system", "administrator"]}
+                    >
+                        <BigLinkButton title="Kiosk" url="/lunch/kiosk" />
+                    </OnlyRolesComponent>
                 </div>
             </div>
         </>
