@@ -9,7 +9,12 @@ import { checkRoles } from "utils/authorization";
 const menuRouter = router({
     get: procedure
         .input(z.strictObject({ week: z.number(), year: z.number() }))
-        .output(z.record(z.string()).array())
+        .output(
+            z.strictObject({
+                options: z.record(z.string()).array(),
+                isOpenForOrders: z.boolean(),
+            })
+        )
         .query(async ({ ctx, input }) => {
             if (!ctx.session) {
                 throw new TRPCError({
@@ -23,9 +28,12 @@ const menuRouter = router({
                 year: input.year,
             });
 
-            if (!menu) return [];
+            if (!menu) return { options: [], isOpenForOrders: true };
 
-            return menu.options;
+            return {
+                options: menu.options,
+                isOpenForOrders: menu.isOpenForOrders,
+            };
         }),
     create: procedure
         .input(
@@ -75,6 +83,52 @@ const menuRouter = router({
                 options: input.options,
                 isOpenForOrders: true,
             }).save();
+        }),
+    setIsopen: procedure
+        .input(
+            z.strictObject({
+                week: z.number(),
+                year: z.number(),
+                isOpen: z.boolean(),
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const date = new Date();
+
+            const week = input.week || getWeek(date);
+            const year = input.year || getWeekYear(date);
+
+            const menu = await Menu.findOne({
+                week,
+                year,
+            });
+
+            if (!menu) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Menu not found for specified week.",
+                });
+            }
+
+            menu.isOpenForOrders = input.isOpen;
+
+            await menu.save();
         }),
 });
 

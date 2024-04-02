@@ -90,7 +90,7 @@ function Orders() {
                     </h2>
                 )}
 
-                {!isLoading && !isError && menu?.length === 0 && (
+                {!isLoading && !isError && menu?.options.length === 0 && (
                     <h2 className="text-center font-bold text-white">
                         Nincs menü.
                     </h2>
@@ -98,7 +98,7 @@ function Orders() {
 
                 {orderCounts &&
                     menu &&
-                    menu.length > 0 &&
+                    menu.options.length > 0 &&
                     orderCounts.length === 0 && (
                         <h2 className="text-center font-bold text-white">
                             Még nincs rendelés.
@@ -143,7 +143,8 @@ function Orders() {
                                                         <td className="whitespace-nowrap bg-gray-900 px-6 py-3 text-left text-sm font-medium text-gray-100">
                                                             {
                                                                 menuCombine(
-                                                                    menu[
+                                                                    menu
+                                                                        .options[
                                                                         dayIndex
                                                                     ]
                                                                 )[option]

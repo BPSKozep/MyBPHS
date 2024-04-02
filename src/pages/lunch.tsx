@@ -24,7 +24,7 @@ function Order() {
         return [getWeekYear(date), getWeek(date)];
     }, []);
 
-    const { data: menu } = trpc.menu.get.useQuery({ year, week });
+    const { data: menu, isLoading } = trpc.menu.get.useQuery({ year, week });
 
     const { data: order, refetch: refetchOrder } = trpc.order.get.useQuery({
         year,
@@ -35,17 +35,37 @@ function Order() {
 
     const orderExists = order && order.length > 0;
 
+    const showMenu =
+        menu &&
+        menu.options.length > 0 &&
+        (orderExists || menu.isOpenForOrders === true);
+
+    const noMenu = !isLoading && (!menu || menu.options.length === 0);
+
+    const menuClosed =
+        !isLoading && !noMenu && !orderExists && !menu?.isOpenForOrders;
+
     return (
         <>
             <PageWithHeader title="Ebédrendelés">
                 <div className="flex h-full w-full text-white">
-                    <div className="m-auto">
-                        {(!menu || menu.length === 0) && (
+                    <div className="m-auto ">
+                        {isLoading && (
+                            <h1 className="text-lg font-bold">
+                                Menü betöltése.
+                            </h1>
+                        )}
+                        {noMenu && (
                             <h1 className="text-lg font-bold">
                                 Nincs még feltöltve a menü.
                             </h1>
                         )}
-                        {menu && menu.length > 0 && (
+                        {menuClosed && (
+                            <h1 className="text-lg font-bold">
+                                A rendelés már le lett zárva.
+                            </h1>
+                        )}
+                        {showMenu && (
                             <Card>
                                 <div className="flex flex-col items-center justify-center gap-4">
                                     <h1 className="text-center font-bold text-white">
@@ -56,33 +76,36 @@ function Order() {
 
                                     <>
                                         <OrderForm
-                                            options={menu.map((menuDay) => {
-                                                if (
-                                                    !menuDay["a-menu"] &&
-                                                    !menuDay["b-menu"]
-                                                ) {
-                                                    const newMenuDay =
-                                                        menuCombine(
-                                                            menuDay,
-                                                            false
+                                            options={menu.options.map(
+                                                (menuDay) => {
+                                                    if (
+                                                        !menuDay["a-menu"] &&
+                                                        !menuDay["b-menu"]
+                                                    ) {
+                                                        const newMenuDay =
+                                                            menuCombine(
+                                                                menuDay,
+                                                                false
+                                                            );
+
+                                                        Object.keys(
+                                                            newMenuDay
+                                                        ).forEach(
+                                                            (key) =>
+                                                                (newMenuDay[
+                                                                    key
+                                                                ] = "")
                                                         );
 
-                                                    Object.keys(
-                                                        newMenuDay
-                                                    ).forEach(
-                                                        (key) =>
-                                                            (newMenuDay[key] =
-                                                                "")
+                                                        return newMenuDay;
+                                                    }
+
+                                                    return menuCombine(
+                                                        menuDay,
+                                                        false
                                                     );
-
-                                                    return newMenuDay;
                                                 }
-
-                                                return menuCombine(
-                                                    menuDay,
-                                                    false
-                                                );
-                                            })}
+                                            )}
                                             selectedOptions={
                                                 orderExists
                                                     ? order.map(
