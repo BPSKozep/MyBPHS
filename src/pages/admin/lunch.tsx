@@ -80,7 +80,7 @@ export default function LunchAdmin() {
                         <LunchOrders />
                     </Card>
                     <Card>
-                        <div className="flex w-44 flex-col items-center justify-center">
+                        <div className="flex flex-col items-center justify-center text-center">
                             <h2 className="mb-3 mt-5 text-white">
                                 Beküldések lezárása
                             </h2>
