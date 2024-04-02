@@ -7,7 +7,7 @@ import OnlyRoles from "components/OnlyRoles";
 import { trpc } from "utils/trpc";
 import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faCalendarXmark } from "@fortawesome/free-solid-svg-icons";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
 
@@ -26,6 +26,8 @@ export default function LunchAdmin() {
     const { mutateAsync: createMenu } = trpc.menu.create.useMutation();
 
     const { mutateAsync: sendEmail } = trpc.email.sendLunchEmail.useMutation();
+
+    const { mutateAsync: setIsOpen } = trpc.menu.setIsopen.useMutation();
 
     return (
         <OnlyRoles roles={["administrator"]}>
@@ -66,6 +68,40 @@ export default function LunchAdmin() {
                     </Card>
                     <Card>
                         <LunchOrders />
+                    </Card>
+                    <Card>
+                        <div className="flex w-44 flex-col items-center justify-center">
+                            <h2 className="mb-3 mt-5 text-white">
+                                Beküldések lezárása
+                            </h2>
+                            <div>
+                                <IconSubmitButton
+                                    icon={
+                                        <FontAwesomeIcon
+                                            icon={faCalendarXmark}
+                                        />
+                                    }
+                                    onClick={async () => {
+                                        try {
+                                            await sleep(500);
+
+                                            const date = new Date();
+                                            date.setDate(date.getDate() + 7);
+
+                                            await setIsOpen({
+                                                week: getWeek(date),
+                                                year: getWeekYear(date),
+                                                isOpen: false,
+                                            });
+
+                                            return true;
+                                        } catch (err) {
+                                            return false;
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
                     </Card>
                 </div>
             </PageWithHeader>

@@ -4,27 +4,34 @@ import Card from "components/Card";
 import OrderForm from "components/OrderForm";
 import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import {
+    faEnvelope,
+    faArrowLeft,
+    faArrowRight,
+} from "@fortawesome/free-solid-svg-icons";
 import { trpc } from "utils/trpc";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
 import menuCombine from "utils/menuCombine";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
+import IconButton from "components/IconButton";
 
 function Order() {
     const [selectedOptions, setSelectedOptions] = useState<string[]>(
         Array(5).fill("i_am_not_want_food")
     );
 
+    const [weekOffset, setWeekOffset] = useState(1);
+
     const [year, week] = useMemo(() => {
         const date = new Date();
-        date.setDate(date.getDate() + 7);
+        date.setDate(date.getDate() + weekOffset * 7);
 
         return [getWeekYear(date), getWeek(date)];
-    }, []);
+    }, [weekOffset]);
 
-    const { data: menu } = trpc.menu.get.useQuery({ year, week });
+    const { data: menu, isLoading } = trpc.menu.get.useQuery({ year, week });
 
     const { data: order, refetch: refetchOrder } = trpc.order.get.useQuery({
         year,
@@ -35,54 +42,119 @@ function Order() {
 
     const orderExists = order && order.length > 0;
 
+    const showMenu =
+        menu &&
+        menu.options.length > 0 &&
+        (orderExists || menu.isOpenForOrders === true);
+
+    const noMenu = !isLoading && (!menu || menu.options.length === 0);
+
+    const menuClosed =
+        !isLoading && !noMenu && !orderExists && !menu?.isOpenForOrders;
+
+    const showText = isLoading || noMenu || menuClosed;
+
     return (
         <>
             <PageWithHeader title="Ebédrendelés">
-                <div className="flex h-full w-full text-white">
+                <div className="flex h-full w-full justify-center text-white">
                     <div className="m-auto">
-                        {(!menu || menu.length === 0) && (
-                            <h1 className="text-lg font-bold">
-                                Nincs még feltöltve a menü.
-                            </h1>
+                        {showText && (
+                            <div className="flex flex-col items-center md:flex-row">
+                                <IconButton
+                                    icon={
+                                        <FontAwesomeIcon icon={faArrowLeft} />
+                                    }
+                                    onClick={() =>
+                                        setWeekOffset((offset) => offset - 1)
+                                    }
+                                    className="m-3 w-full md:w-auto"
+                                />
+                                <h1 className="text-lg font-bold">
+                                    {isLoading && "Menü betöltése."}
+                                    {noMenu && "Nincs még feltöltve a menü."}
+                                    {menuClosed &&
+                                        "A rendelés már le lett zárva."}
+                                    {` (${year}. ${week}. hét)`}
+                                </h1>
+                                <IconButton
+                                    icon={
+                                        <FontAwesomeIcon icon={faArrowRight} />
+                                    }
+                                    onClick={() =>
+                                        setWeekOffset((offset) => offset + 1)
+                                    }
+                                    className="m-3 w-full md:w-auto"
+                                />
+                            </div>
                         )}
-                        {menu && menu.length > 0 && (
+                        {showMenu && (
                             <Card>
                                 <div className="flex flex-col items-center justify-center gap-4">
-                                    <h1 className="text-center font-bold text-white">
-                                        {orderExists
-                                            ? "Leadott rendelés"
-                                            : "Rendelés"}
-                                    </h1>
+                                    <div className="flex w-full items-center justify-between">
+                                        <IconButton
+                                            icon={
+                                                <FontAwesomeIcon
+                                                    icon={faArrowLeft}
+                                                />
+                                            }
+                                            onClick={() =>
+                                                setWeekOffset(
+                                                    (offset) => offset - 1
+                                                )
+                                            }
+                                        />
+                                        <h1 className="inline-block text-center font-bold text-white">
+                                            {orderExists
+                                                ? `Leadott rendelés (${year}. ${week}. hét)`
+                                                : `Rendelés (${year}. ${week}. hét)`}
+                                        </h1>
+                                        <IconButton
+                                            icon={
+                                                <FontAwesomeIcon
+                                                    icon={faArrowRight}
+                                                />
+                                            }
+                                            onClick={() =>
+                                                setWeekOffset(
+                                                    (offset) => offset + 1
+                                                )
+                                            }
+                                        />
+                                    </div>
 
                                     <>
                                         <OrderForm
-                                            options={menu.map((menuDay) => {
-                                                if (
-                                                    !menuDay["a-menu"] &&
-                                                    !menuDay["b-menu"]
-                                                ) {
-                                                    const newMenuDay =
-                                                        menuCombine(
-                                                            menuDay,
-                                                            false
+                                            options={menu.options.map(
+                                                (menuDay) => {
+                                                    if (
+                                                        !menuDay["a-menu"] &&
+                                                        !menuDay["b-menu"]
+                                                    ) {
+                                                        const newMenuDay =
+                                                            menuCombine(
+                                                                menuDay,
+                                                                false
+                                                            );
+
+                                                        Object.keys(
+                                                            newMenuDay
+                                                        ).forEach(
+                                                            (key) =>
+                                                                (newMenuDay[
+                                                                    key
+                                                                ] = "")
                                                         );
 
-                                                    Object.keys(
-                                                        newMenuDay
-                                                    ).forEach(
-                                                        (key) =>
-                                                            (newMenuDay[key] =
-                                                                "")
+                                                        return newMenuDay;
+                                                    }
+
+                                                    return menuCombine(
+                                                        menuDay,
+                                                        false
                                                     );
-
-                                                    return newMenuDay;
                                                 }
-
-                                                return menuCombine(
-                                                    menuDay,
-                                                    false
-                                                );
-                                            })}
+                                            )}
                                             selectedOptions={
                                                 orderExists
                                                     ? order.map(
