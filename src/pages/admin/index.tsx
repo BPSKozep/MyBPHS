@@ -7,8 +7,8 @@ function Users() {
     return (
         <OnlyRoles roles={["administrator"]}>
             <PageWithHeader title="Admin">
-                <div className="flex flex-row justify-center text-white lg:flex-row">
-                    <div className="m-3 inline-grid grid-cols-1 grid-rows-4 gap-4 text-white sm:grid-cols-2 sm:grid-rows-2">
+                <div className="flex h-full w-full items-center justify-center text-white">
+                    <div className="m-3 inline-grid grid-cols-1 grid-rows-4 gap-4 sm:grid-cols-2 sm:grid-rows-2">
                         <BigLinkButton
                             title="Ebédrendelés"
                             url="/admin/lunch"
