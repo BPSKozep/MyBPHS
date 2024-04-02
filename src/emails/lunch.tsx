@@ -37,7 +37,7 @@ function Lunch() {
                             </Text>
                             <Button
                                 className="flex cursor-pointer justify-center rounded-lg bg-slate-700 p-5 text-xl font-bold text-white"
-                                href="https://my.bphs.hu"
+                                href="https://my.bphs.hu/lunch"
                             >
                                 Megrendelem
                             </Button>
