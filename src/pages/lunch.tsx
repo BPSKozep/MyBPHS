@@ -48,8 +48,8 @@ function Order() {
     return (
         <>
             <PageWithHeader title="Ebédrendelés">
-                <div className="flex h-full w-full text-white">
-                    <div className="m-auto ">
+                <div className="flex h-full w-full justify-center text-white">
+                    <div className="m-auto">
                         {isLoading && (
                             <h1 className="text-lg font-bold">
                                 Menü betöltése.
