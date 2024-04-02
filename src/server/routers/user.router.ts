@@ -46,6 +46,44 @@ const userRouter = router({
                 "-_id -__v"
             );
         }),
+    createMany: procedure
+        .input(
+            z.strictObject({
+                names: z.string().array(),
+                emails: z.string().email().array(),
+                roles: z.string().array().array(),
+                nfcIds: z.string().array(),
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const users: IUser[] = input.names.map((_, index) => {
+                return {
+                    name: input.names[index],
+                    email: input.emails[index],
+                    roles: input.roles[index],
+                    nfcId: input.nfcIds[index],
+                    groups: [],
+                };
+            });
+
+            await User.insertMany<IUser>(users);
+        }),
     getTimetable: procedure
         .input(z.string().email())
         .output(z.string().nullable().array().array())
