@@ -1,12 +1,15 @@
 import React, { ReactNode } from "react";
 import { motion } from "framer-motion";
+import { twMerge } from "tailwind-merge";
 
 function IconButton({
     onClick,
     icon,
+    className,
 }: {
     onClick: () => void;
     icon: ReactNode;
+    className?: string;
 }) {
     return (
         <motion.button
@@ -18,7 +21,10 @@ function IconButton({
                 stiffness: 500,
                 damping: 20,
             }}
-            className="inline-block aspect-square h-10 rounded-lg bg-slate-600"
+            className={twMerge(
+                "inline-block aspect-square h-10 rounded-lg bg-slate-600",
+                className
+            )}
             onClick={() => onClick()}
         >
             {icon}
