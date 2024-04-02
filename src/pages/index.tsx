@@ -1,5 +1,5 @@
 import BigLinkButton from "components/BigLinkButton";
-import OnlyRoles from "components/OnlyRoles";
+import OnlyRolesComponent from "components/OnlyRolesComponent";
 
 export default function Home() {
     return (
@@ -9,9 +9,18 @@ export default function Home() {
                     <BigLinkButton title="Ebédrendelés" url="/lunch" />
                     <BigLinkButton title="Kreditek" url="/credits" disabled />
                     <BigLinkButton title="Órarend" url="/timetable" disabled />
-                    <OnlyRoles roles={["administrator"]}>
+                    <OnlyRolesComponent
+                        roles={["administrator"]}
+                        fallback={
+                            <BigLinkButton
+                                title="Coming Soon™"
+                                url="/"
+                                disabled
+                            />
+                        }
+                    >
                         <BigLinkButton title="Admin" url="/admin" />
-                    </OnlyRoles>
+                    </OnlyRolesComponent>
                 </div>
             </div>
         </>
