@@ -64,6 +64,16 @@ export default function LunchAdmin() {
                                     }}
                                 />
                             </div>
+                            <span className="mt-3 font-bold text-white">
+                                Címzettek:
+                            </span>
+                            {process.env.NEXT_PUBLIC_TO_EMAILS?.split(",").map(
+                                (email, index) => (
+                                    <span className="text-white" key={index}>
+                                        {email}
+                                    </span>
+                                )
+                            )}
                         </div>
                     </Card>
                     <Card>

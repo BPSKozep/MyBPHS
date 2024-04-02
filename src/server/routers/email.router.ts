@@ -26,7 +26,7 @@ const emailRouter = router({
 
         await resend.emails.send({
             from: "MyBPHS Ebéd <ebed@bphs.hu>",
-            to: process.env.TO_EMAILS?.split(",") || [],
+            to: process.env.NEXT_PUBLIC_TO_EMAILS?.split(",") || [],
             subject: "Elérhető a jövő heti menü!",
             react: Lunch(),
         });
