@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { trpc } from "utils/trpc";
 
-function OnlyRoles({
+function OnlyRolesComponent({
     roles,
     fallback,
     children,
@@ -19,4 +19,4 @@ function OnlyRoles({
     return fallback;
 }
 
-export default OnlyRoles;
+export default OnlyRolesComponent;
