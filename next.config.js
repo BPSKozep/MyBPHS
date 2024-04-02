@@ -9,6 +9,16 @@ const nextConfig = {
         };
         return config;
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "cdn.bpskozep.hu",
+                port: "",
+                pathname: "**",
+            },
+        ],
+    },
 };
 
 module.exports = nextConfig;
