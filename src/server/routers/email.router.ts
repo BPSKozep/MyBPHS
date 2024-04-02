@@ -26,11 +26,7 @@ const emailRouter = router({
 
         await resend.emails.send({
             from: "MyBPHS Ebéd <ebed@bphs.hu>",
-            to: [
-                // FIXME: Replace test emails
-                "martin.reicher@budapest.school",
-                "mark.gyoni@budapest.school",
-            ],
+            to: process.env.TO_EMAILS?.split(",") || [],
             subject: "Elérhető a jövő heti menü!",
             react: Lunch(),
         });
