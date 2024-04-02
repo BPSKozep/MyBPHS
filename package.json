@@ -38,7 +38,7 @@
         "react-responsive": "^9.0.2",
         "resend": "^3.2.0",
         "use-debounce": "^9.0.4",
-        "zod": "^3.21.4"
+        "zod": "^3.22.3"
     },
     "devDependencies": {
         "@types/node": "^20.11.4",
