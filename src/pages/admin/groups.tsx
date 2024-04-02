@@ -18,7 +18,7 @@ function Groups() {
 
     return (
         <OnlyRoles roles={["administrator", "teacher"]}>
-            <PageWithHeader title="Admin / Csoportok">
+            <PageWithHeader title="Admin / Csoportok" homeLocation="/admin">
                 <div className="flex h-full items-center justify-center">
                     <select
                         className="m-3 rounded-lg p-3"

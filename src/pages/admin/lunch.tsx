@@ -29,7 +29,7 @@ export default function LunchAdmin() {
 
     return (
         <OnlyRoles roles={["administrator"]}>
-            <PageWithHeader title="Ebédrendelés Admin">
+            <PageWithHeader title="Admin | Ebédrendelés" homeLocation="/admin">
                 <div className="flex flex-col justify-center lg:flex-row">
                     <Card>
                         <div className="flex flex-col items-center justify-center">

@@ -32,7 +32,7 @@ function Timetable() {
 
     return (
         <OnlyRoles roles={["administrator", "teacher"]}>
-            <PageWithHeader title="Admin / Órarend">
+            <PageWithHeader title="Admin / Órarend" homeLocation="/admin">
                 <div className="flex h-full w-full flex-col items-center justify-center">
                     <div>
                         <input
