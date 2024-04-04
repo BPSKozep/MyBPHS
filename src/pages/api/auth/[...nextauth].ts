@@ -22,6 +22,10 @@ export const authOptions = {
             return "/forbidden";
         },
     },
+    session: {
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+    },
 } as NextAuthOptions;
 
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
