@@ -16,6 +16,7 @@ import menuCombine from "utils/menuCombine";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import IconButton from "components/IconButton";
+import { useSession } from "next-auth/react";
 
 function Order() {
     const [selectedOptions, setSelectedOptions] = useState<string[]>(
@@ -40,6 +41,9 @@ function Order() {
 
     const { mutateAsync: createOrder } = trpc.order.create.useMutation();
 
+    const { mutateAsync: sendDiscordWebhook } =
+        trpc.webhook.sendDiscordWebhook.useMutation();
+
     const orderExists = order && order.length > 0;
 
     const showMenu =
@@ -53,6 +57,8 @@ function Order() {
         !isLoading && !noMenu && !orderExists && !menu?.isOpenForOrders;
 
     const showText = isLoading || noMenu || menuClosed;
+
+    const userEmail = useSession().data?.user?.email;
 
     return (
         <>
@@ -206,6 +212,15 @@ function Order() {
                                                                         year,
                                                                         chosenOptions:
                                                                             selectedOptions,
+                                                                    }
+                                                                );
+
+                                                                await sendDiscordWebhook(
+                                                                    {
+                                                                        type: "Lunch",
+                                                                        message:
+                                                                            userEmail +
+                                                                            " beküldte a rendelést.📨",
                                                                     }
                                                                 );
 
