@@ -33,6 +33,16 @@ const webhookRouter = router({
                 });
             }
 
+            const date = new Date();
+            const localDate = date.toLocaleDateString("hu-HU", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+            });
+
             await fetch(webhookUrl, {
                 method: "post",
                 headers: {
@@ -40,7 +50,7 @@ const webhookRouter = router({
                 },
                 body: JSON.stringify({
                     username: "MyBPHS",
-                    content: input.message,
+                    content: localDate + " - " + input.message,
                 }),
             });
         }),
