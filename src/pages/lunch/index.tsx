@@ -220,7 +220,7 @@ function Order() {
                                                                         type: "Lunch",
                                                                         message:
                                                                             userEmail +
-                                                                            " beküldte a rendelést.📨",
+                                                                            " beküldte a rendelést. 📨",
                                                                     }
                                                                 );
 
