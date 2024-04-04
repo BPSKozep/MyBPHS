@@ -27,6 +27,9 @@ export default function LunchAdmin() {
 
     const { mutateAsync: sendEmail } = trpc.email.sendLunchEmail.useMutation();
 
+    const { mutateAsync: sendDiscordWebhook } =
+        trpc.webhook.sendDiscordWebhook.useMutation();
+
     const { mutateAsync: setIsOpen } = trpc.menu.setIsopen.useMutation();
 
     return (
@@ -57,8 +60,18 @@ export default function LunchAdmin() {
 
                                             await sendEmail();
 
+                                            await sendDiscordWebhook({
+                                                type: "Lunch",
+                                                message:
+                                                    "Új menü feltöltve, email kiküldve. 📩",
+                                            });
+
                                             return true;
                                         } catch (err) {
+                                            // await sendDiscordWebhook({
+                                            //     type: "Error",
+                                            //     message: err,
+                                            // });
                                             return false;
                                         }
                                     }}
@@ -102,6 +115,12 @@ export default function LunchAdmin() {
                                                 week: getWeek(date),
                                                 year: getWeekYear(date),
                                                 isOpen: false,
+                                            });
+
+                                            await sendDiscordWebhook({
+                                                type: "Lunch",
+                                                message:
+                                                    "Beküldések lezárva. ❌",
                                             });
 
                                             return true;
