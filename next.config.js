@@ -19,6 +19,14 @@ const nextConfig = {
             },
         ],
     },
+    async headers() {
+        return [
+            {
+                source: "/:slug*",
+                headers: [{ key: "Document-Policy", value: "js-profiling" }],
+            },
+        ];
+    },
 };
 
 module.exports = nextConfig;
