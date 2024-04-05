@@ -22,11 +22,6 @@ function MainHeader() {
             username: data?.user?.name || undefined,
             email: data?.user?.email || undefined,
         });
-
-        Sentry.withScope((scope) => {
-            scope.setExtra("battery", 0.7);
-            scope.setTag("user_mode", "admin");
-        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data]);
 
