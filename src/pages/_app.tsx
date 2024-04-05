@@ -11,9 +11,20 @@ import { SessionProvider, useSession } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import OnlyAuthed from "components/OnlyAuthed";
+import * as Sentry from "@sentry/nextjs";
 
 function MainHeader() {
     const { data } = useSession();
+
+    Sentry.setUser({
+        username: data?.user?.name || undefined,
+        email: data?.user?.email || undefined,
+    });
+
+    Sentry.withScope((scope) => {
+        scope.setExtra("battery", 0.7);
+        scope.setTag("user_mode", "admin");
+    });
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
