@@ -18,10 +18,12 @@ function MainHeader() {
     const { data } = useSession();
 
     useEffect(() => {
-        Sentry.setUser({
-            username: data?.user?.name || undefined,
-            email: data?.user?.email || undefined,
-        });
+        if (data?.user?.name) {
+            Sentry.setUser({
+                username: data.user?.name || undefined,
+                email: data.user?.email || undefined,
+            });
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data]);
 
