@@ -41,6 +41,7 @@ const webhookRouter = router({
                 hour: "numeric",
                 minute: "numeric",
                 second: "numeric",
+                timeZone: "Europe/Budapest",
             });
 
             await fetch(webhookUrl, {
