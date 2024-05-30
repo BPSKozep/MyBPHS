@@ -14,7 +14,7 @@ import OnlyAuthed from "components/OnlyAuthed";
 import * as Sentry from "@sentry/nextjs";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
-import { useEffect } from "react";
+import { PropsWithChildren, useEffect } from "react";
 
 if (typeof window !== "undefined") {
     // checks that we are client-side
@@ -29,16 +29,6 @@ if (typeof window !== "undefined") {
 
 function MainHeader() {
     const { data } = useSession();
-
-    useEffect(() => {
-        if (data?.user?.name) {
-            Sentry.setUser({
-                username: data.user?.name || undefined,
-                email: data.user?.email || undefined,
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data]);
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
@@ -61,6 +51,25 @@ function MainHeader() {
     );
 }
 
+function IdentifyUser({ children }: PropsWithChildren) {
+    const { data } = useSession();
+
+    useEffect(() => {
+        if (data?.user?.email) {
+            Sentry.setUser({
+                username: data.user.name || undefined,
+                email: data.user.email || undefined,
+            });
+            console.log(data.user.email);
+        } else {
+            Sentry.setUser(null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data?.user?.email]);
+
+    return children;
+}
+
 function App({ Component, ...rest }: AppProps) {
     const { store, props } = wrapper.useWrappedStore(rest);
     const {
@@ -74,21 +83,23 @@ function App({ Component, ...rest }: AppProps) {
             <Provider store={store}>
                 <SessionProvider session={session}>
                     <OnlyAuthed enable={router.route !== "/forbidden"}>
-                        <div className="box-border flex h-[100vh] w-full flex-col">
-                            <MainHeader />
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={router.route}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="h-full w-full"
-                                >
-                                    <Component {...pageProps} />
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
+                        <IdentifyUser>
+                            <div className="box-border flex h-[100vh] w-full flex-col">
+                                <MainHeader />
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={router.route}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="h-full w-full"
+                                    >
+                                        <Component {...pageProps} />
+                                    </motion.div>
+                                </AnimatePresence>
+                            </div>
+                        </IdentifyUser>
                     </OnlyAuthed>
                 </SessionProvider>
             </Provider>
