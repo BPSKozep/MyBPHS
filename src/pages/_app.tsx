@@ -12,7 +12,20 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import OnlyAuthed from "components/OnlyAuthed";
 import * as Sentry from "@sentry/nextjs";
+import posthog from "posthog-js";
+import { PostHogProvider } from "posthog-js/react";
 import { useEffect } from "react";
+
+if (typeof window !== "undefined") {
+    // checks that we are client-side
+    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY as string, {
+        api_host: "/ingest",
+        ui_host: "https://eu.posthog.com",
+        loaded: (posthog) => {
+            if (process.env.NODE_ENV === "development") posthog.debug(); // debug mode in development
+        },
+    });
+}
 
 function MainHeader() {
     const { data } = useSession();
@@ -57,27 +70,29 @@ function App({ Component, ...rest }: AppProps) {
     const router = useRouter();
 
     return (
-        <Provider store={store}>
-            <SessionProvider session={session}>
-                <OnlyAuthed enable={router.route !== "/forbidden"}>
-                    <div className="box-border flex h-[100vh] w-full flex-col">
-                        <MainHeader />
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={router.route}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className="h-full w-full"
-                            >
-                                <Component {...pageProps} />
-                            </motion.div>
-                        </AnimatePresence>
-                    </div>
-                </OnlyAuthed>
-            </SessionProvider>
-        </Provider>
+        <PostHogProvider client={posthog}>
+            <Provider store={store}>
+                <SessionProvider session={session}>
+                    <OnlyAuthed enable={router.route !== "/forbidden"}>
+                        <div className="box-border flex h-[100vh] w-full flex-col">
+                            <MainHeader />
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={router.route}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="h-full w-full"
+                                >
+                                    <Component {...pageProps} />
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+                    </OnlyAuthed>
+                </SessionProvider>
+            </Provider>
+        </PostHogProvider>
     );
 }
 
