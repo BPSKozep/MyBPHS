@@ -60,9 +60,10 @@ function IdentifyUser({ children }: PropsWithChildren) {
                 username: data.user.name || undefined,
                 email: data.user.email || undefined,
             });
-            console.log(data.user.email);
+            posthog.identify(data.user.email);
         } else {
             Sentry.setUser(null);
+            posthog.reset();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data?.user?.email]);
