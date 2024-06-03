@@ -60,7 +60,10 @@ function IdentifyUser({ children }: PropsWithChildren) {
                 username: data.user.name || undefined,
                 email: data.user.email || undefined,
             });
-            posthog.identify(data.user.email);
+            posthog.identify(data.user.email, {
+                email: data.user.email,
+                name: data.user.name,
+            });
         } else {
             Sentry.setUser(null);
             posthog.reset();
