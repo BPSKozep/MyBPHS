@@ -38,7 +38,7 @@ function Lunch() {
                             <Section className="text-center">
                                 <Button
                                     className="w-96 cursor-pointer justify-center rounded-lg bg-slate-700 p-5 text-xl font-bold text-white"
-                                    href="https://my.bphs.hu/lunch"
+                                    href={`https://${process.env.NEXT_PUBLIC_EMAIL_DOMAIN}/lunch`}
                                 >
                                     Megrendelem
                                 </Button>
