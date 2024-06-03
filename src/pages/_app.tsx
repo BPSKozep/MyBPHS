@@ -79,6 +79,16 @@ function App({ Component, ...rest }: AppProps) {
 
     const router = useRouter();
 
+    useEffect(() => {
+        // Track page views
+        const handleRouteChange = () => posthog?.capture("$pageview");
+        router.events.on("routeChangeComplete", handleRouteChange);
+
+        return () => {
+            router.events.off("routeChangeComplete", handleRouteChange);
+        };
+    }, [router.events]);
+
     return (
         <PostHogProvider client={posthog}>
             <Provider store={store}>
