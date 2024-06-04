@@ -215,7 +215,6 @@ const orderRouter = router({
             }
 
             const currentDate = new Date();
-            currentDate.setDate(currentDate.getDate() + 7);
 
             const year = getWeekYear(currentDate);
             const week = getWeek(currentDate);

@@ -41,6 +41,7 @@ const webhookRouter = router({
                 hour: "numeric",
                 minute: "numeric",
                 second: "numeric",
+                timeZone: "Europe/Budapest",
             });
 
             await fetch(webhookUrl, {
@@ -49,7 +50,6 @@ const webhookRouter = router({
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    username: "MyBPHS",
                     content: localDate + " - " + input.message,
                 }),
             });

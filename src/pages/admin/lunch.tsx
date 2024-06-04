@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faCalendarXmark } from "@fortawesome/free-solid-svg-icons";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
+import NFCInput from "components/NFCInput";
 
 export default function LunchAdmin() {
     const [menuOptions, setMenuOptions] = useState(
@@ -31,6 +32,10 @@ export default function LunchAdmin() {
         trpc.webhook.sendDiscordWebhook.useMutation();
 
     const { mutateAsync: setIsOpen } = trpc.menu.setIsopen.useMutation();
+
+    const [nfcId, setNfcId] = useState<string>("");
+    const { data, isFetched, isLoading } =
+        trpc.user.getUserByNfcId.useQuery(nfcId);
 
     return (
         <OnlyRoles roles={["administrator"]}>
@@ -129,6 +134,20 @@ export default function LunchAdmin() {
                                         }
                                     }}
                                 />
+                            </div>
+                            <h2 className="mb-3 mt-5 text-white">
+                                Token Ellenőrzés
+                            </h2>
+                            <div className="">
+                                <div className="">
+                                    <NFCInput nfc={true} onChange={setNfcId} />
+                                </div>
+
+                                {nfcId && !data && isFetched && (
+                                    <h2>Nem érvényes NFC token</h2>
+                                )}
+                                {nfcId && isLoading && <h2>Betöltés...</h2>}
+                                <h2>{data?.name}</h2>
                             </div>
                         </div>
                     </Card>
