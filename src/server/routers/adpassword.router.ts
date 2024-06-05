@@ -24,6 +24,7 @@ const adPasswordRouter = router({
             const dateTime = new Intl.DateTimeFormat("hu-HU", {
                 dateStyle: "medium",
                 timeStyle: "medium",
+                timeZone: "Europe/Budapest",
             });
             return dateTime.format(user.laptopPasswordChanged);
         }
