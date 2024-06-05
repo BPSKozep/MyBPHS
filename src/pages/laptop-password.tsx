@@ -28,9 +28,7 @@ function LaptopPassword() {
                         <input
                             type="password"
                             placeholder="Jelszó"
-                            className={`mb-3 rounded-md border-4 p-1 text-center transition-all ${
-                                !inputValid && "border-blue-700"
-                            }`}
+                            className="mb-3 rounded-md border-4 p-1 text-center transition-all"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                         />
