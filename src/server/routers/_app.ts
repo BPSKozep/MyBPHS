@@ -6,6 +6,7 @@ import menuRouter from "./menu.router";
 import orderRouter from "./order.router";
 import emailRouter from "./email.router";
 import webhookRouter from "./webhook.router";
+import adPasswordRouter from "./adpassword.router";
 
 export const appRouter = router({
     user: userRouter,
@@ -14,6 +15,7 @@ export const appRouter = router({
     order: orderRouter,
     email: emailRouter,
     webhook: webhookRouter,
+    adpassword: adPasswordRouter,
 });
 
 // export type definition of API

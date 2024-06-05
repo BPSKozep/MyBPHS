@@ -8,6 +8,7 @@ export interface IUser {
     roles: string[];
     groups: Types.ObjectId[];
     nfcId: string;
+    laptopPasswordChanged?: Date;
 }
 
 const userSchema = new Schema<IUser>({
@@ -30,6 +31,10 @@ const userSchema = new Schema<IUser>({
     nfcId: {
         type: String,
         required: true,
+    },
+    laptopPasswordChanged: {
+        type: Date,
+        required: false,
     },
 });
 

@@ -13,8 +13,7 @@ export default function Home() {
                     <BigLinkButton title="Ebédrendelés" url="/lunch" />
                     <BigLinkButton
                         title="Laptop jelszó"
-                        url="/ad-password-reset"
-                        disabled
+                        url="/laptop-password"
                     />
                     <BigLinkButton title="Kreditek" url="/credits" disabled />
                     <BigLinkButton title="Órarend" url="/timetable" disabled />
