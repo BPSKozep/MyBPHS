@@ -43,13 +43,14 @@ const adPasswordRouter = router({
                 });
             }
             await fetch(
-                `https://pu.bpskozep.hu/ad/password-reset/${user.email}/${input}`,
+                `https://pu.bpskozep.hu/ad/password-reset/${user.email}`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${puToken}`,
                     },
+                    body: input,
                 }
             );
 
