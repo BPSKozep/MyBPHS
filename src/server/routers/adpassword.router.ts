@@ -50,7 +50,7 @@ const adPasswordRouter = router({
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${puToken}`,
                     },
-                    body: input,
+                    body: JSON.stringify({ password: input }),
                 }
             );
 
