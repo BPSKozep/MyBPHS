@@ -1,5 +1,6 @@
 import { PropsWithChildren, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
+import Loading from "./Loading";
 
 function OnlyAuthed({
     enable,
@@ -16,8 +17,9 @@ function OnlyAuthed({
     if (status === "authenticated" || !enable) return children;
     else
         return (
-            <div className="flex h-[100vh] items-center justify-center text-xl font-bold">
-                <h1 className="text-white">Betöltés...</h1>
+            <div className="flex h-screen items-center justify-center text-xl font-bold">
+                {/* <h1 className="text-white">Betöltés...</h1> */}
+                <Loading />
             </div>
         );
 }
