@@ -13,6 +13,7 @@ import * as Sentry from "@sentry/nextjs";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
+import PWAInstall from "components/PWAInstall";
 
 if (typeof window !== "undefined") {
     // checks that we are client-side
@@ -30,6 +31,9 @@ function MainHeader() {
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
+            <div className="absolute left-10 flex w-10 items-center justify-end">
+                <PWAInstall />
+            </div>
             <h1 className="text-center text-2xl font-bold text-white">
                 <span className="hidden sm:inline">Üdvözlünk a </span>
                 <span className="font-handwriting text-amber-400">My</span>
