@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { trpc } from "utils/trpc";
 import OrderCounts from "components/OrderCounts";
 import { io } from "socket.io-client";
+import Loading from "components/Loading";
 
 function Kiosk() {
     const [nfcId, setNfcId] = useState("");
@@ -92,9 +93,7 @@ function Kiosk() {
         <PageWithHeader title="Kiosk">
             <OnlyRoles roles={["administrator", "lunch-system"]}>
                 <div className="flex h-full w-full flex-col items-center justify-center text-center text-white">
-                    {isValidNfc && loading && (
-                        <h1 className="text-5xl font-bold">Betöltés...</h1>
-                    )}
+                    {isValidNfc && loading && <Loading />}
                     {isValidNfc && error && (
                         <h1 className="text-5xl font-bold">Hiba történt.</h1>
                     )}

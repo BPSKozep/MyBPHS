@@ -24,6 +24,11 @@ export default function LunchAdmin() {
             })
     );
 
+    // const date = new Date();
+
+    // const year = getWeekYear(date);
+    // const week = getWeek(date);
+
     const { mutateAsync: createMenu } = trpc.menu.create.useMutation();
 
     const { mutateAsync: sendEmail } = trpc.email.sendLunchEmail.useMutation();
@@ -34,8 +39,17 @@ export default function LunchAdmin() {
     const { mutateAsync: setIsOpen } = trpc.menu.setIsopen.useMutation();
 
     const [nfcId, setNfcId] = useState<string>("");
-    const { data, isFetched, isLoading } =
-        trpc.user.getUserByNfcId.useQuery(nfcId);
+    const {
+        data: user,
+        isFetched,
+        isLoading,
+    } = trpc.user.getUserByNfcId.useQuery(nfcId);
+
+    // const { data: order, isLoading: orderloading } = trpc.order.get.useQuery({
+    //     email: user?.email,
+    //     year,
+    //     week,
+    // });
 
     return (
         <OnlyRoles roles={["administrator"]}>
@@ -99,7 +113,7 @@ export default function LunchAdmin() {
                     </Card>
                     <Card>
                         <div className="flex flex-col items-center justify-center text-center">
-                            <h2 className="mb-3 mt-5 text-white">
+                            <h2 className="mb-3 mt-5 font-bold text-white">
                                 Beküldések lezárása
                             </h2>
                             <div>
@@ -135,20 +149,44 @@ export default function LunchAdmin() {
                                     }}
                                 />
                             </div>
-                            <h2 className="mb-3 mt-5 text-white">
+                            <h2 className="mt-8 font-bold text-white">
                                 Token Ellenőrzés
                             </h2>
-                            <div className="">
-                                <div className="">
-                                    <NFCInput nfc={true} onChange={setNfcId} />
-                                </div>
-
-                                {nfcId && !data && isFetched && (
-                                    <h2>Nem érvényes NFC token</h2>
-                                )}
-                                {nfcId && isLoading && <h2>Betöltés...</h2>}
-                                <h2>{data?.name}</h2>
+                            <div className="m-3">
+                                <NFCInput nfc={true} onChange={setNfcId} />
                             </div>
+                            {nfcId && !user && isFetched && (
+                                <h2 className="text-white">
+                                    Nem érvényes NFC token
+                                </h2>
+                            )}
+                            {nfcId && isLoading && (
+                                <h2 className="text-white">Betöltés...</h2>
+                            )}
+                            {user && (
+                                <div>
+                                    <h2 className="text-white">{user.name}</h2>
+                                    {/* <table className="mt-8 text-white">
+                                        <thead>
+                                            <tr>
+                                                <th>Nap</th>
+                                                <th>Rendelt</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {order &&
+                                                order.map((order) => (
+                                                    <tr key={order.chosen}>
+                                                        <td>{order.chosen}</td>
+                                                        <td>
+                                                            {order.completed}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </table> */}
+                                </div>
+                            )}
                         </div>
                     </Card>
                 </div>

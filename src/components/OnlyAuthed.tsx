@@ -18,7 +18,6 @@ function OnlyAuthed({
     else
         return (
             <div className="flex h-screen items-center justify-center text-xl font-bold">
-                {/* <h1 className="text-white">Betöltés...</h1> */}
                 <Loading />
             </div>
         );
