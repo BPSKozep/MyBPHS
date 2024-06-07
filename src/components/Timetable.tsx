@@ -41,11 +41,12 @@ function Timetable({
                                 <th className="p-3">{timeslot}</th>
 
                                 <td className="p-2 text-center">
-                                    {timetable[dayIndex][i] && (
-                                        <div className="inline-block rounded-xl bg-[#3A445D] px-3 py-1">
-                                            {timetable[dayIndex][i]}
-                                        </div>
-                                    )}
+                                    {timetable[dayIndex] &&
+                                        timetable[dayIndex][i] && (
+                                            <div className="inline-block rounded-xl bg-[#3A445D] px-3 py-1">
+                                                {timetable[dayIndex][i]}
+                                            </div>
+                                        )}
                                 </td>
                             </tr>
                         ))}
