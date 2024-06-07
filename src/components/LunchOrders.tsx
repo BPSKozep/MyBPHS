@@ -79,7 +79,11 @@ function Orders() {
                 </div>
             </div>
             <div className="">
-                {isLoading && <Loading />}
+                {isLoading && (
+                    <div className="flex justify-center">
+                        <Loading />
+                    </div>
+                )}
 
                 {isError && !isLoading && (
                     <h2 className="text-center font-bold text-white">
