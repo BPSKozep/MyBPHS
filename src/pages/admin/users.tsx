@@ -30,7 +30,7 @@ function Users() {
                                 onChange={(e) =>
                                     setNames(e.target.value.split("\n"))
                                 }
-                                className="h-60 w-96 resize-none rounded-md p-2 text-black"
+                                className="h-24 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
                                 placeholder={"Kovács Júdás\nBakos Gergely"}
                             ></textarea>
                             <p className="mt-3">Email címek</p>
@@ -39,7 +39,7 @@ function Users() {
                                 onChange={(e) =>
                                     setEmails(e.target.value.split("\n"))
                                 }
-                                className="h-60 w-96 resize-none rounded-md p-2 text-black"
+                                className="h-24 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
                                 placeholder={
                                     "kovacs.judas@budapest.school\ngergely.bakos@budapest.school"
                                 }
@@ -50,7 +50,7 @@ function Users() {
                                 onChange={(e) =>
                                     setNfcIds(e.target.value.split("\n"))
                                 }
-                                className="h-60 w-96 resize-none rounded-md p-2 text-black"
+                                className="h-24 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
                                 placeholder={"f72aeb82\n92fba9c8"}
                             ></textarea>
                             <p className="mt-3">Szerepkör</p>
@@ -59,7 +59,7 @@ function Users() {
                                 onChange={(e) =>
                                     setRoles(e.target.value.split("\n"))
                                 }
-                                className="h-32 w-96 resize-none rounded-md p-2 text-black"
+                                className="h-10 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
                                 placeholder={"student"}
                             ></textarea>
                             <div className="mt-3">

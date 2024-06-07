@@ -31,7 +31,7 @@ function SetMenuForm({
                     <div className="flex flex-row items-center justify-center">
                         <input
                             type="text"
-                            className="m-2 w-40 rounded-md border-none p-2 text-center font-bold text-black"
+                            className="m-2 w-32 rounded-md border-none p-2 text-center font-bold text-black sm:w-40"
                             placeholder="A Menü"
                             value={options[dayIndex]["a-menu"]}
                             onChange={(e) => {
@@ -51,7 +51,7 @@ function SetMenuForm({
                         />
                         <input
                             type="text"
-                            className="md:w-100 m-2 w-40 rounded-md border-none p-2 text-center font-bold text-black"
+                            className="m-2 w-32 rounded-md border-none p-2 text-center font-bold text-black sm:w-40"
                             placeholder="B Menü"
                             value={options[dayIndex]["b-menu"]}
                             onChange={(e) => {
