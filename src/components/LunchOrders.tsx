@@ -79,11 +79,7 @@ function Orders() {
                 </div>
             </div>
             <div className="">
-                {isLoading && (
-                    <h2 className="text-center font-bold text-white">
-                        <Loading />
-                    </h2>
-                )}
+                {isLoading && <Loading />}
 
                 {isError && !isLoading && (
                     <h2 className="text-center font-bold text-white">
