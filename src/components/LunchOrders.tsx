@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { trpc } from "utils/trpc";
 import { getWeek, getWeekYear } from "utils/isoweek";
 import menuCombine from "utils/menuCombine";
+import Loading from "components/Loading";
 
 const days = [
     "Hétfő",
@@ -80,7 +81,7 @@ function Orders() {
             <div className="">
                 {isLoading && (
                     <h2 className="text-center font-bold text-white">
-                        Betöltés...
+                        <Loading />
                     </h2>
                 )}
 
