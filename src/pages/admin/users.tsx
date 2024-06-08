@@ -69,12 +69,6 @@ function Users() {
                                     }
                                     onClick={async () => {
                                         try {
-                                            console.log(
-                                                new Array(emails.length).fill(
-                                                    roles
-                                                )
-                                            );
-
                                             await createMany({
                                                 emails: emails,
                                                 names,
