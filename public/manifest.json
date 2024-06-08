@@ -6,6 +6,12 @@
     "start_url": "/",
     "name": "MyBPHS",
     "short_name": "MyBPHS",
+    "related_applications": [
+        {
+            "platform": "webapp",
+            "url": "https://my.bphs.hu/manifest.json"
+        }
+    ],
     "icons": [
         {
             "src": "/android-chrome-36x36.png",
