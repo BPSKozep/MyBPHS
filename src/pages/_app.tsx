@@ -14,6 +14,7 @@ import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
 import PWAInstall from "components/PWAInstall";
+import Link from "next/link";
 
 if (typeof window !== "undefined") {
     // checks that we are client-side
@@ -35,10 +36,12 @@ function MainHeader() {
                 <PWAInstall />
             </div>
             <h1 className="text-center text-2xl font-bold text-white">
-                <span className="hidden sm:inline">Üdvözlünk a </span>
-                <span className="font-handwriting text-amber-400">My</span>
-                <span className="font-black">BPHS</span>
-                <span className="hidden sm:inline">-ben!</span>
+                <Link href="/">
+                    <span className="hidden sm:inline">Üdvözlünk a </span>
+                    <span className="font-handwriting text-amber-400">My</span>
+                    <span className="font-black">BPHS</span>
+                    <span className="hidden sm:inline">-ben!</span>
+                </Link>
             </h1>
             <div className="absolute right-10 flex w-10 items-center justify-end">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -97,7 +100,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
                         <div className="box-border flex h-[100vh] w-full flex-col">
                             <MainHeader />
                             <AnimatePresence mode="wait">
-                                <motion.div
+                                <motion.main
                                     key={router.route}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
@@ -106,7 +109,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
                                     className="h-full w-full"
                                 >
                                     <Component {...pageProps} />
-                                </motion.div>
+                                </motion.main>
                             </AnimatePresence>
                         </div>
                     </IdentifyUser>
