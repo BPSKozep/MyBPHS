@@ -47,10 +47,12 @@ module.exports = withSentryConfig(
         // For all available options, see:
         // https://github.com/getsentry/sentry-webpack-plugin#options
 
-        // Suppresses source map uploading logs during build
-        silent: true,
         org: "bphs",
         project: "mybphs",
+        telemetry: false,
+        sourcemaps: {
+            disable: true,
+        },
     },
     {
         // For all available options, see:
@@ -73,8 +75,8 @@ module.exports = withSentryConfig(
     }
 );
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const withPWA = require("next-pwa")({
-    dest: "public",
-});
+// const withPWA = require("next-pwa")({
+//     dest: "public",
+// });
 
-module.exports = withPWA(module.exports);
+// module.exports = withPWA(module.exports);
