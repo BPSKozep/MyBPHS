@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
@@ -12,6 +12,7 @@ function BigLinkButton({
     disabled?: boolean;
 }) {
     const router = useRouter();
+    const [clicked, setClicked] = useState(false);
 
     if (disabled) {
         return (
@@ -33,15 +34,18 @@ function BigLinkButton({
 
     return (
         <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileFocus={{ scale: 1.1 }}
+            whileHover={{ scale: clicked ? 1 : 1.1 }}
+            whileFocus={{ scale: clicked ? 1 : 1.1 }}
             whileTap={{ scale: 0.95 }}
             transition={{
                 type: "spring",
                 stiffness: 500,
                 damping: 20,
             }}
-            onClick={() => setTimeout(() => router.push(url), 350)}
+            onClick={() => {
+                setClicked(true);
+                setTimeout(() => router.push(url), 150);
+            }}
             className="flex cursor-pointer rounded-md border-2 bg-slate-700 p-7"
         >
             <span className="w-full text-center text-xl font-bold">
