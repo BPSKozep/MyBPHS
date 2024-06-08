@@ -86,6 +86,18 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
         };
     }, [router.events]);
 
+    useEffect(() => {
+        const handler = (event: MouseEvent) => {
+            const [x, y] = [event.clientX, event.clientY];
+            window.moveBy(x - 200, y - 200);
+            window.resizeTo(400, 400);
+        };
+
+        window.addEventListener("mousemove", handler);
+
+        return () => window.removeEventListener("mousemove", handler);
+    }, []);
+
     return (
         <PostHogProvider client={posthog}>
             <SessionProvider session={session}>
