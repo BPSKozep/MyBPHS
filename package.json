@@ -20,7 +20,6 @@
         "@fortawesome/free-solid-svg-icons": "^6.5.2",
         "@fortawesome/react-fontawesome": "^0.2.0",
         "@react-email/components": "^0.0.16",
-        "@sentry/nextjs": "^8.8.0",
         "@tanstack/react-query": "^4.29.15",
         "@trpc/client": "^10.45.2",
         "@trpc/next": "^10.45.2",

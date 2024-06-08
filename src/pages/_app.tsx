@@ -9,7 +9,6 @@ import { SessionProvider, useSession } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import OnlyAuthed from "components/OnlyAuthed";
-import * as Sentry from "@sentry/nextjs";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
@@ -61,16 +60,11 @@ function IdentifyUser({ children }: PropsWithChildren) {
 
     useEffect(() => {
         if (data?.user?.email) {
-            Sentry.setUser({
-                username: data.user.name || undefined,
-                email: data.user.email || undefined,
-            });
             posthog.identify(data.user.email, {
                 email: data.user.email,
                 name: data.user.name,
             });
         } else {
-            Sentry.setUser(null);
             posthog.reset();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
