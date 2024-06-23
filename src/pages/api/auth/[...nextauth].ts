@@ -26,6 +26,9 @@ export const authOptions = {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60, // 30 days
     },
+    pages: {
+        signIn: "/auth/signin",
+    },
 } as NextAuthOptions;
 
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
