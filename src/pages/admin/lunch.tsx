@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faCalendarXmark } from "@fortawesome/free-solid-svg-icons";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
-import NFCInput from "components/NFCInput";
+import TokenCheck from "components/TokenCheck";
 
 export default function LunchAdmin() {
     const [menuOptions, setMenuOptions] = useState(
@@ -37,13 +37,6 @@ export default function LunchAdmin() {
         trpc.webhook.sendDiscordWebhook.useMutation();
 
     const { mutateAsync: setIsOpen } = trpc.menu.setIsopen.useMutation();
-
-    const [nfcId, setNfcId] = useState<string>("");
-    const {
-        data: user,
-        isFetched,
-        isLoading,
-    } = trpc.user.getUserByNfcId.useQuery(nfcId);
 
     // const { data: order, isLoading: orderloading } = trpc.order.get.useQuery({
     //     email: user?.email,
@@ -149,44 +142,8 @@ export default function LunchAdmin() {
                                     }}
                                 />
                             </div>
-                            <h2 className="mt-8 font-bold text-white">
-                                Token Ellenőrzés
-                            </h2>
-                            <div className="m-3">
-                                <NFCInput nfc={true} onChange={setNfcId} />
-                            </div>
-                            {nfcId && !user && isFetched && (
-                                <h2 className="text-white">
-                                    Nem érvényes NFC token
-                                </h2>
-                            )}
-                            {nfcId && isLoading && (
-                                <h2 className="text-white">Betöltés...</h2>
-                            )}
-                            {user && (
-                                <div>
-                                    <h2 className="text-white">{user.name}</h2>
-                                    {/* <table className="mt-8 text-white">
-                                        <thead>
-                                            <tr>
-                                                <th>Nap</th>
-                                                <th>Rendelt</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {order &&
-                                                order.map((order) => (
-                                                    <tr key={order.chosen}>
-                                                        <td>{order.chosen}</td>
-                                                        <td>
-                                                            {order.completed}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                        </tbody>
-                                    </table> */}
-                                </div>
-                            )}
+                            <hr className="border-1 my-5 h-1 w-full bg-gray-900" />
+                            <TokenCheck />
                         </div>
                     </Card>
                 </div>

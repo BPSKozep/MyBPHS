@@ -295,6 +295,49 @@ const userRouter = router({
                 }
             }
         }),
+    list: procedure
+        .input(z.enum(["all", "student", "teacher", "administrator"]))
+        .output(
+            z.array(
+                z.object({
+                    email: z.string(),
+                    name: z.string(),
+                })
+            )
+        )
+        .query(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            let roleFilter = {};
+            if (input === "student") {
+                roleFilter = { roles: "student" };
+            } else if (input === "teacher") {
+                roleFilter = { roles: "teacher" };
+            } else if (input === "administrator") {
+                roleFilter = { roles: "administrator" };
+            }
+
+            const users = await User.find(roleFilter).select("email name");
+
+            return users.map((user) => ({
+                email: user.email,
+                name: user.name,
+            }));
+        }),
 });
 
 export default userRouter;
