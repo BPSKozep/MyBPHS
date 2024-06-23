@@ -77,7 +77,7 @@ function TokenCheck() {
             {nfcId && isUserLoading && (
                 <h2 className="text-white">Betöltés...</h2>
             )}
-            {user && orderExists && (
+            {user && orderExists ? (
                 <div>
                     {checkMode === "token" && (
                         <h2 className="text-white">{user.name}</h2>
@@ -127,6 +127,10 @@ function TokenCheck() {
                         </tbody>
                     </table>
                 </div>
+            ) : (
+                <h1 className="mt-5 text-xl text-white">
+                    Nincs rendelés a jelenlegi hétre
+                </h1>
             )}
         </>
     );
