@@ -42,3 +42,11 @@ const withPWA = require("next-pwa")({
 });
 
 module.exports = withPWA(module.exports);
+
+module.exports = {
+    i18n: {
+        locales: ["en-US", "hu-HU"],
+        defaultLocale: "en-US",
+        localeDetection: true,
+    },
+};

@@ -14,6 +14,7 @@ import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
 import PWAInstall from "components/PWAInstall";
 import Link from "next/link";
+import { NextIntlClientProvider } from "next-intl";
 
 if (typeof window !== "undefined") {
     // checks that we are client-side
@@ -91,21 +92,27 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
             <SessionProvider session={session}>
                 <OnlyAuthed enable={router.route !== "/forbidden"}>
                     <IdentifyUser>
-                        <div className="box-border flex h-[100vh] w-full flex-col">
-                            <MainHeader />
-                            <AnimatePresence mode="wait">
-                                <motion.main
-                                    key={router.route}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="h-full w-full"
-                                >
-                                    <Component {...pageProps} />
-                                </motion.main>
-                            </AnimatePresence>
-                        </div>
+                        <NextIntlClientProvider
+                            locale={router.locale}
+                            timeZone="Europe/Budapest"
+                            messages={pageProps.messages}
+                        >
+                            <div className="box-border flex h-[100vh] w-full flex-col">
+                                <MainHeader />
+                                <AnimatePresence mode="wait">
+                                    <motion.main
+                                        key={router.route}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="h-full w-full"
+                                    >
+                                        <Component {...pageProps} />
+                                    </motion.main>
+                                </AnimatePresence>
+                            </div>
+                        </NextIntlClientProvider>
                     </IdentifyUser>
                 </OnlyAuthed>
             </SessionProvider>
