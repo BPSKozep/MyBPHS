@@ -45,16 +45,16 @@ function TokenCheck() {
             <h2 className="font-bold text-white">Ellenőrzés</h2>
             <div className="my-3 text-center text-white">
                 <button
-                    className={`h-12 w-20 rounded-l-xl bg-[#565e85] p-3 transition-all hover:bg-[#3a445d] ${
-                        checkMode === "user" ? "bg-[#3a445d]" : ""
+                    className={`h-12 w-20 rounded-l-xl p-3 transition-all hover:bg-[#3a445d] ${
+                        checkMode === "user" ? "bg-[#3a445d]" : "bg-[#565e85]"
                     }`}
                     onClick={() => setCheckMode("user")}
                 >
                     Név
                 </button>
                 <button
-                    className={`h-12 w-20 rounded-r-xl bg-[#565e85] p-3 transition-all hover:bg-[#3a445d] ${
-                        checkMode === "token" ? "bg-[#3a445d]" : ""
+                    className={`h-12 w-20 rounded-r-xl p-3 transition-all hover:bg-[#3a445d] ${
+                        checkMode === "token" ? "bg-[#3a445d]" : "bg-[#565e85]"
                     }`}
                     onClick={() => setCheckMode("token")}
                 >
