@@ -3,6 +3,7 @@ import NFCInput from "components/NFCInput";
 import { trpc } from "utils/trpc";
 import { getWeek, getWeekYear } from "utils/isoweek";
 import UserInput from "./UserInput";
+import Loading from "./Loading";
 
 function TokenCheck() {
     const [nfcId, setNfcId] = useState<string>("");
@@ -74,9 +75,7 @@ function TokenCheck() {
             {nfcId && !user && isUserFetched && (
                 <h2 className="text-white">Nem érvényes NFC token</h2>
             )}
-            {nfcId && isUserLoading && (
-                <h2 className="text-white">Betöltés...</h2>
-            )}
+            {nfcId && isUserLoading && <Loading />}
             {user && orderExists ? (
                 <div>
                     {checkMode === "token" && (
