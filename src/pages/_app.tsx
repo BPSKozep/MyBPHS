@@ -30,7 +30,7 @@ if (typeof window !== "undefined") {
 
 function MainHeader() {
     const { data } = useSession();
-    const [isSheetOpen, setSheetOpen] = useState(false);
+    const [isSheetOpen, setSheetOpen] = useState(true);
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
@@ -55,7 +55,7 @@ function MainHeader() {
                 <img
                     src={data?.user?.image || ""}
                     alt="Profile picture"
-                    className="rounded-full"
+                    className="cursor-pointer rounded-full"
                     draggable="false"
                 />
             </div>
@@ -65,7 +65,38 @@ function MainHeader() {
                     setSheetOpen(false);
                 }}
             >
-                <h1>Sheet test hello</h1>
+                <h1 className="text-2xl font-bold text-white">Felhasználó</h1>
+                <p className="my-3 text-gray-400">
+                    Itt megtekintheted a saját információidat
+                </p>
+                <div className="flex flex-col gap-3 align-middle md:flex-row">
+                    <h2 className="text-center font-bold text-white">Név</h2>
+                    <input
+                        type="text"
+                        value={data?.user?.name || "Nincs adat"}
+                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-white"
+                    />
+                </div>
+                <div className="flex flex-col gap-3 align-middle md:flex-row">
+                    <h2 className="text-center font-bold text-white">
+                        Email cím
+                    </h2>
+                    <input
+                        type="text"
+                        value={data?.user?.email || "Nincs adat"}
+                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-white"
+                    />
+                </div>
+                <div className="flex flex-col gap-3 align-middle md:flex-row">
+                    <h2 className="text-center font-bold text-white">
+                        Token azonosító
+                    </h2>
+                    <input
+                        type="text"
+                        value={data?.user?.email || "Nincs adat"}
+                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-white"
+                    />
+                </div>
             </Sheet>
         </header>
     );
