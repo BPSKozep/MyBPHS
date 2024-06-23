@@ -38,6 +38,7 @@ const Sheet = ({ isOpen, onClose, children }: SheetProps) => {
                           key="modal"
                           initial={{ x: 300 }}
                           animate={{ x: 0 }}
+                          exit={{ x: 300 }}
                           transition={{ duration: 0.2 }}
                           className={`fixed inset-y-0 right-0 w-3/4 transform border-l-2 border-l-gray-800 bg-[#09090b] p-6 shadow-lg transition-transform sm:max-w-sm ${
                               isOpen ? "translate-x-0" : "translate-x-full"

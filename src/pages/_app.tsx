@@ -16,6 +16,11 @@ import PWAInstall from "components/PWAInstall";
 import Link from "next/link";
 import { NextIntlClientProvider } from "next-intl";
 import Sheet from "components/Sheet";
+import IconSubmitButton from "components/IconSubmitButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import sleep from "utils/sleep";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { signOut } from "next-auth/react";
 
 if (typeof window !== "undefined") {
     // checks that we are client-side
@@ -31,6 +36,8 @@ if (typeof window !== "undefined") {
 function MainHeader() {
     const { data } = useSession();
     const [isSheetOpen, setSheetOpen] = useState(true);
+
+    const NfcId = trpc.user.getNfcId.useQuery(data?.user?.email || "");
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
@@ -69,32 +76,52 @@ function MainHeader() {
                 <p className="my-3 text-gray-400">
                     Itt megtekintheted a saját információidat
                 </p>
-                <div className="flex flex-col gap-3 align-middle md:flex-row">
-                    <h2 className="text-center font-bold text-white">Név</h2>
+                <div className="flex flex-col gap-3 align-middle">
+                    <h2 className="text-center align-middle font-bold text-white">
+                        Név
+                    </h2>
                     <input
                         type="text"
                         value={data?.user?.name || "Nincs adat"}
-                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-white"
+                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-slate-500"
                     />
                 </div>
-                <div className="flex flex-col gap-3 align-middle md:flex-row">
+                <div className="flex flex-col gap-3 align-middle">
                     <h2 className="text-center font-bold text-white">
                         Email cím
                     </h2>
                     <input
                         type="text"
                         value={data?.user?.email || "Nincs adat"}
-                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-white"
+                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-slate-500"
                     />
                 </div>
-                <div className="flex flex-col gap-3 align-middle md:flex-row">
+                <div className="flex flex-col gap-3 align-middle">
                     <h2 className="text-center font-bold text-white">
                         Token azonosító
                     </h2>
                     <input
                         type="text"
-                        value={data?.user?.email || "Nincs adat"}
-                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-white"
+                        value={NfcId.data || "Nincs adat"}
+                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-slate-500"
+                    />
+                </div>
+                <div className="flex justify-center">
+                    <IconSubmitButton
+                        icon={<FontAwesomeIcon icon={faRightFromBracket} />}
+                        onClick={async () => {
+                            try {
+                                await sleep(500);
+
+                                await signOut({
+                                    callbackUrl: "/",
+                                });
+
+                                return true;
+                            } catch (err) {
+                                return false;
+                            }
+                        }}
                     />
                 </div>
             </Sheet>
