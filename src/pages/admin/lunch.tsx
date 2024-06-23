@@ -24,11 +24,6 @@ export default function LunchAdmin() {
             })
     );
 
-    // const date = new Date();
-
-    // const year = getWeekYear(date);
-    // const week = getWeek(date);
-
     const { mutateAsync: createMenu } = trpc.menu.create.useMutation();
 
     const { mutateAsync: sendEmail } = trpc.email.sendLunchEmail.useMutation();
@@ -37,12 +32,6 @@ export default function LunchAdmin() {
         trpc.webhook.sendDiscordWebhook.useMutation();
 
     const { mutateAsync: setIsOpen } = trpc.menu.setIsopen.useMutation();
-
-    // const { data: order, isLoading: orderloading } = trpc.order.get.useQuery({
-    //     email: user?.email,
-    //     year,
-    //     week,
-    // });
 
     return (
         <OnlyRoles roles={["administrator"]}>
