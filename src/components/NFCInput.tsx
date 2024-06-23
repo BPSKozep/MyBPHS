@@ -38,7 +38,7 @@ function NFCInput({
                 type="text"
                 value={data}
                 onChange={(e) => setData(e.target.value)}
-                className="rounded-md p-1 text-center"
+                className="h-10 w-40 rounded-md p-1 text-center"
                 placeholder="Token ID"
             />
         </>

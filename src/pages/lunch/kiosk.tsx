@@ -38,14 +38,12 @@ function Kiosk() {
             auth: { passphrase: process.env.NEXT_PUBLIC_SOCKETIO_PASSPHRASE },
         });
 
-        socket.on("disconnect", (err) => {
-            console.log(err);
+        socket.on("disconnect", () => {
             setSocketFailure(true);
             socket.close();
         });
 
-        socket.on("connect_error", (err) => {
-            console.log(err);
+        socket.on("connect_error", () => {
             setSocketFailure(true);
             socket.close();
         });

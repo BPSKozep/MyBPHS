@@ -5,7 +5,7 @@ import { Order, User, Menu } from "models";
 import { getWeek, getWeekYear } from "utils/isoweek";
 import { checkRoles } from "utils/authorization";
 import { TRPCError } from "@trpc/server";
-import menuCombine from "utils/menuCombine";
+import menuCombine, { menuCombines } from "utils/menuCombine";
 import { IOrder } from "models/Order.model";
 
 const orderRouter = router({
@@ -81,6 +81,80 @@ const orderRouter = router({
 
             return order.toObject().order;
         }),
+    getAllWeek: procedure
+        .input(
+            z.strictObject({
+                email: z.string().email().optional(),
+                year: z.number().optional(),
+                week: z.number().optional(),
+            })
+        )
+        .output(z.string().array())
+        .query(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "administrator",
+                "lunch-system",
+            ]);
+
+            const email = ctx.session.user?.email || input.email;
+
+            const requester = await User.findOne({
+                email: ctx.session.user?.email,
+            });
+
+            if (!authorized && requester?.email !== email) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const user = await User.findOne({ email: input.email });
+
+            if (!user) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+            }
+
+            const date = new Date();
+
+            const year = input.year || getWeekYear(date);
+            const week = input.week || getWeek(date);
+
+            const menu = await Menu.findOne({ year, week });
+
+            if (!menu) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Menu not found",
+                });
+            }
+
+            const order = await Order.findOne({ menu, user }).select(
+                "-order._id"
+            );
+
+            if (!order) {
+                return [];
+            }
+
+            const combinedOptions = menuCombines(menu.options);
+
+            const orders = order.order.map(
+                (order, index) => combinedOptions[index][order.chosen]
+            );
+
+            return orders;
+        }),
     getOrCreateOrderByNfc: procedure
         .input(z.string())
         .query(async ({ input, ctx }) => {
@@ -103,12 +177,12 @@ const orderRouter = router({
                 });
             }
 
-            const currentDate = new Date();
+            const date = new Date();
 
-            const year = getWeekYear(currentDate);
-            const week = getWeek(currentDate);
+            const year = getWeekYear(date);
+            const week = getWeek(date);
 
-            const day = currentDate.getDay() - 1;
+            const day = date.getDay() - 1;
 
             const menu = await Menu.findOne({
                 week,
