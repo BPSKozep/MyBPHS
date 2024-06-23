@@ -11,10 +11,11 @@ import { useRouter } from "next/router";
 import OnlyAuthed from "components/OnlyAuthed";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import PWAInstall from "components/PWAInstall";
 import Link from "next/link";
 import { NextIntlClientProvider } from "next-intl";
+import Sheet from "components/Sheet";
 
 if (typeof window !== "undefined") {
     // checks that we are client-side
@@ -29,6 +30,7 @@ if (typeof window !== "undefined") {
 
 function MainHeader() {
     const { data } = useSession();
+    const [isSheetOpen, setSheetOpen] = useState(false);
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
@@ -43,7 +45,12 @@ function MainHeader() {
                     <span className="hidden sm:inline">-ben!</span>
                 </Link>
             </h1>
-            <div className="absolute right-10 flex w-10 items-center justify-end">
+            <div
+                className="absolute right-10 flex w-10 items-center justify-end"
+                onClick={() => {
+                    setSheetOpen(true);
+                }}
+            >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src={data?.user?.image || ""}
@@ -52,6 +59,14 @@ function MainHeader() {
                     draggable="false"
                 />
             </div>
+            <Sheet
+                isOpen={isSheetOpen}
+                onClose={() => {
+                    setSheetOpen(false);
+                }}
+            >
+                <h1>Sheet test hello</h1>
+            </Sheet>
         </header>
     );
 }
