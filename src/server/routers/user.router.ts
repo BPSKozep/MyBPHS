@@ -338,6 +338,33 @@ const userRouter = router({
                 name: user.name,
             }));
         }),
+    getNfcId: procedure
+        .input(z.string().email())
+        .output(z.string())
+        .query(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "student",
+                "teacher",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const user = await User.findOne({ email: input });
+
+            return user?.nfcId || "";
+        }),
 });
 
 export default userRouter;
