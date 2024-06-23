@@ -13,7 +13,7 @@ function Groups() {
     );
     const [groups, setGroups] = useState("student\nsysadmin_kvk");
     const [students, setStudents] = useState(
-        "martin.reicher@budapest.school\nmark.gyoni@budapest.school"
+        "email@example.com\nemail@example.com"
     );
 
     return (

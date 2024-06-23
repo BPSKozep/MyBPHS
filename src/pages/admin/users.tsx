@@ -41,7 +41,7 @@ function Users() {
                                 }
                                 className="h-24 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
                                 placeholder={
-                                    "kovacs.judas@budapest.school\ngergely.bakos@budapest.school"
+                                    "email@example.com\nemail@example.com"
                                 }
                             ></textarea>
                             <p className="mt-3">NFCk</p>
