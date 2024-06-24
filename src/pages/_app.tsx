@@ -14,7 +14,7 @@ import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect, useState } from "react";
 import PWAInstall from "components/PWAInstall";
 import Link from "next/link";
-import { NextIntlClientProvider } from "next-intl";
+import { appWithTranslation } from "next-i18next";
 import Sheet from "components/Sheet";
 import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,7 +35,7 @@ if (typeof window !== "undefined") {
 
 function MainHeader() {
     const { data } = useSession();
-    const [isSheetOpen, setSheetOpen] = useState(true);
+    const [isSheetOpen, setSheetOpen] = useState(false);
 
     const NfcId = trpc.user.getNfcId.useQuery(data?.user?.email || "");
 
@@ -165,27 +165,21 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
             <SessionProvider session={session}>
                 <OnlyAuthed enable={router.route !== "/forbidden"}>
                     <IdentifyUser>
-                        <NextIntlClientProvider
-                            locale={router.locale}
-                            timeZone="Europe/Budapest"
-                            messages={pageProps.messages}
-                        >
-                            <div className="box-border flex h-[100vh] w-full flex-col">
-                                <MainHeader />
-                                <AnimatePresence mode="wait">
-                                    <motion.main
-                                        key={router.route}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="h-full w-full"
-                                    >
-                                        <Component {...pageProps} />
-                                    </motion.main>
-                                </AnimatePresence>
-                            </div>
-                        </NextIntlClientProvider>
+                        <div className="box-border flex h-[100vh] w-full flex-col">
+                            <MainHeader />
+                            <AnimatePresence mode="wait">
+                                <motion.main
+                                    key={router.route}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="h-full w-full"
+                                >
+                                    <Component {...pageProps} />
+                                </motion.main>
+                            </AnimatePresence>
+                        </div>
                     </IdentifyUser>
                 </OnlyAuthed>
             </SessionProvider>
@@ -193,4 +187,4 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     );
 }
 
-export default trpc.withTRPC(App);
+export default trpc.withTRPC(appWithTranslation(App));
