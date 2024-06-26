@@ -1,7 +1,9 @@
-"use client";
-
 import BigLinkButton from "components/BigLinkButton";
 import OnlyRolesComponent from "components/OnlyRolesComponent";
+
+export const metadata = {
+    title: "MyBPHS",
+};
 
 export default function Home() {
     return (

@@ -1,3 +1,5 @@
+"use client";
+
 import { useSession } from "next-auth/react";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { trpc } from "utils/trpc";
