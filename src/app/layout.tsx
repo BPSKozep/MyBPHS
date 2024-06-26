@@ -20,7 +20,7 @@ import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import OnlyAuthed from "components/OnlyAuthed";
-import { Providers } from "./providers";
+import Providers from "./providers";
 
 function MainHeader() {
     const { data } = useSession();

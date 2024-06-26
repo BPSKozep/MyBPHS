@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { procedure, router } from "../trpc";
+import { procedure, router } from "server/api/trpc";
 import { Menu } from "models";
 import { IMenu } from "models/Menu.model";
 import { TRPCError } from "@trpc/server";
