@@ -1,3 +1,5 @@
+"use client";
+
 import PageWithHeader from "components/PageWithHeader";
 import TimetableEditor from "components/TimetableEditor";
 import React, { useCallback, useEffect, useState } from "react";

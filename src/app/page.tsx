@@ -1,10 +1,7 @@
-import BigLinkButton from "components/BigLinkButton";
-// import OnlyRolesComponent from "components/OnlyRolesComponent";
+"use client";
 
-export const metadata = {
-    title: "MyBPHS",
-    description: "MyBPHS",
-};
+import BigLinkButton from "components/BigLinkButton";
+import OnlyRolesComponent from "components/OnlyRolesComponent";
 
 export default function Home() {
     return (
@@ -18,15 +15,14 @@ export default function Home() {
                     />
                     <BigLinkButton title="Kreditek" url="/credits" disabled />
                     <BigLinkButton title="Órarend" url="/timetable" disabled />
-                    {/* TODO: reenable */}
-                    {/* <OnlyRolesComponent roles={["administrator"]}>
+                    <OnlyRolesComponent roles={["administrator"]}>
                         <BigLinkButton title="Admin" url="/admin" />
                     </OnlyRolesComponent>
                     <OnlyRolesComponent
                         roles={["lunch-system", "administrator"]}
                     >
                         <BigLinkButton title="Kiosk" url="/lunch/kiosk" />
-                    </OnlyRolesComponent> */}
+                    </OnlyRolesComponent>
                 </nav>
             </div>
         </>

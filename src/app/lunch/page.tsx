@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useMemo, useState } from "react";
 import PageWithHeader from "components/PageWithHeader";
 import Card from "components/Card";

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { procedure, router } from "server/api/trpc";
+import { procedure, router } from "server/trpc";
 
 import { Group } from "models";
 import { TRPCError } from "@trpc/server";

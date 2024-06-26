@@ -1,3 +1,5 @@
+"use client";
+
 import OnlyRoles from "components/OnlyRoles";
 import PageWithHeader from "components/PageWithHeader";
 import Image from "next/image";

@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { procedure, router } from "server/api/trpc";
+import { procedure, router } from "server/trpc";
 import Lunch from "emails/lunch";
 import { checkRoles } from "utils/authorization";
 import { TRPCError } from "@trpc/server";

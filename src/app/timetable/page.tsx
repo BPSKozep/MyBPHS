@@ -1,3 +1,5 @@
+"use client";
+
 import PageWithHeader from "components/PageWithHeader";
 import Timetable from "components/Timetable";
 import { useSession } from "next-auth/react";

@@ -5,7 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import PostHogPageView from "components/PostHogPageView";
 import { trpc } from "utils/trpc";
 import { useState } from "react";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 
 if (typeof window !== "undefined") {
@@ -45,8 +45,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <PostHogProvider client={posthog}>
             <SessionProvider>
                 <trpc.Provider client={trpcClient} queryClient={queryClient}>
-                    <PostHogPageView />
-                    {children}
+                    <QueryClientProvider client={queryClient}>
+                        <PostHogPageView />
+                        {children}
+                    </QueryClientProvider>
                 </trpc.Provider>
             </SessionProvider>
         </PostHogProvider>
