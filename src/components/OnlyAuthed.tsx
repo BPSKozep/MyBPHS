@@ -1,3 +1,5 @@
+"use client";
+
 import { PropsWithChildren, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import Loading from "./Loading";
@@ -5,7 +7,7 @@ import Loading from "./Loading";
 function OnlyAuthed({
     enable,
     children,
-}: { enable: boolean } & PropsWithChildren) {
+}: { enable?: boolean } & PropsWithChildren) {
     const { status } = useSession();
 
     useEffect(() => {
