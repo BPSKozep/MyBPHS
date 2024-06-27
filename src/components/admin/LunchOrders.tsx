@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useMemo, useState } from "react";
 import { trpc } from "utils/trpc";
 import { getWeek, getWeekYear } from "utils/isoweek";

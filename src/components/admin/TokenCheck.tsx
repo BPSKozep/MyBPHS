@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import NFCInput from "components/admin/NFCInput";
 import { trpc } from "utils/trpc";

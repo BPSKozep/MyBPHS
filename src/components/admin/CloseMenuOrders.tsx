@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

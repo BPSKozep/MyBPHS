@@ -21,7 +21,7 @@ function GoogleSignIn() {
                     height={48}
                 />
                 <span className="w-max font-semibold tracking-wide text-white transition duration-300">
-                    Bejelentkezés Google-lel
+                    Továbblépés Google-lel
                 </span>
             </div>
         </div>

@@ -22,7 +22,11 @@ export default function UserDropdown({
             >
                 {users.data &&
                     users.data.map((user) => (
-                        <option key={user.email} value={user.email}>
+                        <option
+                            key={user.email}
+                            value={user.email}
+                            className="font-bold"
+                        >
                             {user.name}
                         </option>
                     ))}
