@@ -7,7 +7,7 @@ export const metadata = {
     title: "MyBPHS - Admin / Órarend",
 };
 
-function Timetable() {
+export default function Timetable() {
     return (
         <OnlyRoles roles={["administrator", "teacher"]}>
             <PageWithHeader title="Admin / Órarend" homeLocation="/admin">
@@ -16,5 +16,3 @@ function Timetable() {
         </OnlyRoles>
     );
 }
-
-export default Timetable;

@@ -7,7 +7,7 @@ export const metadata = {
     title: "MyBPHS - Admin / Felhasználók",
 };
 
-function Users() {
+export default function Users() {
     return (
         <OnlyRoles roles={["administrator"]}>
             <PageWithHeader title="Admin / Felhasználók" homeLocation="/admin">
@@ -16,5 +16,3 @@ function Users() {
         </OnlyRoles>
     );
 }
-
-export default Users;

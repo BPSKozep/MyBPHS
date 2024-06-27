@@ -12,7 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 
 const EMPTY_TIMETABLE = Array(5).fill([]);
 
-function CreateTimetable() {
+export default function CreateTimetable() {
     const [groupName, setGroupName] = useState("");
     const [debouncedGroupName] = useDebounce(groupName, 500);
     const [priority, setPriority] = useState("");
@@ -89,5 +89,3 @@ function CreateTimetable() {
         </div>
     );
 }
-
-export default CreateTimetable;

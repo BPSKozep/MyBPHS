@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Card from "components/Card";
 import IconSubmitButton from "components/IconSubmitButton";
 
-function CreateUsers() {
+export default function CreateUsers() {
     const [names, setNames] = useState<string[]>([]);
     const [emails, setEmails] = useState<string[]>([]);
     const [roles, setRoles] = useState<string[]>([]);
@@ -76,5 +76,3 @@ function CreateUsers() {
         </div>
     );
 }
-
-export default CreateUsers;
