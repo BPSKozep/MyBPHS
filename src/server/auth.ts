@@ -1,3 +1,5 @@
+import mongooseConnect from "clients/mongoose";
+import { User } from "models";
 import {
     getServerSession,
     type DefaultSession,
@@ -19,11 +21,6 @@ declare module "next-auth" {
             // role: UserRole;
         } & DefaultSession["user"];
     }
-
-    // interface User {
-    //   // ...other properties
-    //   // role: UserRole;
-    // }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -35,6 +32,15 @@ export const authOptions: NextAuthOptions = {
                 id: token.sub,
             },
         }),
+        async signIn({ profile }) {
+            await mongooseConnect();
+
+            const user = await User.findOne({ email: profile?.email });
+
+            if (user) return true;
+
+            return "/forbidden";
+        },
     },
     providers: [
         GoogleProvider({
