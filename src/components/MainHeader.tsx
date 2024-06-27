@@ -30,7 +30,7 @@ export default function MainHeader() {
                     <h1 className="text-center text-2xl font-bold text-white">
                         <Link href="/">
                             <span className="hidden sm:inline">
-                                Üdvözlünk a
+                                Üdvözlünk a{" "}
                             </span>
                             <span className="font-handwriting text-amber-400">
                                 My
