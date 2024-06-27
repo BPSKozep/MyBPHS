@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { procedure, router } from "../trpc";
+import { procedure, router } from "server/trpc";
 
 import { Order, User, Menu } from "models";
 import { getWeek, getWeekYear } from "utils/isoweek";

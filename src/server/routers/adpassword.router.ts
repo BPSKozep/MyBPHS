@@ -1,4 +1,4 @@
-import { procedure, router } from "../trpc";
+import { procedure, router } from "server/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { User } from "models";

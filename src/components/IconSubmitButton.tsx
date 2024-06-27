@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode, useState } from "react";
 import { motion } from "framer-motion";
 import { ObjectValues } from "utils/types";
