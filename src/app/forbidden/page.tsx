@@ -1,7 +1,5 @@
 import ForbiddenComponent from "components/ForbiddenComponent";
 
-function Forbidden() {
+export default function Forbidden() {
     return <ForbiddenComponent />;
 }
-
-export default Forbidden;

@@ -4,8 +4,9 @@ import React from "react";
 import GoogleSignIn from "components/GoogleSignIn";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-function SignInComponent() {
+export default function SignInComponent() {
     const session = useSession();
     const router = useRouter();
 
@@ -17,8 +18,14 @@ function SignInComponent() {
         <div className="flex flex-col items-center">
             <h1 className="mb-20 text-xl font-bold">Bejelentkezés</h1>
             <GoogleSignIn />
+            <div className="mt-5 flex flex-row">
+                <Image
+                    src="https://cdn.bpskozep.hu/bps-logo.svg"
+                    alt="bps logo"
+                    width={100}
+                    height={50}
+                />
+            </div>
         </div>
     );
 }
-
-export default SignInComponent;

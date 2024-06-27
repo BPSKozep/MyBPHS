@@ -2,7 +2,11 @@ import Card from "components/Card";
 import SignInComponent from "components/SignInComponent";
 import React from "react";
 
-function SignIn() {
+export const metadata = {
+    title: "MyBPHS - Bejelentkezés",
+};
+
+export default function SignIn() {
     return (
         <div className="flex h-full w-full flex-col items-center justify-center text-white">
             <Card>
@@ -11,5 +15,3 @@ function SignIn() {
         </div>
     );
 }
-
-export default SignIn;

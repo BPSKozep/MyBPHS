@@ -3,7 +3,7 @@
 import CreditBar from "components/CreditBar";
 import React, { useState } from "react";
 
-function CreditBarDemo() {
+export default function CreditBarDemo() {
     const [progressInput, setProgressInput] = useState("");
     const [progress, setProgress] = useState(0);
 
@@ -41,5 +41,3 @@ function CreditBarDemo() {
         </>
     );
 }
-
-export default CreditBarDemo;

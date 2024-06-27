@@ -1,8 +1,6 @@
 import React from "react";
 import PageWithHeader from "components/PageWithHeader";
 
-function Credits() {
+export default function Credits() {
     return <PageWithHeader title="Kreditek"></PageWithHeader>;
 }
-
-export default Credits;
