@@ -7,7 +7,7 @@ import IconSubmitButton from "components/IconSubmitButton";
 import Card from "components/Card";
 import { trpc } from "utils/trpc";
 import { useDebounce } from "use-debounce";
-import TimetableEditor from "components/TimetableEditor";
+import TimetableEditor from "components/admin/TimetableEditor";
 import { useCallback, useEffect, useState } from "react";
 
 const EMPTY_TIMETABLE = Array(5).fill([]);
