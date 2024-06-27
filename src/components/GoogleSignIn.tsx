@@ -14,9 +14,11 @@ function GoogleSignIn() {
         >
             <div className="relative flex items-center justify-center space-x-4 px-2 align-middle">
                 <Image
-                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    src="https://cdn.bpskozep.hu/google.svg"
                     className="absolute left-0 w-5"
                     alt="google logo"
+                    width={48}
+                    height={48}
                 />
                 <span className="w-max font-semibold tracking-wide text-white transition duration-300">
                     Bejelentkezés Google-lel
