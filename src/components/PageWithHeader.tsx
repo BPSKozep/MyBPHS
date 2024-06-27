@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from "react";
-import PageHeader from "./PageHeader";
+import PageHeader from "components/PageHeader";
 
 function PageWithHeader({
     title,

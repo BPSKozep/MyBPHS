@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import Tabs from "./Tabs";
+import Tabs from "components/Tabs";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"];
 

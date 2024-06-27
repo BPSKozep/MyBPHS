@@ -7,6 +7,7 @@ import IconSubmitButton from "components/IconSubmitButton";
 import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "utils/trpc";
+
 function LaptopPasswordReset() {
     const [input, setInput] = useState("");
     const { data, refetch: refetchData } =

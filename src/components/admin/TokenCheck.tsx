@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import NFCInput from "components/admin/NFCInput";
 import { trpc } from "utils/trpc";
 import { getWeek, getWeekYear } from "utils/isoweek";
-import UserDropdown from "./UserDropdown";
-import Loading from "../Loading";
+import UserDropdown from "components/admin/UserDropdown";
+import Loading from "components/Loading";
 
 function TokenCheck() {
     const [nfcId, setNfcId] = useState<string>("");
