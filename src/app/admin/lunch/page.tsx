@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import PageWithHeader from "components/PageWithHeader";
 import Card from "components/Card";
-import LunchOrders from "components/LunchOrders";
-import SetMenuForm from "components/SetMenuForm";
+import LunchOrders from "components/admin/LunchOrders";
+import SetMenuForm from "components/admin/SetMenuForm";
 import OnlyRoles from "components/OnlyRoles";
 import { trpc } from "utils/trpc";
 import IconSubmitButton from "components/IconSubmitButton";
@@ -12,8 +12,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
-import TokenCheck from "components/TokenCheck";
-import CloseMenuOrders from "components/CloseMenuOrders";
+import TokenCheck from "components/admin/TokenCheck";
+import CloseMenuOrders from "components/admin/CloseMenuOrders";
 
 // export const metadata = {
 //     title: "MyBPHS - Admin / Ebédrendelés",

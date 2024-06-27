@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { trpc } from "utils/trpc";
 
-export default function UserInput({
+export default function UserDropdown({
     onChange,
 }: {
     onChange: (data: string) => void;

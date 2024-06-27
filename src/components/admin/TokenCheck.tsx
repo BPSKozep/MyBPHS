@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import NFCInput from "components/NFCInput";
+import NFCInput from "components/admin/NFCInput";
 import { trpc } from "utils/trpc";
 import { getWeek, getWeekYear } from "utils/isoweek";
-import UserInput from "./UserInput";
-import Loading from "./Loading";
+import UserDropdown from "./UserDropdown";
+import Loading from "../Loading";
 
 function TokenCheck() {
     const [nfcId, setNfcId] = useState<string>("");
@@ -69,7 +69,7 @@ function TokenCheck() {
             )}
             {checkMode === "user" && (
                 <div className="m-3">
-                    <UserInput onChange={setEmail} />
+                    <UserDropdown onChange={setEmail} />
                 </div>
             )}
             {nfcId && !user && isUserFetched && (

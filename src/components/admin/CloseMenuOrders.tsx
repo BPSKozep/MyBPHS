@@ -1,5 +1,5 @@
 import React from "react";
-import IconSubmitButton from "./IconSubmitButton";
+import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarXmark } from "@fortawesome/free-solid-svg-icons";
 import sleep from "utils/sleep";
