@@ -3,6 +3,10 @@ import PageWithHeader from "components/PageWithHeader";
 import React from "react";
 import BigLinkButton from "components/BigLinkButton";
 
+export const metadata = {
+    title: "MyBPHS - Admin",
+};
+
 function Users() {
     return (
         <OnlyRoles roles={["administrator"]}>
