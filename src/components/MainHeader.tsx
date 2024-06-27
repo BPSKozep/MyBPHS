@@ -31,20 +31,22 @@ export default function MainHeader() {
                     <span className="hidden sm:inline">-ben!</span>
                 </Link>
             </h1>
-            <div
-                className="absolute right-10 flex w-10 items-center justify-end"
-                onClick={() => {
-                    setSheetOpen(true);
-                }}
-            >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                    src={data?.user?.image || ""}
-                    alt="Profile picture"
-                    className="cursor-pointer rounded-full"
-                    draggable="false"
-                />
-            </div>
+            {data && (
+                <div
+                    className="absolute right-10 flex w-10 items-center justify-end"
+                    onClick={() => {
+                        setSheetOpen(true);
+                    }}
+                >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src={data?.user?.image || ""}
+                        alt="Profile picture"
+                        className="cursor-pointer rounded-full"
+                        draggable="false"
+                    />
+                </div>
+            )}
             <Sheet
                 isOpen={isSheetOpen}
                 onClose={() => {
