@@ -9,10 +9,15 @@ import OnlyRoles from "components/OnlyRoles";
 import { trpc } from "utils/trpc";
 import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faCalendarXmark } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
 import TokenCheck from "components/TokenCheck";
+import CloseMenuOrders from "components/CloseMenuOrders";
+
+// export const metadata = {
+//     title: "MyBPHS - Admin / Ebédrendelés",
+// };
 
 export default function LunchAdmin() {
     const [menuOptions, setMenuOptions] = useState(
@@ -33,11 +38,9 @@ export default function LunchAdmin() {
     const { mutateAsync: sendDiscordWebhook } =
         trpc.webhook.sendDiscordWebhook.useMutation();
 
-    const { mutateAsync: setIsOpen } = trpc.menu.setIsopen.useMutation();
-
     return (
         <OnlyRoles roles={["administrator"]}>
-            <PageWithHeader title="Admin | Ebédrendelés" homeLocation="/admin">
+            <PageWithHeader title="Admin / Ebédrendelés" homeLocation="/admin">
                 <div className="flex flex-col justify-center lg:flex-row">
                     <Card>
                         <div className="flex flex-col items-center justify-center">
@@ -97,42 +100,7 @@ export default function LunchAdmin() {
                     </Card>
                     <Card>
                         <div className="flex flex-col items-center justify-center text-center">
-                            <h2 className="mb-3 mt-5 font-bold text-white">
-                                Beküldések lezárása
-                            </h2>
-                            <div>
-                                <IconSubmitButton
-                                    icon={
-                                        <FontAwesomeIcon
-                                            icon={faCalendarXmark}
-                                        />
-                                    }
-                                    onClick={async () => {
-                                        try {
-                                            await sleep(500);
-
-                                            const date = new Date();
-                                            date.setDate(date.getDate() + 7);
-
-                                            await setIsOpen({
-                                                week: getWeek(date),
-                                                year: getWeekYear(date),
-                                                isOpen: false,
-                                            });
-
-                                            await sendDiscordWebhook({
-                                                type: "Lunch",
-                                                message:
-                                                    "Beküldések lezárva. ❌",
-                                            });
-
-                                            return true;
-                                        } catch (err) {
-                                            return false;
-                                        }
-                                    }}
-                                />
-                            </div>
+                            <CloseMenuOrders />
                             <hr className="border-1 my-5 h-1 w-full bg-gray-900" />
                             <TokenCheck />
                         </div>
