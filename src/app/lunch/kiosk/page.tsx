@@ -3,6 +3,10 @@ import PageWithHeader from "components/PageWithHeader";
 import React from "react";
 import KioskComponent from "components/admin/KioskComponent";
 
+export const metadata = {
+    title: "MyBPHS - Kiosk",
+};
+
 function Kiosk() {
     return (
         <PageWithHeader title="Kiosk">

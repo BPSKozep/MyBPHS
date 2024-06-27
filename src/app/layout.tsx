@@ -10,6 +10,29 @@ import OnlyAuthed from "components/OnlyAuthed";
 import Providers from "./providers";
 import MainHeader from "components/MainHeader";
 import IdentifyUser from "components/IdentifyUser";
+import { Metadata, Viewport } from "next";
+
+export const metadata: Metadata = {
+    applicationName: "MyBPHS",
+    title: "MyBPHS",
+    description: "User portal for BPS JPP",
+    manifest: "/manifest.json",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "default",
+        title: "MyBPHS",
+    },
+    openGraph: {
+        type: "website",
+        siteName: "MyBPHS",
+        title: "MyBPHS",
+        description: "User portal for BPS JPP",
+    },
+};
+
+export const viewport: Viewport = {
+    themeColor: "#111827",
+};
 
 export default function RootLayout({
     children,

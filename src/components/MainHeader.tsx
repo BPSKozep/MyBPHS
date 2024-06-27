@@ -26,12 +26,29 @@ export default function MainHeader() {
                 <PWAInstall />
             </div>
             <h1 className="text-center text-2xl font-bold text-white">
-                <Link href="/">
-                    <span className="hidden sm:inline">Üdvözlünk a </span>
-                    <span className="font-handwriting text-amber-400">My</span>
-                    <span className="font-black">BPHS</span>
-                    <span className="hidden sm:inline">-ben!</span>
-                </Link>
+                {data ? (
+                    <h1 className="text-center text-2xl font-bold text-white">
+                        <Link href="/">
+                            <span className="hidden sm:inline">
+                                Üdvözlünk a
+                            </span>
+                            <span className="font-handwriting text-amber-400">
+                                My
+                            </span>
+                            <span className="font-black">BPHS</span>
+                            <span className="hidden sm:inline">-ben!</span>
+                        </Link>
+                    </h1>
+                ) : (
+                    <>
+                        <span className="hidden sm:inline">Üdvözlünk a </span>
+                        <span className="font-handwriting text-amber-400">
+                            My
+                        </span>
+                        <span className="font-black">BPHS</span>
+                        <span className="hidden sm:inline">-ben!</span>
+                    </>
+                )}
             </h1>
             {data && (
                 <div
@@ -57,7 +74,8 @@ export default function MainHeader() {
             >
                 <h1 className="text-2xl font-bold text-white">Felhasználó</h1>
                 <p className="my-3 text-gray-400">
-                    Itt megtekintheted a saját információidat
+                    Itt megtekintheted a saját információidat vagy
+                    kijeletkezhetsz.
                 </p>
                 <div className="flex flex-col gap-3 align-middle">
                     <h2 className="text-center align-middle font-bold text-white">
