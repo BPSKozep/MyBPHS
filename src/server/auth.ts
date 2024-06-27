@@ -26,11 +26,6 @@ declare module "next-auth" {
     // }
 }
 
-/**
- * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
- *
- * @see https://next-auth.js.org/configuration/options
- */
 export const authOptions: NextAuthOptions = {
     callbacks: {
         session: ({ session, token }) => ({
@@ -47,6 +42,9 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GOOGLE_SECRET as string,
         }),
     ],
+    pages: {
+        signIn: "/auth/signin",
+    },
 };
 
 /**
