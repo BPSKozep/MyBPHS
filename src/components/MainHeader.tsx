@@ -5,7 +5,6 @@ import { trpc } from "utils/trpc";
 import PWAInstall from "components/PWAInstall";
 import Link from "next/link";
 import Sheet from "components/Sheet";
-import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import sleep from "utils/sleep";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
@@ -85,7 +84,7 @@ export default function MainHeader() {
                         type="text"
                         disabled
                         value={data?.user?.name || "Nincs adat"}
-                        className="mb-5 h-10 overflow-scroll rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-slate-500"
+                        className="mb-5 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
                 </div>
                 <div className="flex flex-col gap-3 align-middle">
@@ -96,7 +95,7 @@ export default function MainHeader() {
                         type="text"
                         disabled
                         value={data?.user?.email || "Nincs adat"}
-                        className="mb-5 h-10 overflow-scroll rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-slate-500"
+                        className="mb-5 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
                 </div>
                 <div className="flex flex-col gap-3 align-middle">
@@ -107,26 +106,21 @@ export default function MainHeader() {
                         type="text"
                         disabled
                         value={NfcId || "Nincs adat"}
-                        className="mb-5 h-10 rounded-md border-2 border-slate-400 bg-[#09090b] p-[0.1rem] text-center text-slate-500"
+                        className="mb-5 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
                 </div>
-                <div className="flex justify-center">
-                    <IconSubmitButton
-                        icon={<FontAwesomeIcon icon={faRightFromBracket} />}
-                        onClick={async () => {
-                            try {
-                                await sleep(500);
+                <div
+                    className="flex cursor-pointer items-center justify-center align-middle text-white"
+                    onClick={async () => {
+                        await sleep(500);
 
-                                await signOut({
-                                    callbackUrl: "/",
-                                });
-
-                                return true;
-                            } catch (err) {
-                                return false;
-                            }
-                        }}
-                    />
+                        await signOut({
+                            callbackUrl: "/",
+                        });
+                    }}
+                >
+                    <p className="mr-1">Kijelentkezés</p>
+                    <FontAwesomeIcon icon={faRightFromBracket} />
                 </div>
             </Sheet>
         </header>

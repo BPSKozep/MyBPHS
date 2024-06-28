@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faX } from "@fortawesome/free-solid-svg-icons";
 
 interface SheetProps {
     isOpen: boolean;
@@ -33,30 +35,25 @@ const Sheet = ({ isOpen, onClose, children }: SheetProps) => {
                       className="fixed inset-0 bg-black/40"
                       onClick={onClose}
                   />
-                  <AnimatePresence>
-                      <motion.div
-                          key="modal"
-                          initial={{ x: 300 }}
-                          animate={{ x: 0 }}
-                          exit={{ x: 300 }}
-                          transition={{ duration: 0.2 }}
-                          className={`fixed inset-y-0 right-0 w-3/4 transform border-l-2 border-l-gray-800 bg-[#09090b] p-6 shadow-lg transition-transform sm:max-w-sm ${
-                              isOpen ? "translate-x-0" : "translate-x-full"
-                          }`}
+                  <motion.div
+                      initial={{ x: 400 }}
+                      animate={{ x: 0 }}
+                      transition={{ type: "spring" }}
+                      className={`fixed inset-y-0 right-0 w-3/4 transform border-l-2 border-l-gray-800 bg-[#111827] p-6 shadow-lg transition-transform sm:max-w-sm ${
+                          isOpen ? "translate-x-0" : "translate-x-full"
+                      }`}
+                  >
+                      <button
+                          className="absolute right-5 top-5 text-white"
+                          onClick={onClose}
                       >
-                          <button
-                              className="absolute right-5 top-5 text-white"
-                              onClick={onClose}
-                          >
-                              X
-                          </button>
-                          {children}
-                      </motion.div>
-                  </AnimatePresence>
+                          <FontAwesomeIcon icon={faX} />
+                      </button>
+                      {children}
+                  </motion.div>
               </div>,
               document.body
           )
         : null;
 };
-
 export default Sheet;
