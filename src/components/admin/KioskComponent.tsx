@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { trpc } from "utils/trpc";
 import OrderCounts from "components/OrderCounts";
 import { io } from "socket.io-client";
@@ -12,7 +12,7 @@ function KioskComponent() {
     const [profileImageURL, setProfileImageURL] = useState(
         "https://cdn.bpskozep.hu/no_picture.png"
     );
-    const [orderCounts, setOrderCounts] = useState<Record<string, number>>({});
+    // const [orderCounts, setOrderCounts] = useState<Record<string, number>>({});
 
     const {
         data: order,
@@ -59,6 +59,10 @@ function KioskComponent() {
 
     const { mutate: setCompleted } = trpc.order.setCompleted.useMutation();
 
+    const { mutateAsync: saveKiosk } = trpc.kiosk.save.useMutation();
+    const { data: kioskCounts, refetch: kioskCountsRefetch } =
+        trpc.kiosk.get.useQuery();
+
     const loading = orderloading || userLoading;
     const error = !loading && (orderError || userError || socketFailure);
 
@@ -69,19 +73,20 @@ function KioskComponent() {
             setProfileImageURL(`https://cdn.bpskozep.hu/${user?.email}`);
     }, [user]);
 
+    const orderCounts = useMemo(() => {
+        if (!kioskCounts) return {};
+
+        return Object.fromEntries(kioskCounts);
+    }, [kioskCounts]);
+
     useEffect(() => {
         if (order && !order.orderError) {
             setCompleted({ nfcId });
-            setOrderCounts((prevOrderCounts) => {
-                const newOrderCounts = { ...prevOrderCounts };
-
-                if (!newOrderCounts[order.order])
-                    newOrderCounts[order.order] = 0;
-
-                newOrderCounts[order.order] += 1;
-
-                return newOrderCounts;
-            });
+            console.log(order.order, order);
+            (async () => {
+                await saveKiosk(order.order);
+                kioskCountsRefetch();
+            })();
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

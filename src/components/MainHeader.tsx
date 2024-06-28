@@ -119,8 +119,8 @@ export default function MainHeader() {
                         });
                     }}
                 >
-                    <p className="mr-1">Kijelentkezés</p>
                     <FontAwesomeIcon icon={faRightFromBracket} />
+                    <p className="ml-2">Kijelentkezés</p>
                 </div>
             </Sheet>
         </header>
