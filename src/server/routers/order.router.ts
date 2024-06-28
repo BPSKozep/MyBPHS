@@ -209,28 +209,27 @@ const orderRouter = router({
                 menu: menu.id,
                 user: user.id,
             });
-
             if (!order) {
-                order = await new Order<IOrder>({
+                await new Order<IOrder>({
                     order: [
                         {
-                            chosen: menu.options[0]["a-menu"],
+                            chosen: "a-menu",
                             completed: false,
                         },
                         {
-                            chosen: menu.options[1]["a-menu"],
+                            chosen: "a-menu",
                             completed: false,
                         },
                         {
-                            chosen: menu.options[2]["a-menu"],
+                            chosen: "a-menu",
                             completed: false,
                         },
                         {
-                            chosen: menu.options[3]["a-menu"],
+                            chosen: "a-menu",
                             completed: false,
                         },
                         {
-                            chosen: menu.options[4]["a-menu"],
+                            chosen: "a-menu",
                             completed: false,
                         },
                     ],
@@ -238,10 +237,28 @@ const orderRouter = router({
                     user: user.id,
                 }).save();
             }
+            order = await Order.findOne({
+                menu: menu.id,
+                user: user.id,
+            });
+
+            if (!order) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Order not found",
+                });
+            }
 
             const combinedOptions = menuCombine(menu.options[day]);
 
             const chosen = combinedOptions[order.order[day].chosen];
+
+            if (!chosen) {
+                return {
+                    order: "Hibás rendelés",
+                    orderError: true,
+                };
+            }
 
             if (order.order[day].completed) {
                 return {

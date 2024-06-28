@@ -14,7 +14,7 @@ const nextConfig = {
             {
                 protocol: "https",
                 hostname: "cdn.bpskozep.hu",
-                port: "",
+                port: "443",
                 pathname: "**",
             },
         ],
