@@ -36,9 +36,8 @@ const Sheet = ({ isOpen, onClose, children }: SheetProps) => {
                       onClick={onClose}
                   />
                   <motion.div
-                      initial={{ x: 400 }}
-                      animate={{ x: 0 }}
-                      transition={{ type: "spring" }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       className={`fixed inset-y-0 right-0 w-3/4 transform border-l-2 border-l-gray-800 bg-[#111827] p-6 shadow-lg transition-transform sm:max-w-sm ${
                           isOpen ? "translate-x-0" : "translate-x-full"
                       }`}
