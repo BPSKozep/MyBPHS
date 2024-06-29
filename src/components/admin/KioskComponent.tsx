@@ -94,10 +94,20 @@ function KioskComponent() {
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center text-center text-white">
+            <OrderCounts data={orderCounts} />
             {isValidNfc && loading && <Loading />}
+
+            {isValidNfc &&
+                error &&
+                process.env.MONGODB_DATABASE === "dev-mybphs" && (
+                    <h1 className="text-5xl font-bold">
+                        Hiba történt. Hétvége?
+                    </h1>
+                )}
             {isValidNfc && error && (
                 <h1 className="text-5xl font-bold">Hiba történt.</h1>
             )}
+
             {!isValidNfc && !socketFailure && (
                 <h1 className="text-5xl font-bold">
                     Várakozás token olvasására...
