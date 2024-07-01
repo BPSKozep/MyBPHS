@@ -12,7 +12,7 @@
     "dependencies": {
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.5",
-        "@fontsource-variable/montserrat": "^5.0.18",
+        "@fontsource-variable/montserrat": "^5.0.19",
         "@fontsource-variable/roboto-slab": "^5.0.20",
         "@fontsource-variable/source-code-pro": "^5.0.19",
         "@fontsource/lily-script-one": "^5.0.12",
