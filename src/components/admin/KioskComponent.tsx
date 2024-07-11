@@ -138,6 +138,7 @@ function KioskComponent() {
                         }`}
                     >
                         {order?.order}
+                        {/* TODO: Investigate unknown order text */}
                     </h2>
                     <OrderCounts data={orderCounts} />
                 </div>
