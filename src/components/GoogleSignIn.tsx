@@ -17,8 +17,8 @@ export default function GoogleSignIn() {
 
     return (
         <motion.div
-            initial="initial"
-            animate={clicked ? "clicked" : "initial"}
+            // initial="initial"
+            // animate={clicked ? "clicked" : "initial"}
             variants={buttonVariants}
             onClick={() => {
                 setClicked(true);

@@ -74,7 +74,7 @@ export default function MainHeader() {
                 <h1 className="text-2xl font-bold text-white">Felhasználó</h1>
                 <p className="my-3 text-gray-400">
                     Itt megtekintheted a saját információidat vagy
-                    kijeletkezhetsz.
+                    kijelentkezhetsz.
                 </p>
                 <div className="flex flex-col gap-3 align-middle">
                     <h2 className="text-center align-middle font-bold text-white">
@@ -120,7 +120,7 @@ export default function MainHeader() {
                     }}
                 >
                     <FontAwesomeIcon icon={faRightFromBracket} />
-                    <p className="ml-2">Kijelentkezés</p>
+                    <p className="ml-2 text-lg">Kijelentkezés</p>
                 </div>
             </Sheet>
         </header>
