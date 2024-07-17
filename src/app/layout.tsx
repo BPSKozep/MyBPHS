@@ -2,7 +2,7 @@ import "@fontsource-variable/montserrat";
 import "@fontsource-variable/source-code-pro";
 import "@fontsource-variable/roboto-slab";
 import "@fontsource/lily-script-one";
-import "styles/globals.css";
+import "./globals.css";
 
 import OnlyAuthed from "components/OnlyAuthed";
 import Providers from "./providers";
@@ -14,8 +14,11 @@ import PageTransition from "components/PageTransition";
 
 export const metadata: Metadata = {
     applicationName: "MyBPHS",
-    title: "MyBPHS",
-    description: "User portal for BPS JPP",
+    title: {
+        default: "MyBPHS",
+        template: "%s - MyBPHS",
+    },
+    description: "Hasznos eszközök a BPS JPP tagjainak",
     manifest: "/manifest.json",
     appleWebApp: {
         capable: true,
@@ -26,7 +29,10 @@ export const metadata: Metadata = {
         type: "website",
         siteName: "MyBPHS",
         title: "MyBPHS",
-        description: "User portal for BPS JPP",
+        description: "Hasznos eszközök a BPS JPP tagjainak",
+    },
+    twitter: {
+        card: "summary_large_image",
     },
 };
 
