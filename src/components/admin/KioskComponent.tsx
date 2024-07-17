@@ -5,14 +5,12 @@ import { trpc } from "utils/trpc";
 import OrderCounts from "components/OrderCounts";
 import { io } from "socket.io-client";
 import Loading from "components/Loading";
-import Image from "next/image";
 
 function KioskComponent() {
     const [nfcId, setNfcId] = useState("");
     const [profileImageURL, setProfileImageURL] = useState(
         "https://cdn.bpskozep.hu/no_picture.png"
     );
-    // const [orderCounts, setOrderCounts] = useState<Record<string, number>>({});
 
     const {
         data: order,
@@ -82,7 +80,6 @@ function KioskComponent() {
     useEffect(() => {
         if (order && !order.orderError) {
             setCompleted({ nfcId });
-            console.log(order.order, order);
             (async () => {
                 await saveKiosk(order.order);
                 kioskCountsRefetch();
@@ -94,9 +91,11 @@ function KioskComponent() {
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center text-center text-white">
-            <OrderCounts data={orderCounts} />
             {isValidNfc && loading && <Loading />}
 
+            {isValidNfc && error && (
+                <h1 className="text-5xl font-bold">Hiba történt.</h1>
+            )}
             {isValidNfc &&
                 error &&
                 process.env.MONGODB_DATABASE === "dev-mybphs" && (
@@ -104,9 +103,6 @@ function KioskComponent() {
                         Hiba történt. Hétvége?
                     </h1>
                 )}
-            {isValidNfc && error && (
-                <h1 className="text-5xl font-bold">Hiba történt.</h1>
-            )}
 
             {!isValidNfc && !socketFailure && (
                 <h1 className="text-5xl font-bold">
@@ -118,7 +114,8 @@ function KioskComponent() {
             )}
             {isValidNfc && user && order && (
                 <div className="flex flex-col items-center justify-center gap-y-6">
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                         src={profileImageURL}
                         alt=""
                         className="m-10 aspect-square rounded-full object-cover object-[50%_20%]"
@@ -138,7 +135,6 @@ function KioskComponent() {
                         }`}
                     >
                         {order?.order}
-                        {/* TODO: Investigate unknown order text */}
                     </h2>
                     <OrderCounts data={orderCounts} />
                 </div>

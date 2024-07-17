@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
@@ -10,10 +10,6 @@ export default function PageTransition({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-
-    useEffect(() => {
-        console.log(pathname);
-    }, [pathname]);
 
     return (
         <motion.main

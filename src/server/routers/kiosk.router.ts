@@ -82,7 +82,6 @@ const kioskRouter = router({
             }
 
             // get data
-            console.log(kiosk.options.entries());
             return Array.from(kiosk.options.entries());
         }),
 });

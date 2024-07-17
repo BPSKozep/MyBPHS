@@ -40,7 +40,6 @@ function TokenCheck() {
         year,
         week,
     });
-    console.log(user);
     const orderExists = order && order.length > 0;
 
     return (
