@@ -14,7 +14,7 @@ const nextConfig = {
             {
                 protocol: "https",
                 hostname: "cdn.bpskozep.hu",
-                port: "",
+                port: "443",
                 pathname: "**",
             },
         ],
@@ -42,3 +42,11 @@ const withPWA = require("next-pwa")({
 });
 
 module.exports = withPWA(module.exports);
+
+module.exports = {
+    i18n: {
+        locales: ["en", "hu"],
+        defaultLocale: "hu",
+        localeDetection: false,
+    },
+};

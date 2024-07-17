@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { procedure, router } from "../trpc";
+import { procedure, router } from "server/trpc";
 import { TRPCError } from "@trpc/server";
 
 const webhookRouter = router({
