@@ -4,7 +4,7 @@ import React from "react";
 import KioskComponent from "components/admin/KioskComponent";
 
 export const metadata = {
-    title: "MyBPHS - Kiosk",
+    title: "Kiosk",
 };
 
 function Kiosk() {

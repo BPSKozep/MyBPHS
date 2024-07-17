@@ -3,7 +3,7 @@ import SignInComponent from "components/SignInComponent";
 import React from "react";
 
 export const metadata = {
-    title: "MyBPHS - Bejelentkezés",
+    title: "Bejelentkezés",
 };
 
 export default function SignIn() {

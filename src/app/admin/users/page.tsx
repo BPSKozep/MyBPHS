@@ -4,7 +4,7 @@ import PageWithHeader from "components/PageWithHeader";
 import React from "react";
 
 export const metadata = {
-    title: "MyBPHS - Admin / Felhasználók",
+    title: "Admin / Felhasználók",
 };
 
 export default function Users() {

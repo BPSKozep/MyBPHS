@@ -4,7 +4,7 @@ import PageWithHeader from "components/PageWithHeader";
 import React from "react";
 
 export const metadata = {
-    title: "MyBPHS - Laptop Jelszó",
+    title: "Laptop Jelszó",
 };
 
 function LaptopPassword() {
