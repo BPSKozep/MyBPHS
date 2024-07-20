@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { trpc } from "utils/trpc";
 import PWAInstall from "components/PWAInstall";
 import Link from "next/link";
@@ -18,6 +18,31 @@ export default function MainHeader() {
     const { data: NfcId } = trpc.user.getNfcId.useQuery(
         data?.user?.email || ""
     );
+
+    const {mutateAsync: setNotificationPreference} = trpc.user.setNotificationPreference.useMutation();
+
+    const {data: notificationPreference, refetch: refetchNotificationPreference} = trpc.user.getNotificationPreference.useQuery();
+
+    const [switchState, setSwitchState] = useState(false)
+
+    useEffect(() => {
+        if (notificationPreference === "push") {
+            setSwitchState(true);
+        }
+        else {
+            setSwitchState(false);
+        }
+    }, [notificationPreference]);
+
+    useEffect(() => {
+        if (switchState) {
+            setNotificationPreference("push");
+        }
+        else {
+            setNotificationPreference("email");
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [switchState]);
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
@@ -108,6 +133,21 @@ export default function MainHeader() {
                         value={NfcId || "Nincs adat"}
                         className="mb-5 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
+                </div>
+                <div className="flex flex-col gap-3 align-middle text-white mb-8">
+                    <h2 className="text-center font-bold">
+                        Értesítés típusa
+                    </h2>
+                    <div className="flex flex-row justify-center">
+                        <p>Email</p>
+                    <label className="inline-flex items-center cursor-pointer mx-3">
+                        <input type="checkbox" value="" className="sr-only peer" checked={switchState} onChange={async (e) => {
+                            await setSwitchState(e.target.checked)
+                            refetchNotificationPreference();
+                            }}/>
+                        <div className="relative w-11 h-6 peer-focus:outline-none rounded-full peer bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                    <p>Push</p></div>
                 </div>
                 <div
                     className="flex cursor-pointer items-center justify-center align-middle text-white"
