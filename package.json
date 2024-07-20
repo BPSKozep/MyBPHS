@@ -44,6 +44,7 @@
         "superjson": "^2.2.1",
         "tailwind-merge": "^2.4.0",
         "use-debounce": "^9.0.4",
+        "web-push": "^3.6.7",
         "zod": "^3.23.8"
     },
     "devDependencies": {
