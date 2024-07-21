@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 if (!admin.apps.length) {
-  const serviceAccount = ("data/firebase-servicekey.json");
+  const serviceAccount = ("src/data/firebase-servicekey.json");
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });

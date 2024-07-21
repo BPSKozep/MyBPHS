@@ -100,7 +100,7 @@ const useFcmToken = () => {
       const unsubscribe = onMessage(m, (payload) => {
         if (Notification.permission !== "granted") return;
 
-        console.log("Foreground push notification received:", payload);
+        console.log("Foreground push notification received");
         const link = payload.fcmOptions?.link || payload.data?.link;
 
         // --------------------------------------------

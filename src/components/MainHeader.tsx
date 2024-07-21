@@ -11,6 +11,8 @@ import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import useFcmToken from "./useFcmToken";
+import { motion } from "framer-motion";
+import Card from "./Card";
 
 export default function MainHeader() {
     const { data } = useSession();
@@ -156,7 +158,29 @@ export default function MainHeader() {
                             }}/>
                         <div className="relative w-11 h-6 peer-focus:outline-none rounded-full peer bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
-                    <p>Push</p></div>
+                    <p>Push</p>
+                    </div>
+                    <div className="text-center">
+                    <Card>
+                        {/* <h2>Értesítés teszt: {useFcmToken === "denied" ? <p>✅</p> : <p>❌</p>}</h2> */}
+                        {/* <button onClick={() => {console.log(useFcmToken())}}>a</button> */}
+                        <motion.span
+                            className="text-white text-center"
+                            initial={{
+                                opacity: 0,
+                                height: 0,
+                            }}
+                            animate={{
+                                opacity: switchState ? 1 : 0,
+                                height: switchState ? "auto" : 0,
+                            }}
+                            transition={{
+                                height: { delay: switchState ? 0 : 0.2 },
+                            }}
+                        >
+                            Figyelj arra, hogy a böngésződben engedélyezve legyenek a push értesítések!
+                        </motion.span>
+                    </Card></div>
                 </div>
                 <div
                     className="flex cursor-pointer items-center justify-center align-middle text-white"

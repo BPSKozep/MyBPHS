@@ -10,6 +10,7 @@ export interface IUser {
     nfcId: string;
     laptopPasswordChanged?: Date;
     notificationPreference?: "email" | "push";
+    pushDevices?: number;
 }
 
 const userSchema = new Schema<IUser>({
@@ -39,6 +40,10 @@ const userSchema = new Schema<IUser>({
     },
     notificationPreference: {
         type: String,
+        required: false,
+    },
+    pushDevices: {
+        type: Number,
         required: false,
     },
 });
