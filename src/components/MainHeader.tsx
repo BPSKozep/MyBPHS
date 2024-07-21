@@ -10,6 +10,7 @@ import sleep from "utils/sleep";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
+import useFcmToken from "./useFcmToken";
 
 export default function MainHeader() {
     const { data } = useSession();
@@ -20,10 +21,13 @@ export default function MainHeader() {
     );
 
     const {mutateAsync: setNotificationPreference} = trpc.user.setNotificationPreference.useMutation();
+    const {mutateAsync: sendPush} = trpc.fcmpush.sendPush.useMutation();
 
     const {data: notificationPreference, refetch: refetchNotificationPreference} = trpc.user.getNotificationPreference.useQuery();
 
     const [switchState, setSwitchState] = useState(false)
+
+    const { token } = useFcmToken();
 
     useEffect(() => {
         if (notificationPreference === "push") {
@@ -32,7 +36,7 @@ export default function MainHeader() {
         else {
             setSwitchState(false);
         }
-    }, [notificationPreference]);
+    }, [notificationPreference]);  // TODO only change switch state if different from current state
 
     useEffect(() => {
         if (switchState) {
@@ -49,7 +53,7 @@ export default function MainHeader() {
             <div className="absolute left-10 flex w-10 items-center justify-end">
                 <PWAInstall />
             </div>
-            <h1 className="text-center text-2xl font-bold text-white">
+            <div className="text-center text-2xl font-bold text-white">
                 {data ? (
                     <h1 className="text-center text-2xl font-bold text-white">
                         <Link href="/">
@@ -73,7 +77,7 @@ export default function MainHeader() {
                         <span className="hidden sm:inline">-ben!</span>
                     </>
                 )}
-            </h1>
+            </div>
             {data && (
                 <div
                     className="absolute right-10 flex w-10 items-center justify-end"
@@ -144,6 +148,11 @@ export default function MainHeader() {
                         <input type="checkbox" value="" className="sr-only peer" checked={switchState} onChange={async (e) => {
                             await setSwitchState(e.target.checked)
                             refetchNotificationPreference();
+                            sendPush({
+                                token: token || "",
+                                title: "Így fog kinézni a cím",
+                                message: "Így pedig a leírás",
+                            })
                             }}/>
                         <div className="relative w-11 h-6 peer-focus:outline-none rounded-full peer bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>

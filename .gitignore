@@ -42,4 +42,5 @@ public/sw.js.map
 public/workbox-*.js
 public/workbox-*.js.map
 public/fallback-*
-data/firebase-servicekey.json
+firebase-servicekey.json
+certificates
