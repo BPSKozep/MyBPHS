@@ -313,7 +313,7 @@ const userRouter = router({
                 });
             }
 
-            const authorized = await checkRoles(ctx.session, ["administrator"]);
+            const authorized = await checkRoles(ctx.session, ["administrator", "teacher"]);
 
             if (!authorized) {
                 throw new TRPCError({
