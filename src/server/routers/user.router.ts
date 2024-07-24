@@ -313,7 +313,7 @@ const userRouter = router({
                 });
             }
 
-            const authorized = await checkRoles(ctx.session, ["administrator"]);
+            const authorized = await checkRoles(ctx.session, ["administrator", "teacher"]);
 
             if (!authorized) {
                 throw new TRPCError({
@@ -364,6 +364,86 @@ const userRouter = router({
             const user = await User.findOne({ email: input });
 
             return user?.nfcId || "";
+        }),
+    setNotificationPreference: procedure
+        .input(z.string())
+        .mutation(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "student",
+                "teacher",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const user = await User.findOne({ email: ctx.session.user?.email });
+
+            if (!user) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+            }
+
+            if (input !== "email" && input !== "push") {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "Invalid input",
+                });
+            }
+
+            user.notificationPreference = input;
+            await user.save();
+        }),
+
+    getNotificationPreference: procedure
+        .output(z.string())
+        .query(async ({ ctx }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "student",
+                "teacher",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const user = await User.findOne({ email: ctx.session.user?.email });
+
+            if (!user) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+            }
+
+            if (!user.notificationPreference) {
+                user.notificationPreference = "email";
+                await user.save();
+            }
+
+            return user.notificationPreference;
         }),
 });
 

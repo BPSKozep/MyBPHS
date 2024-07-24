@@ -8,6 +8,7 @@ import emailRouter from "./email.router";
 import webhookRouter from "./webhook.router";
 import adPasswordRouter from "./adpassword.router";
 import kioskRouter from "./kiosk.router";
+import fcmPushRouter from "./fcmpush.router";
 
 export const appRouter = router({
     user: userRouter,
@@ -18,6 +19,7 @@ export const appRouter = router({
     webhook: webhookRouter,
     adpassword: adPasswordRouter,
     kiosk: kioskRouter,
+    fcmpush: fcmPushRouter,
 });
 
 // export type definition of API
