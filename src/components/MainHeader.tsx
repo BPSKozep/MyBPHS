@@ -38,17 +38,33 @@ export default function MainHeader() {
         else {
             setSwitchState(false);
         }
-    }, [notificationPreference]);  // TODO only change switch state if different from current state
+    }, [notificationPreference]);
 
     useEffect(() => {
+        const updatePreference = async () => {
+            if (switchState) {
+                await setNotificationPreference("push");
+            } else {
+                await setNotificationPreference("email");
+            }
+        };
+        updatePreference();
+    }, [switchState, setNotificationPreference]);
+
+    useEffect(() => {
+        const updateNotificationPreference = async () => {
+            await refetchNotificationPreference();
+            await sendPush({
+                token: token || "",
+                title: "Így fog kinézni a cím",
+                message: "Így pedig a leírás",
+            });
+        };
+
         if (switchState) {
-            setNotificationPreference("push");
+            updateNotificationPreference();
         }
-        else {
-            setNotificationPreference("email");
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [switchState]);
+    }, [switchState, refetchNotificationPreference, sendPush, token]);
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
@@ -147,25 +163,13 @@ export default function MainHeader() {
                     <div className="flex flex-row justify-center">
                         <p>Email</p>
                     <label className="inline-flex items-center cursor-pointer mx-3">
-                        <input type="checkbox" value="" className="sr-only peer" checked={switchState} onChange={async (e) => {
-                            await setSwitchState(e.target.checked)
-                            refetchNotificationPreference();
-                            sendPush({
-                                token: token || "",
-                                title: "Így fog kinézni a cím",
-                                message: "Így pedig a leírás",
-                            })
-                            }}/>
+                        <input type="checkbox" value="" className="sr-only peer" checked={switchState} onChange={async (e) => {setSwitchState(e.target.checked)}}/>
                         <div className="relative w-11 h-6 peer-focus:outline-none rounded-full peer bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
                     <p>Push</p>
                     </div>
                     <div className="text-center">
-                    <Card>
-                        {/* <h2>Értesítés teszt: {useFcmToken === "denied" ? <p>✅</p> : <p>❌</p>}</h2> */}
-                        {/* <button onClick={() => {console.log(useFcmToken())}}>a</button> */}
-                        <motion.span
-                            className="text-white text-center"
+                    <motion.div
                             initial={{
                                 opacity: 0,
                                 height: 0,
@@ -178,9 +182,18 @@ export default function MainHeader() {
                                 height: { delay: switchState ? 0 : 0.2 },
                             }}
                         >
+                            <Card>
+                        {/* <h2>Értesítés teszt: {useFcmToken === "denied" ? <p>✅</p> : <p>❌</p>}</h2> */}
+                        {/* <button onClick={() => {console.log(useFcmToken())}}>a</button> */}
+                        <span
+                            className="text-white text-center"
+                            
+                        >
                             Figyelj arra, hogy a böngésződben engedélyezve legyenek a push értesítések!
-                        </motion.span>
-                    </Card></div>
+                        </span>
+                    </Card>
+                        </motion.div>
+                    </div>
                 </div>
                 <div
                     className="flex cursor-pointer items-center justify-center align-middle text-white"
