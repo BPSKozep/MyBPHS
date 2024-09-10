@@ -8,7 +8,7 @@ import CloseMenuOrders from "components/admin/CloseMenuOrders";
 import SetMenuAndSendEmail from "components/admin/SetMenuAndSendEmail";
 
 export const metadata = {
-    title: "MyBPHS - Admin / Ebédrendelés",
+    title: "Admin / Ebédrendelés",
 };
 
 export default function LunchAdmin() {

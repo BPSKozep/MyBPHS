@@ -129,9 +129,12 @@ function TokenCheck() {
                 </div>
             )}
             {user && !orderExists && (
-                <h1 className="mt-5 text-xl text-white">
-                    Nincs rendelés a jelenlegi hétre
-                </h1>
+                <>
+                    <h1 className="mt-5 text-xl text-white">
+                        Nincs rendelés a jelenlegi hétre
+                    </h1>
+                    <h2 className="text-white">{user.name}</h2>
+                </>
             )}
         </>
     );

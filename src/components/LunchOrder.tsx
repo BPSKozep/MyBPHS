@@ -62,31 +62,38 @@ function LunchOrder() {
     const userEmail = useSession().data?.user?.email;
 
     return (
-        <div className="flex h-full w-full justify-center text-white">
+        <div className="flex w-full justify-center text-white">
             <div className="m-auto">
                 {showText && (
-                    <div className="flex flex-col items-center md:flex-row">
-                        <IconButton
-                            icon={<FontAwesomeIcon icon={faArrowLeft} />}
-                            onClick={() =>
-                                setWeekOffset((offset) => offset - 1)
-                            }
-                            className="m-3 w-full md:w-auto"
-                        />
-                        <h1 className="text-center text-lg font-bold">
-                            {isLoading && "Menü betöltése..."}
-                            {noMenu && "Nincs még feltöltve a menü."}
-                            {menuClosed && "A rendelés már le lett zárva."}
-                            {` (${year}. ${week}. hét)`}
-                        </h1>
-                        <IconButton
-                            icon={<FontAwesomeIcon icon={faArrowRight} />}
-                            onClick={() =>
-                                setWeekOffset((offset) => offset + 1)
-                            }
-                            className="m-3 w-full md:w-auto"
-                        />
-                    </div>
+                    <Card>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex w-full items-center">
+                                <IconButton
+                                    icon={
+                                        <FontAwesomeIcon icon={faArrowLeft} />
+                                    }
+                                    onClick={() =>
+                                        setWeekOffset((offset) => offset - 1)
+                                    }
+                                />
+                                <h1 className="mx-2 text-center text-base font-bold md:text-lg">
+                                    {isLoading && "Menü betöltése..."}
+                                    {noMenu && "Nincs még feltöltve a menü."}
+                                    {menuClosed &&
+                                        "A rendelés már le lett zárva."}
+                                    {` (${year}. ${week}. hét)`}
+                                </h1>
+                                <IconButton
+                                    icon={
+                                        <FontAwesomeIcon icon={faArrowRight} />
+                                    }
+                                    onClick={() =>
+                                        setWeekOffset((offset) => offset + 1)
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </Card>
                 )}
                 {showMenu && (
                     <Card>
@@ -100,7 +107,7 @@ function LunchOrder() {
                                         setWeekOffset((offset) => offset - 1)
                                     }
                                 />
-                                <h1 className="inline-block text-center font-bold text-white">
+                                <h1 className="mx-1 inline-block text-center text-base font-bold text-white md:text-lg">
                                     {orderExists
                                         ? `Leadott rendelés (${year}. ${week}. hét)`
                                         : `Rendelés (${year}. ${week}. hét)`}

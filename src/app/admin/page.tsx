@@ -4,7 +4,7 @@ import React from "react";
 import BigLinkButton from "components/BigLinkButton";
 
 export const metadata = {
-    title: "MyBPHS - Admin",
+    title: "Admin",
 };
 
 export default function Users() {

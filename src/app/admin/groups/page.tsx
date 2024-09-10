@@ -4,7 +4,7 @@ import PageWithHeader from "components/PageWithHeader";
 import React from "react";
 
 export const metadata = {
-    title: "MyBPHS - Admin / Csoportok",
+    title: "Admin / Csoportok",
 };
 
 export default function Groups() {

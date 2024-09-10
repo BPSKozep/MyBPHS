@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "export MYBPHS_VERSION=$(git rev-parse --short HEAD) && next build",
+        "build-win": "next build",
         "start": "next start",
         "lint": "next lint",
         "prepare": "husky"

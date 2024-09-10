@@ -4,7 +4,7 @@ import OnlyRoles from "components/OnlyRoles";
 import CreateTimetable from "components/admin/CreateTimetable";
 
 export const metadata = {
-    title: "MyBPHS - Admin / Órarend",
+    title: "Admin / Órarend",
 };
 
 export default function Timetable() {

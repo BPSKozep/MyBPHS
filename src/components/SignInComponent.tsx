@@ -15,7 +15,10 @@ export default function SignInComponent() {
     }
     return (
         <div className="flex flex-col items-center">
-            <h1 className="mb-10 text-xl font-bold">Bejelentkezés</h1>
+            <h1 className="mb-10 text-center text-xl font-bold">
+                A MyBPHS csak az iskola felhasználói
+                <br /> számára elérhető
+            </h1>
             <GoogleSignIn />
         </div>
     );
