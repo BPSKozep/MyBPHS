@@ -32,6 +32,11 @@ const nextConfig = {
         ];
     },
     skipTrailingSlashRedirect: true,
+    i18n: {
+        locales: ["en", "hu"],
+        defaultLocale: "hu",
+        localeDetection: false,
+    },
 };
 
 module.exports = nextConfig;
@@ -42,11 +47,3 @@ const withPWA = require("next-pwa")({
 });
 
 module.exports = withPWA(module.exports);
-
-module.exports = {
-    i18n: {
-        locales: ["en", "hu"],
-        defaultLocale: "hu",
-        localeDetection: false,
-    },
-};
