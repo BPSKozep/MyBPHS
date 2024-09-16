@@ -1,11 +1,11 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, ReactNode } from "react";
 import PageHeader from "components/PageHeader";
 
 function PageWithHeader({
     title,
     homeLocation = "/",
     children,
-}: { title: string; homeLocation?: string } & PropsWithChildren) {
+}: { title: string | ReactNode; homeLocation?: string } & PropsWithChildren) {
     return (
         <>
             <div className="flex h-full w-full flex-col items-center">
