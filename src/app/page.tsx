@@ -15,8 +15,8 @@ export default function Home() {
                         title="Laptop jelszó"
                         url="/laptop-password"
                     />
-                    <BigLinkButton title="Kreditek" url="/credits" disabled />
                     <BigLinkButton title="Órarend" url="/timetable" disabled />
+                    <BigLinkButton title="Chat ✨" url="/chat" disabled />
                     <OnlyRolesComponent roles={["administrator"]}>
                         <BigLinkButton title="Admin" url="/admin" />
                     </OnlyRolesComponent>

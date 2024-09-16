@@ -1,13 +1,13 @@
 import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import React from "react";
+import React, { ReactNode } from "react";
 
 function PageHeader({
     title,
     homeLocation = "/",
 }: {
-    title: string;
+    title: string | ReactNode;
     homeLocation: string;
 }) {
     return (
