@@ -19,7 +19,7 @@ const userRouter = router({
                     email: z.string(),
                     roles: z.string().array(),
                 })
-                .nullable()
+                .nullable(),
         )
         .query(async ({ ctx, input }) => {
             if (!ctx.session) {
@@ -43,7 +43,7 @@ const userRouter = router({
             }
 
             return await User.findOne({ email: input }).select<IUser>(
-                "-_id -__v"
+                "-_id -__v",
             );
         }),
     getUserByNfcId: procedure
@@ -55,7 +55,7 @@ const userRouter = router({
                     email: z.string(),
                     roles: z.string().array(),
                 })
-                .nullable()
+                .nullable(),
         )
         .query(async ({ ctx, input }) => {
             if (!ctx.session) {
@@ -65,7 +65,10 @@ const userRouter = router({
                 });
             }
 
-            const authorized = await checkRoles(ctx.session, ["administrator"]);
+            const authorized = await checkRoles(ctx.session, [
+                "administrator",
+                "lunch-system",
+            ]);
 
             if (!authorized) {
                 throw new TRPCError({
@@ -75,7 +78,7 @@ const userRouter = router({
             }
 
             return await User.findOne({ nfcId: input }).select<IUser>(
-                "-_id -__v"
+                "-_id -__v",
             );
         }),
     createMany: procedure
@@ -85,7 +88,7 @@ const userRouter = router({
                 emails: z.string().email().array(),
                 roles: z.string().array().array(),
                 nfcIds: z.string().array(),
-            })
+            }),
         )
         .mutation(async ({ ctx, input }) => {
             if (!ctx.session) {
@@ -230,7 +233,7 @@ const userRouter = router({
                         newGroups: z.string().array(),
                     })
                     .array(),
-            })
+            }),
         )
         .mutation(async ({ ctx, input }) => {
             if (!ctx.session) {
@@ -262,7 +265,7 @@ const userRouter = router({
                                     name: { $in: request.newGroups },
                                 }),
                             },
-                        }
+                        },
                     );
                 }
             } else if (input.mode === "add") {
@@ -277,7 +280,7 @@ const userRouter = router({
                                     }),
                                 },
                             },
-                        }
+                        },
                     );
                 }
             } else if (input.mode === "remove") {
@@ -290,7 +293,7 @@ const userRouter = router({
                                     name: { $in: request.newGroups },
                                 }),
                             },
-                        }
+                        },
                     );
                 }
             }
@@ -302,8 +305,8 @@ const userRouter = router({
                 z.object({
                     email: z.string(),
                     name: z.string(),
-                })
-            )
+                }),
+            ),
         )
         .query(async ({ ctx, input }) => {
             if (!ctx.session) {
