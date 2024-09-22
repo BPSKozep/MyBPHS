@@ -16,7 +16,10 @@ export default function MainHeader() {
     const [isSheetOpen, setSheetOpen] = useState(false);
 
     const { data: NfcId } = trpc.user.getNfcId.useQuery(
-        data?.user?.email || ""
+        data?.user?.email || "",
+        {
+            enabled: !!data?.user?.email,
+        },
     );
 
     return (
