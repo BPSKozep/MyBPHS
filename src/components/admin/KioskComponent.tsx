@@ -9,7 +9,7 @@ import Loading from "components/Loading";
 function KioskComponent() {
     const [nfcId, setNfcId] = useState("");
     const [profileImageURL, setProfileImageURL] = useState(
-        "https://cdn.bpskozep.hu/no_picture.png"
+        "https://cdn.bpskozep.hu/no_picture.png",
     );
 
     const {
@@ -32,26 +32,51 @@ function KioskComponent() {
     const [socketFailure, setSocketFailure] = useState<boolean>(false);
 
     useEffect(() => {
+        const devSocket = io(process.env.NEXT_PUBLIC_DEV_SOCKET_URL || "", {
+            auth: { passphrase: process.env.NEXT_PUBLIC_SOCKETIO_PASSPHRASE },
+        });
+
         const socket = io("http://127.0.0.1:27471", {
             auth: { passphrase: process.env.NEXT_PUBLIC_SOCKETIO_PASSPHRASE },
         });
 
-        socket.on("disconnect", () => {
+        let primarySocketFailed = false;
+
+        const handleSocketFailure = () => {
+            if (primarySocketFailed) {
+                setSocketFailure(true);
+                devSocket.close();
+            } else {
+                primarySocketFailed = true;
+                socket.close();
+                devSocket.connect();
+            }
+        };
+
+        socket.on("disconnect", handleSocketFailure);
+        socket.on("connect_error", handleSocketFailure);
+
+        devSocket.on("disconnect", () => {
             setSocketFailure(true);
-            socket.close();
+            devSocket.close();
         });
 
-        socket.on("connect_error", () => {
+        devSocket.on("connect_error", () => {
             setSocketFailure(true);
-            socket.close();
+            devSocket.close();
         });
 
         socket.on("tag", (uid: string) => {
             setNfcId(uid);
         });
 
+        devSocket.on("tag", (uid: string) => {
+            setNfcId(uid);
+        });
+
         return () => {
             socket.close();
+            devSocket.close();
         };
     }, []);
 
@@ -123,7 +148,7 @@ function KioskComponent() {
                         width={200}
                         onError={() =>
                             setProfileImageURL(
-                                "https://cdn.bpskozep.hu/no_picture.png"
+                                "https://cdn.bpskozep.hu/no_picture.png",
                             )
                         }
                     />
