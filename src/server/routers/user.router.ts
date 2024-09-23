@@ -355,6 +355,7 @@ const userRouter = router({
             const authorized = await checkRoles(ctx.session, [
                 "student",
                 "teacher",
+                "lunch-system",
             ]);
 
             if (!authorized) {
