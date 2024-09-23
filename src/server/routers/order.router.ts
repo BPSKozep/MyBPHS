@@ -15,12 +15,12 @@ const orderRouter = router({
                 email: z.string().email().optional(),
                 year: z.number().optional(),
                 week: z.number().optional(),
-            })
+            }),
         )
         .output(
             z
                 .strictObject({ chosen: z.string(), completed: z.boolean() })
-                .array()
+                .array(),
         )
         .query(async ({ ctx, input }) => {
             if (!ctx.session) {
@@ -72,7 +72,7 @@ const orderRouter = router({
             }
 
             const order = await Order.findOne({ menu, user }).select(
-                "-order._id"
+                "-order._id",
             );
 
             if (!order) {
@@ -87,7 +87,7 @@ const orderRouter = router({
                 email: z.string().email().optional(),
                 year: z.number().optional(),
                 week: z.number().optional(),
-            })
+            }),
         )
         .output(z.string().array())
         .query(async ({ ctx, input }) => {
@@ -140,7 +140,7 @@ const orderRouter = router({
             }
 
             const order = await Order.findOne({ menu, user }).select(
-                "-order._id"
+                "-order._id",
             );
 
             if (!order) {
@@ -150,7 +150,7 @@ const orderRouter = router({
             const combinedOptions = menuCombines(menu.options);
 
             const orders = order.order.map(
-                (order, index) => combinedOptions[index][order.chosen]
+                (order, index) => combinedOptions[index][order.chosen],
             );
 
             return orders;
@@ -182,7 +182,14 @@ const orderRouter = router({
             const year = getWeekYear(date);
             const week = getWeek(date);
 
-            const day = date.getDay() - 1;
+            let day = date.getDay() - 1;
+
+            // Adjust the date to Friday if today is Saturday or Sunday
+            if (day === 5 || day === -1) {
+                day = 4;
+            }
+
+            console.log(date);
 
             const menu = await Menu.findOne({
                 week,
@@ -283,7 +290,7 @@ const orderRouter = router({
         .input(
             z.strictObject({
                 nfcId: z.string(),
-            })
+            }),
         )
         .mutation(async ({ ctx, input }) => {
             if (!ctx.session) {
@@ -343,7 +350,13 @@ const orderRouter = router({
                 });
             }
 
-            order.order[currentDate.getDay() - 1].completed = true;
+            let day = currentDate.getDay() - 1;
+            // Adjust the date to Friday if today is Saturday or Sunday
+            if (currentDate.getDay() === 6 || currentDate.getDay() === 0) {
+                day = 4;
+            }
+
+            order.order[day].completed = true;
             await order.save();
         }),
     create: procedure
@@ -352,7 +365,7 @@ const orderRouter = router({
                 week: z.number().optional(),
                 year: z.number().optional(),
                 chosenOptions: z.string().array(),
-            })
+            }),
         )
         .mutation(async ({ ctx, input }) => {
             const date = new Date();
