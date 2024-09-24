@@ -189,8 +189,6 @@ const orderRouter = router({
                 day = 4;
             }
 
-            console.log(date);
-
             const menu = await Menu.findOne({
                 week,
                 year,
