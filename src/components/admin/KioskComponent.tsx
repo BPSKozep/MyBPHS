@@ -9,13 +9,17 @@ import Loading from "components/Loading";
 interface KioskComponentProps {
     primarySocketFailed: boolean;
     setPrimarySocketFailed: (value: boolean) => void;
+    nfcId: string;
+    setNfcId: (value: string) => void;
 }
 
 function KioskComponent({
     primarySocketFailed,
     setPrimarySocketFailed,
+    nfcId,
+    setNfcId,
 }: KioskComponentProps) {
-    const [nfcId, setNfcId] = useState("");
+    // const [nfcId, setNfcId] = useState("");
     const [profileImageURL, setProfileImageURL] = useState(
         "https://cdn.bpskozep.hu/no_picture.png",
     );
@@ -27,6 +31,7 @@ function KioskComponent({
     } = trpc.order.getOrCreateOrderByNfc.useQuery(nfcId, {
         staleTime: Infinity,
         cacheTime: 0,
+        enabled: !!nfcId,
     });
     const {
         data: user,
@@ -35,14 +40,12 @@ function KioskComponent({
     } = trpc.user.getUserByNfcId.useQuery(nfcId, {
         staleTime: Infinity,
         cacheTime: 0,
+        enabled: !!nfcId,
     });
 
     const [socketFailure, setSocketFailure] = useState<boolean>(false);
 
     useEffect(() => {
-        const devSocket = io(process.env.NEXT_PUBLIC_DEV_SOCKET_URL || "", {
-            auth: { passphrase: process.env.NEXT_PUBLIC_SOCKETIO_PASSPHRASE },
-        });
         const socket = io("http://127.0.0.1:27471", {
             auth: { passphrase: process.env.NEXT_PUBLIC_SOCKETIO_PASSPHRASE },
         });
@@ -50,27 +53,13 @@ function KioskComponent({
         const handleSocketFailure = () => {
             if (primarySocketFailed) {
                 setSocketFailure(true);
-                devSocket.close();
             } else {
                 setPrimarySocketFailed(true);
                 socket.close();
-                devSocket.connect();
             }
         };
 
-        if (primarySocketFailed) {
-            devSocket.on("disconnect", () => {
-                setSocketFailure(true);
-                devSocket.close();
-            });
-            devSocket.on("connect_error", () => {
-                setSocketFailure(true);
-                devSocket.close();
-            });
-            devSocket.on("tag", (uid: string) => {
-                setNfcId(uid);
-            });
-        } else {
+        if (!primarySocketFailed) {
             socket.on("disconnect", handleSocketFailure);
             socket.on("connect_error", handleSocketFailure);
             socket.on("tag", (uid: string) => {
@@ -80,9 +69,9 @@ function KioskComponent({
 
         return () => {
             socket.close();
-            devSocket.close();
         };
-    }, [primarySocketFailed, setPrimarySocketFailed]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const { mutate: setCompleted } = trpc.order.setCompleted.useMutation();
 
