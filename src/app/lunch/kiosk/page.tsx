@@ -9,7 +9,7 @@ export const metadata = {
 
 function Kiosk() {
     return (
-        <PageWithHeader title="Kiosk">
+        <PageWithHeader title="Kiosk" rightContent={<h1>test</h1>}>
             <OnlyRoles roles={["administrator", "lunch-system"]}>
                 <KioskComponent />
             </OnlyRoles>

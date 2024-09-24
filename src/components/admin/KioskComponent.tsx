@@ -31,6 +31,9 @@ function KioskComponent() {
 
     const [socketFailure, setSocketFailure] = useState<boolean>(false);
 
+    const [primarySocketFailed, setPrimarySocketFailed] =
+        useState<boolean>(false);
+
     useEffect(() => {
         const devSocket = io(process.env.NEXT_PUBLIC_DEV_SOCKET_URL || "", {
             auth: { passphrase: process.env.NEXT_PUBLIC_SOCKETIO_PASSPHRASE },
@@ -40,14 +43,12 @@ function KioskComponent() {
             auth: { passphrase: process.env.NEXT_PUBLIC_SOCKETIO_PASSPHRASE },
         });
 
-        let primarySocketFailed = false;
-
         const handleSocketFailure = () => {
             if (primarySocketFailed) {
                 setSocketFailure(true);
                 devSocket.close();
             } else {
-                primarySocketFailed = true;
+                setPrimarySocketFailed(true);
                 socket.close();
                 devSocket.connect();
             }
@@ -78,7 +79,7 @@ function KioskComponent() {
             socket.close();
             devSocket.close();
         };
-    }, []);
+    }, [primarySocketFailed]);
 
     const { mutate: setCompleted } = trpc.order.setCompleted.useMutation();
 
@@ -129,9 +130,14 @@ function KioskComponent() {
                     </h1>
                 )}
 
-            {!isValidNfc && !socketFailure && (
+            {!isValidNfc && !socketFailure && !primarySocketFailed && (
                 <h1 className="text-5xl font-bold">
                     Várakozás token olvasására...
+                </h1>
+            )}
+            {!isValidNfc && !socketFailure && primarySocketFailed && (
+                <h1 className="text-5xl font-bold">
+                    Várakozás token olvasására... (devsocket)
                 </h1>
             )}
             {socketFailure && (
