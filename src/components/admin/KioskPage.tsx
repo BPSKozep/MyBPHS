@@ -36,7 +36,7 @@ function KioskPage() {
 
                         <div className="inline-flex items-center">
                             <div className="has-tooltip relative">
-                                <span className="tooltip absolute -left-48 -top-1 transform rounded bg-slate-800 p-1 text-center text-white shadow-lg transition-all">
+                                <span className="tooltip absolute -left-[12.8rem] -top-2 transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
                                     Dev mode is activated
                                 </span>
                                 <FontAwesomeIcon icon={faWrench} />
@@ -46,7 +46,7 @@ function KioskPage() {
                 ) : (
                     <div className="inline-flex items-center">
                         <div className="has-tooltip relative">
-                            <span className="tooltip absolute -left-48 -top-1 transform rounded bg-slate-800 p-1 text-center text-white shadow-lg transition-all">
+                            <span className="tooltip absolute -left-[14.5rem] -top-2 transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
                                 Connected to local socket
                             </span>
                             <FontAwesomeIcon icon={faCheck} />
