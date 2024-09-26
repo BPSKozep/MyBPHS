@@ -18,7 +18,7 @@ function SetMenuAndSendEmail() {
                     "a-menu": "",
                     "b-menu": "",
                 };
-            })
+            }),
     );
 
     const { mutateAsync: createMenu } = trpc.menu.create.useMutation();
@@ -73,7 +73,7 @@ function SetMenuAndSendEmail() {
                     <span className="text-white" key={index}>
                         {email}
                     </span>
-                )
+                ),
             )}
         </div>
     );
