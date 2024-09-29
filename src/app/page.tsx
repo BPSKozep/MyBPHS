@@ -16,7 +16,7 @@ export default function Home() {
                         url="/laptop-password"
                     />
                     <BigLinkButton title="Órarend" url="/timetable" disabled />
-                    <BigLinkButton title="Chat ✨" url="/chat" disabled />
+                    <BigLinkButton title="Chat ✨" url="/chat" />
                     <OnlyRolesComponent roles={["administrator"]}>
                         <BigLinkButton title="Admin" url="/admin" />
                     </OnlyRolesComponent>
