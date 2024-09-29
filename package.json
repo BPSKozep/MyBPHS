@@ -11,6 +11,7 @@
         "prepare": "husky"
     },
     "dependencies": {
+        "@ai-sdk/openai": "^0.0.63",
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.5",
         "@fontsource-variable/montserrat": "^5.1.0",
@@ -26,7 +27,9 @@
         "@trpc/next": "^10.45.2",
         "@trpc/react-query": "^10.45.2",
         "@trpc/server": "^10.45.2",
+        "ai": "^3.4.7",
         "framer-motion": "^11.2.10",
+        "generate-password": "^1.7.1",
         "mongoose": "^8.4.1",
         "next": "^14.2.3",
         "next-auth": "^4.24.7",
