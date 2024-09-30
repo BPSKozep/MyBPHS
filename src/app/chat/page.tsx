@@ -1,15 +1,55 @@
+"use client";
+
 import PageWithHeader from "components/PageWithHeader";
 import React from "react";
 
-export const metadata = {
-    title: "Laptop Jelszó",
-};
+import { useChat } from "ai/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 function LaptopPassword() {
+    const { messages, input, handleInputChange, handleSubmit } = useChat();
+
     return (
         <PageWithHeader title="MyBPHS Intelligence ✨">
-            <div className="flex h-full w-full items-center justify-center align-middle">
-                <span className="text-lg font-bold text-white">Hamarosan.</span>
+            <div className="flex h-full w-full items-start justify-center align-middle">
+                <div className="mx-auto flex h-full w-full max-w-md flex-col">
+                    <div
+                        className="h-full overflow-auto"
+                        style={{ maxHeight: "calc(100vh - 15rem)" }}
+                    >
+                        {messages.map(
+                            (message) =>
+                                message && (
+                                    <div
+                                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                                        key={message.id}
+                                    >
+                                        <div
+                                            key={message.id}
+                                            className={`m-2 whitespace-pre-wrap rounded-lg ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
+                                        >
+                                            {message.content.trim()}
+                                        </div>
+                                    </div>
+                                ),
+                        )}
+                    </div>
+                    <form
+                        onSubmit={handleSubmit}
+                        className="bottom-0 mt-4 flex w-full max-w-md overflow-auto rounded-lg bg-slate-300 shadow-lg"
+                    >
+                        <input
+                            className="h-full w-full bg-slate-300 p-2 text-black placeholder-gray-700"
+                            value={input}
+                            placeholder="Üzenet"
+                            onChange={handleInputChange}
+                        />
+                        <button className="w-10 bg-[#565e85] text-gray-200">
+                            <FontAwesomeIcon icon={faPaperPlane} />
+                        </button>
+                    </form>
+                </div>
             </div>
         </PageWithHeader>
     );
