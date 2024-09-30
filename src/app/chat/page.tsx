@@ -11,7 +11,14 @@ function LaptopPassword() {
     const { messages, input, handleInputChange, handleSubmit } = useChat();
 
     return (
-        <PageWithHeader title="MyBPHS Intelligence ✨">
+        <PageWithHeader
+            title={
+                <span>
+                    <span className="hidden sm:inline">MyBPHS</span>{" "}
+                    Intelligence ✨
+                </span>
+            }
+        >
             <div className="flex h-full items-start justify-center">
                 <div className="flex h-full w-full max-w-md flex-col">
                     <div className="flex-1 overflow-y-auto">
@@ -34,7 +41,7 @@ function LaptopPassword() {
                     </div>
                     <form
                         onSubmit={handleSubmit}
-                        className="bottom-0 mb-10 mt-4 flex h-10 w-full max-w-md overflow-auto rounded-lg bg-slate-300 shadow-lg"
+                        className="bottom-0 mx-auto mb-10 mt-4 flex h-10 w-full max-w-[90vw] overflow-auto rounded-lg bg-slate-300 shadow-lg"
                     >
                         <input
                             className="h-full w-full bg-slate-300 p-2 text-black placeholder-gray-700"
