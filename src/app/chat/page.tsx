@@ -7,7 +7,7 @@ import { useChat } from "ai/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
-function LaptopPassword() {
+function MyBPHSIntelligence() {
     const { messages, input, handleInputChange, handleSubmit } = useChat();
 
     return (
@@ -55,4 +55,4 @@ function LaptopPassword() {
     );
 }
 
-export default LaptopPassword;
+export default MyBPHSIntelligence;
