@@ -3,6 +3,7 @@ import { streamText, convertToCoreMessages, tool } from "ai";
 import PasswordReset from "emails/password-reset";
 import { generate } from "generate-password";
 import { User } from "models";
+import Chat from "models/Chat.model";
 import { Resend } from "resend";
 import { getServerAuthSession } from "server/auth";
 import { z } from "zod";
@@ -56,6 +57,12 @@ export async function POST(req: Request) {
 
     if (!session || !session.user.name)
         return new Response("Unauthorized", { status: 401 });
+
+    const user = await User.findOne({
+        email: session?.user.email,
+    });
+
+    if (!user) return new Response("Forbidden", { status: 403 });
 
     const { messages } = await req.json();
 
@@ -123,14 +130,6 @@ export async function POST(req: Request) {
                             numbers: true,
                             excludeSimilarCharacters: true,
                         });
-
-                        const user = await User.findOne({
-                            email: session.user.email,
-                        });
-
-                        if (!user) {
-                            return { status: "User not found / file ticket" };
-                        }
 
                         await fetch(
                             `https://pu.bpskozep.hu/ad/password-reset/${user.email}`,
@@ -201,6 +200,15 @@ export async function POST(req: Request) {
         },
         maxSteps: 3,
         temperature: 0.4,
+        async onFinish(event) {
+            await new Chat({
+                user: user.id,
+                messages: [
+                    ...convertToCoreMessages(messages),
+                    ...event.responseMessages,
+                ],
+            }).save();
+        },
     });
 
     return result.toDataStreamResponse();
