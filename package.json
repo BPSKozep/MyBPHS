@@ -28,7 +28,7 @@
         "@trpc/react-query": "^10.45.2",
         "@trpc/server": "^10.45.2",
         "ai": "^3.4.7",
-        "framer-motion": "^11.2.10",
+        "framer-motion": "^11.9.0",
         "generate-password": "^1.7.1",
         "mongoose": "^8.6.3",
         "next": "^14.2.3",
