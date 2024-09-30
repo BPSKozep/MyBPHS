@@ -101,7 +101,8 @@ export async function POST(req: Request) {
                         return {
                             status: "Ticket created.",
                         };
-                    } catch {
+                    } catch (err) {
+                        console.error(err);
                         return {
                             status: "Something went wrong / ask user to write email to us",
                         };
@@ -156,7 +157,8 @@ export async function POST(req: Request) {
                         return {
                             status: "Temporary password sent via email.",
                         };
-                    } catch {
+                    } catch (err) {
+                        console.error(err);
                         return { status: "Unknown error / file ticket" };
                     }
                 },
@@ -185,7 +187,8 @@ export async function POST(req: Request) {
                         return {
                             results: await res.json(),
                         };
-                    } catch {
+                    } catch (err) {
+                        console.error(err);
                         return {
                             status: "Search failed / file ticket",
                         };
