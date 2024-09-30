@@ -6,6 +6,9 @@ import { User } from "models";
 import { Resend } from "resend";
 import { getServerAuthSession } from "server/auth";
 import { z } from "zod";
+import mongooseConnect from "clients/mongoose"
+
+const mongooseClient = await mongooseConnect();
 
 const SYSTEM = await (
     await fetch(`${process.env.DOCUMENTS_ENDPOINT}/prompt`, {
