@@ -24,7 +24,7 @@ function LaptopPassword() {
                                     >
                                         <div
                                             key={message.id}
-                                            className={`m-2 whitespace-pre-wrap rounded-lg ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
+                                            className={`m-2 max-w-96 whitespace-pre-wrap break-words rounded-lg ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
                                         >
                                             {message.content.trim()}
                                         </div>
