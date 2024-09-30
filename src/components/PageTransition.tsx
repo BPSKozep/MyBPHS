@@ -17,7 +17,7 @@ export default function PageTransition({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.15 }}
-            className="h-full w-full"
+            className="flex-1 overflow-hidden"
         >
             {children}
         </motion.main>

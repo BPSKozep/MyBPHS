@@ -8,9 +8,9 @@ function PageWithHeader({
 }: { title: string | ReactNode; homeLocation?: string } & PropsWithChildren) {
     return (
         <>
-            <div className="flex h-full w-full flex-col items-center">
+            <div className="flex h-full flex-col">
                 <PageHeader title={title} homeLocation={homeLocation} />
-                <div className="h-full w-full">{children}</div>
+                <div className="flex-1 overflow-y-auto">{children}</div>
             </div>
         </>
     );
