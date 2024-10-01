@@ -6,6 +6,8 @@ import React from "react";
 import { useChat } from "ai/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 function LaptopPassword() {
     const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -31,9 +33,13 @@ function LaptopPassword() {
                                     >
                                         <div
                                             key={message.id}
-                                            className={`m-2 max-w-96 whitespace-pre-wrap break-words rounded-lg ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
+                                            className={`space-pre-wrap prose prose-invert m-2 max-w-96 break-words rounded-lg text-white ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
                                         >
-                                            {message.content.trim()}
+                                            <Markdown
+                                                remarkPlugins={[remarkGfm]}
+                                            >
+                                                {message.content.trim()}
+                                            </Markdown>
                                         </div>
                                     </div>
                                 ),
