@@ -8,6 +8,7 @@ import { Resend } from "resend";
 import { getServerAuthSession } from "server/auth";
 import { z } from "zod";
 import mongooseConnect from "clients/mongoose";
+import { nanoid } from "nanoid";
 
 await mongooseConnect();
 
@@ -133,7 +134,7 @@ export async function POST(req: Request) {
                         });
 
                         return {
-                            status: "Ticket created.",
+                            status: "Ticket created. ID: " + nanoid(),
                         };
                     } catch (err) {
                         console.error(err);
