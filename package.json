@@ -38,7 +38,9 @@
         "posthog-js": "^1.161.5",
         "react": "18.2.0",
         "react-dom": "18.2.0",
+        "react-markdown": "^9.0.1",
         "react-responsive": "^10.0.0",
+        "remark-gfm": "^4.0.0",
         "resend": "^3.2.0",
         "socket.io-client": "^4.7.5",
         "superjson": "^2.2.1",
@@ -47,6 +49,7 @@
         "zod": "^3.23.8"
     },
     "devDependencies": {
+        "@tailwindcss/typography": "^0.5.15",
         "@types/node": "^20.14.8",
         "@types/react": "^18.2.74",
         "@types/react-dom": "^18.2.24",
