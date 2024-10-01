@@ -7,7 +7,7 @@ import Chat from "models/Chat.model";
 import { Resend } from "resend";
 import { getServerAuthSession } from "server/auth";
 import { z } from "zod";
-import mongooseConnect from "clients/mongoose"
+import mongooseConnect from "clients/mongoose";
 
 await mongooseConnect();
 
@@ -66,6 +66,8 @@ export async function POST(req: Request) {
 
     const { messages } = await req.json();
 
+    const coreMessages = convertToCoreMessages(messages);
+
     const names = session.user.name.split(" ");
 
     names.unshift(names.pop() || "");
@@ -80,13 +82,35 @@ export async function POST(req: Request) {
         timeZone: "Europe/Budapest",
     }).format(new Date());
 
+    let rag_context = "";
+
+    try {
+        const res = await fetch(`${process.env.DOCUMENTS_ENDPOINT}/search`, {
+            headers: {
+                Authorization: `Bearer ${process.env.DOCUMENTS_AUTH}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query: coreMessages[coreMessages.length - 1].content,
+                num_docs: 1,
+            }),
+            method: "POST",
+        });
+
+        rag_context = (await res.json())[0];
+    } catch (err) {
+        console.log("rag failed", err);
+        rag_context = "Retrieval failed.";
+    }
+
+    console.log(rag_context);
+
     const result = await streamText({
         model: openai("gemini-1.5-flash"),
-        system: SYSTEM.replace("USER_DETAILS", user_details).replace(
-            "CURRENT_TIME",
-            dateTime,
-        ),
-        messages: convertToCoreMessages(messages),
+        system: SYSTEM.replace("USER_DETAILS", user_details)
+            .replace("CURRENT_TIME", dateTime)
+            .replace("RAG_CONTEXT", rag_context),
+        messages: coreMessages,
         tools: {
             fileTicket: tool({
                 description: "File a ticket for IT",
@@ -181,7 +205,10 @@ export async function POST(req: Request) {
                                     Authorization: `Bearer ${process.env.DOCUMENTS_AUTH}`,
                                     "Content-Type": "application/json",
                                 },
-                                body: JSON.stringify(body),
+                                body: JSON.stringify({
+                                    query: body.query,
+                                    num_docs: 2,
+                                }),
                                 method: "POST",
                             },
                         );
@@ -203,10 +230,7 @@ export async function POST(req: Request) {
         async onFinish(event) {
             await new Chat({
                 user: user.id,
-                messages: [
-                    ...convertToCoreMessages(messages),
-                    ...event.responseMessages,
-                ],
+                messages: [...coreMessages, ...event.responseMessages],
             }).save();
         },
     });
