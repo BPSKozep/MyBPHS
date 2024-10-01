@@ -9,6 +9,7 @@ import {
     faEnvelope,
     faArrowLeft,
     faArrowRight,
+    faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import { trpc } from "utils/trpc";
 import sleep from "utils/sleep";
@@ -18,12 +19,9 @@ import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import IconButton from "components/IconButton";
 import { useSession } from "next-auth/react";
+import PageWithHeader from "components/PageWithHeader";
 
 function LunchOrder() {
-    const [selectedOptions, setSelectedOptions] = useState<string[]>(
-        Array(5).fill("i_am_not_want_food")
-    );
-
     const [weekOffset, setWeekOffset] = useState(1);
 
     const [year, week] = useMemo(() => {
@@ -40,12 +38,20 @@ function LunchOrder() {
         week,
     });
 
+    const orderExists = order && order.length > 0;
+
+    const [selectedOptions, setSelectedOptions] = useState<string[]>(
+        orderExists
+            ? order.map((day) => day.chosen)
+            : Array(5).fill("i_am_not_want_food"),
+    );
+
     const { mutateAsync: createOrder } = trpc.order.create.useMutation();
+
+    const { mutateAsync: editOrder } = trpc.order.edit.useMutation();
 
     const { mutateAsync: sendDiscordWebhook } =
         trpc.webhook.sendDiscordWebhook.useMutation();
-
-    const orderExists = order && order.length > 0;
 
     const showMenu =
         menu &&
@@ -61,160 +67,252 @@ function LunchOrder() {
 
     const userEmail = useSession().data?.user?.email;
 
+    const [orderEditing, setOrderEditing] = useState(false);
+
     return (
-        <div className="flex w-full justify-center text-white">
-            <div className="m-auto">
-                {showText && (
-                    <Card>
-                        <div className="flex flex-col gap-4">
-                            <div className="flex w-full items-center">
-                                <IconButton
-                                    icon={
-                                        <FontAwesomeIcon icon={faArrowLeft} />
-                                    }
-                                    onClick={() =>
-                                        setWeekOffset((offset) => offset - 1)
-                                    }
-                                />
-                                <h1 className="mx-2 text-center text-base font-bold md:text-lg">
-                                    {isLoading && "Menü betöltése..."}
-                                    {noMenu && "Nincs még feltöltve a menü."}
-                                    {menuClosed &&
-                                        "A rendelés már le lett zárva."}
-                                    {` (${year}. ${week}. hét)`}
-                                </h1>
-                                <IconButton
-                                    icon={
-                                        <FontAwesomeIcon icon={faArrowRight} />
-                                    }
-                                    onClick={() =>
-                                        setWeekOffset((offset) => offset + 1)
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </Card>
-                )}
-                {showMenu && (
-                    <Card>
-                        <div className="flex flex-col items-center justify-center gap-4">
-                            <div className="flex w-full items-center justify-between">
-                                <IconButton
-                                    icon={
-                                        <FontAwesomeIcon icon={faArrowLeft} />
-                                    }
-                                    onClick={() =>
-                                        setWeekOffset((offset) => offset - 1)
-                                    }
-                                />
-                                <h1 className="mx-1 inline-block text-center text-base font-bold text-white md:text-lg">
-                                    {orderExists
-                                        ? `Leadott rendelés (${year}. ${week}. hét)`
-                                        : `Rendelés (${year}. ${week}. hét)`}
-                                </h1>
-                                <IconButton
-                                    icon={
-                                        <FontAwesomeIcon icon={faArrowRight} />
-                                    }
-                                    onClick={() =>
-                                        setWeekOffset((offset) => offset + 1)
-                                    }
-                                />
-                            </div>
-
-                            <>
-                                <OrderForm
-                                    options={menu.options.map((menuDay) => {
-                                        if (
-                                            !menuDay["a-menu"] &&
-                                            !menuDay["b-menu"]
-                                        ) {
-                                            const newMenuDay = menuCombine(
-                                                menuDay,
-                                                false
-                                            );
-
-                                            Object.keys(newMenuDay).forEach(
-                                                (key) => (newMenuDay[key] = "")
-                                            );
-
-                                            return newMenuDay;
+        <PageWithHeader title="Ebédrendelés">
+            <div className="flex w-full justify-center text-white">
+                <div className="m-auto">
+                    {showText && (
+                        <Card>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex w-full items-center">
+                                    <IconButton
+                                        icon={
+                                            <FontAwesomeIcon
+                                                icon={faArrowLeft}
+                                            />
                                         }
-
-                                        return menuCombine(menuDay, false);
-                                    })}
-                                    selectedOptions={
-                                        orderExists
-                                            ? order.map((day) => day.chosen)
-                                            : selectedOptions
-                                    }
-                                    onChange={(chosenOptions) => {
-                                        if (orderExists) return;
-
-                                        setSelectedOptions(chosenOptions);
-                                    }}
-                                />
-
-                                <AnimatePresence>
-                                    {!orderExists && (
-                                        <motion.div
-                                            initial={{
-                                                opacity: 1,
-                                                height: "auto",
-                                            }}
-                                            exit={{
-                                                opacity: 0,
-                                                height: 0,
-                                            }}
+                                        onClick={() =>
+                                            setWeekOffset(
+                                                (offset) => offset - 1,
+                                            )
+                                        }
+                                    />
+                                    <h1 className="mx-2 text-center text-base font-bold md:text-lg">
+                                        {isLoading && "Menü betöltése..."}
+                                        {noMenu &&
+                                            "Nincs még feltöltve a menü."}
+                                        {menuClosed &&
+                                            "A rendelés már le lett zárva."}
+                                        {` (${year}. ${week}. hét)`}
+                                    </h1>
+                                    <IconButton
+                                        icon={
+                                            <FontAwesomeIcon
+                                                icon={faArrowRight}
+                                            />
+                                        }
+                                        onClick={() =>
+                                            setWeekOffset(
+                                                (offset) => offset + 1,
+                                            )
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        </Card>
+                    )}
+                    {showMenu && (
+                        <Card>
+                            {orderExists && menu.isOpenForOrders && (
+                                <div className="mb-5">
+                                    <div className="absolute -right-[0.9rem] -top-[0.9rem]">
+                                        <motion.button
+                                            whileHover={{ scale: 1.1 }}
+                                            whileFocus={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.95 }}
                                             transition={{
-                                                height: { delay: 0.5 },
+                                                type: "spring",
+                                                stiffness: 500,
+                                                damping: 20,
+                                            }}
+                                            onClick={() => {
+                                                setOrderEditing(!orderEditing);
                                             }}
                                         >
-                                            <IconSubmitButton
-                                                icon={
-                                                    <FontAwesomeIcon
-                                                        icon={faEnvelope}
-                                                    />
-                                                }
-                                                onClick={async () => {
-                                                    try {
-                                                        await sleep(500);
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-600 drop-shadow-2xl">
+                                                <FontAwesomeIcon
+                                                    icon={faEdit}
+                                                />
+                                            </div>
+                                        </motion.button>
+                                    </div>
+                                </div>
+                            )}
 
-                                                        await createOrder({
-                                                            week,
-                                                            year,
-                                                            chosenOptions:
-                                                                selectedOptions,
-                                                        });
-
-                                                        await sendDiscordWebhook(
-                                                            {
-                                                                type: "Lunch",
-                                                                message:
-                                                                    userEmail +
-                                                                    " beküldte a rendelést. 📨",
-                                                            }
-                                                        );
-
-                                                        sleep(1700).then(() => {
-                                                            refetchOrder();
-                                                        });
-
-                                                        return true;
-                                                    } catch (err) {
-                                                        return false;
-                                                    }
-                                                }}
+                            <div className="flex flex-col items-center justify-center gap-4">
+                                <div className="flex w-full items-center justify-between">
+                                    <IconButton
+                                        icon={
+                                            <FontAwesomeIcon
+                                                icon={faArrowLeft}
                                             />
-                                        </motion.div>
+                                        }
+                                        onClick={() =>
+                                            setWeekOffset(
+                                                (offset) => offset - 1,
+                                            )
+                                        }
+                                    />
+                                    <h1 className="mx-1 inline-block text-center text-base font-bold text-white md:text-lg">
+                                        {orderExists
+                                            ? orderEditing
+                                                ? `Rendelés szerkesztése (${year}. ${week}. hét)`
+                                                : `Leadott rendelés (${year}. ${week}. hét)`
+                                            : `Rendelés (${year}. ${week}. hét)`}
+                                    </h1>
+                                    <IconButton
+                                        icon={
+                                            <FontAwesomeIcon
+                                                icon={faArrowRight}
+                                            />
+                                        }
+                                        onClick={() =>
+                                            setWeekOffset(
+                                                (offset) => offset + 1,
+                                            )
+                                        }
+                                    />
+                                </div>
+
+                                <>
+                                    <OrderForm
+                                        options={menu.options.map((menuDay) => {
+                                            if (
+                                                !menuDay["a-menu"] &&
+                                                !menuDay["b-menu"]
+                                            ) {
+                                                const newMenuDay = menuCombine(
+                                                    menuDay,
+                                                    false,
+                                                );
+
+                                                Object.keys(newMenuDay).forEach(
+                                                    (key) =>
+                                                        (newMenuDay[key] = ""),
+                                                );
+
+                                                return newMenuDay;
+                                            }
+
+                                            return menuCombine(menuDay, false);
+                                        })}
+                                        selectedOptions={
+                                            orderExists
+                                                ? orderEditing
+                                                    ? selectedOptions
+                                                    : order.map(
+                                                          (day) => day.chosen,
+                                                      )
+                                                : selectedOptions
+                                        }
+                                        onChange={(chosenOptions) => {
+                                            if (orderExists) return;
+
+                                            setSelectedOptions(chosenOptions);
+                                        }}
+                                    />
+
+                                    <AnimatePresence>
+                                        {!orderExists && (
+                                            <motion.div
+                                                initial={{
+                                                    opacity: 1,
+                                                    height: "auto",
+                                                }}
+                                                exit={{
+                                                    opacity: 0,
+                                                    height: 0,
+                                                }}
+                                                transition={{
+                                                    height: { delay: 0.5 },
+                                                }}
+                                            >
+                                                <IconSubmitButton
+                                                    icon={
+                                                        <FontAwesomeIcon
+                                                            icon={faEnvelope}
+                                                        />
+                                                    }
+                                                    onClick={async () => {
+                                                        try {
+                                                            await sleep(500);
+
+                                                            await createOrder({
+                                                                week,
+                                                                year,
+                                                                chosenOptions:
+                                                                    selectedOptions,
+                                                            });
+
+                                                            await sendDiscordWebhook(
+                                                                {
+                                                                    type: "Lunch",
+                                                                    message:
+                                                                        userEmail +
+                                                                        " szerkesztette a rendelését. ✍️",
+                                                                },
+                                                            );
+
+                                                            sleep(1700).then(
+                                                                () => {
+                                                                    refetchOrder();
+                                                                },
+                                                            );
+
+                                                            return true;
+                                                        } catch (err) {
+                                                            return false;
+                                                        }
+                                                    }}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                    {orderEditing && (
+                                        <IconSubmitButton
+                                            icon={
+                                                <FontAwesomeIcon
+                                                    icon={faEdit}
+                                                />
+                                            }
+                                            onClick={async () => {
+                                                try {
+                                                    await sleep(500);
+
+                                                    await editOrder({
+                                                        week,
+                                                        year,
+                                                        chosenOptions:
+                                                            selectedOptions,
+                                                    });
+
+                                                    await sendDiscordWebhook({
+                                                        type: "Lunch",
+                                                        message:
+                                                            userEmail +
+                                                            " beküldte a rendelést. 📨",
+                                                    });
+
+                                                    sleep(1700).then(() => {
+                                                        refetchOrder();
+                                                    });
+
+                                                    return true;
+                                                } catch (err) {
+                                                    return false;
+                                                }
+                                            }}
+                                        />
                                     )}
-                                </AnimatePresence>
-                            </>
-                        </div>
-                    </Card>
-                )}
+                                </>
+                            </div>
+                        </Card>
+                    )}
+                </div>
             </div>
-        </div>
+        </PageWithHeader>
     );
 }
 
