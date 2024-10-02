@@ -489,7 +489,7 @@ const orderRouter = router({
 
             return result;
         }),
-    updateOrder: procedure
+    edit: procedure
         .input(
             z.strictObject({
                 week: z.number().optional(),
