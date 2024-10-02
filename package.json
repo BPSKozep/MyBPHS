@@ -1,6 +1,6 @@
 {
     "name": "mybphs",
-    "version": "2.1.2",
+    "version": "2.3.0",
     "private": true,
     "scripts": {
         "dev": "next dev",
@@ -30,7 +30,8 @@
         "ai": "^3.4.7",
         "framer-motion": "^11.2.10",
         "generate-password": "^1.7.1",
-        "mongoose": "^8.6.3",
+        "mongoose": "^8.4.1",
+        "nanoid": "^5.0.7",
         "next": "^14.2.3",
         "next-auth": "^4.24.7",
         "next-intl": "^3.19.1",
@@ -38,7 +39,9 @@
         "posthog-js": "^1.161.5",
         "react": "18.2.0",
         "react-dom": "18.2.0",
+        "react-markdown": "^9.0.1",
         "react-responsive": "^10.0.0",
+        "remark-gfm": "^4.0.0",
         "resend": "^3.2.0",
         "socket.io-client": "^4.8.0",
         "superjson": "^2.2.1",
@@ -47,6 +50,7 @@
         "zod": "^3.23.8"
     },
     "devDependencies": {
+        "@tailwindcss/typography": "^0.5.15",
         "@types/node": "^20.14.8",
         "@types/react": "^18.2.74",
         "@types/react-dom": "^18.2.24",
