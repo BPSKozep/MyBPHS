@@ -290,6 +290,15 @@ function LunchOrder() {
 
                                                             return true;
                                                         } catch (err) {
+                                                            await sendDiscordWebhook(
+                                                                {
+                                                                    type: "Error",
+                                                                    message:
+                                                                        String(
+                                                                            err,
+                                                                        ),
+                                                                },
+                                                            );
                                                             return false;
                                                         }
                                                     }}
@@ -342,6 +351,15 @@ function LunchOrder() {
 
                                                             return true;
                                                         } catch (err) {
+                                                            await sendDiscordWebhook(
+                                                                {
+                                                                    type: "Error",
+                                                                    message:
+                                                                        String(
+                                                                            err,
+                                                                        ),
+                                                                },
+                                                            );
                                                             return false;
                                                         }
                                                     }}
