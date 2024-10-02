@@ -6,7 +6,6 @@ export interface IOrder {
     user: mongoose.Types.ObjectId;
     menu: mongoose.Types.ObjectId;
     order: { chosen: string; completed: boolean }[];
-    editNumber?: number;
 }
 
 const OrderSchema = new Schema<IOrder>({
@@ -34,10 +33,6 @@ const OrderSchema = new Schema<IOrder>({
             },
         },
     ],
-    editNumber: {
-        type: Number,
-        required: true,
-    },
 });
 
 const Order: Model<IOrder> =

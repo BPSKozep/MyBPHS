@@ -3,9 +3,14 @@ import { streamText, convertToCoreMessages, tool } from "ai";
 import PasswordReset from "emails/password-reset";
 import { generate } from "generate-password";
 import { User } from "models";
+import Chat from "models/Chat.model";
 import { Resend } from "resend";
 import { getServerAuthSession } from "server/auth";
 import { z } from "zod";
+import mongooseConnect from "clients/mongoose";
+import { nanoid } from "nanoid";
+
+await mongooseConnect();
 
 const SYSTEM = await (
     await fetch(`${process.env.DOCUMENTS_ENDPOINT}/prompt`, {
@@ -54,7 +59,15 @@ export async function POST(req: Request) {
     if (!session || !session.user.name)
         return new Response("Unauthorized", { status: 401 });
 
+    const user = await User.findOne({
+        email: session?.user.email,
+    });
+
+    if (!user) return new Response("Forbidden", { status: 403 });
+
     const { messages } = await req.json();
+
+    const coreMessages = convertToCoreMessages(messages);
 
     const names = session.user.name.split(" ");
 
@@ -70,13 +83,35 @@ export async function POST(req: Request) {
         timeZone: "Europe/Budapest",
     }).format(new Date());
 
+    let rag_context = "";
+
+    try {
+        const res = await fetch(`${process.env.DOCUMENTS_ENDPOINT}/search`, {
+            headers: {
+                Authorization: `Bearer ${process.env.DOCUMENTS_AUTH}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query: coreMessages[coreMessages.length - 1].content,
+                num_docs: 1,
+            }),
+            method: "POST",
+        });
+
+        rag_context = (await res.json())[0];
+    } catch (err) {
+        console.log("rag failed", err);
+        rag_context = "Retrieval failed.";
+    }
+
+    console.log(rag_context);
+
     const result = await streamText({
         model: openai("gemini-1.5-flash"),
-        system: SYSTEM.replace("USER_DETAILS", user_details).replace(
-            "CURRENT_TIME",
-            dateTime,
-        ),
-        messages: convertToCoreMessages(messages),
+        system: SYSTEM.replace("USER_DETAILS", user_details)
+            .replace("CURRENT_TIME", dateTime)
+            .replace("RAG_CONTEXT", rag_context),
+        messages: coreMessages,
         tools: {
             fileTicket: tool({
                 description: "File a ticket for IT",
@@ -99,7 +134,7 @@ export async function POST(req: Request) {
                         });
 
                         return {
-                            status: "Ticket created.",
+                            status: "Ticket created. ID: " + nanoid(),
                         };
                     } catch (err) {
                         console.error(err);
@@ -120,14 +155,6 @@ export async function POST(req: Request) {
                             numbers: true,
                             excludeSimilarCharacters: true,
                         });
-
-                        const user = await User.findOne({
-                            email: session.user.email,
-                        });
-
-                        if (!user) {
-                            return { status: "User not found / file ticket" };
-                        }
 
                         await fetch(
                             `https://pu.bpskozep.hu/ad/password-reset/${user.email}`,
@@ -179,7 +206,10 @@ export async function POST(req: Request) {
                                     Authorization: `Bearer ${process.env.DOCUMENTS_AUTH}`,
                                     "Content-Type": "application/json",
                                 },
-                                body: JSON.stringify(body),
+                                body: JSON.stringify({
+                                    query: body.query,
+                                    num_docs: 2,
+                                }),
                                 method: "POST",
                             },
                         );
@@ -198,6 +228,12 @@ export async function POST(req: Request) {
         },
         maxSteps: 3,
         temperature: 0.4,
+        async onFinish(event) {
+            await new Chat({
+                user: user.id,
+                messages: [...coreMessages, ...event.responseMessages],
+            }).save();
+        },
     });
 
     return result.toDataStreamResponse();
