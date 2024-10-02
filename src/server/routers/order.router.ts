@@ -189,8 +189,6 @@ const orderRouter = router({
                 day = 4;
             }
 
-            console.log(date);
-
             const menu = await Menu.findOne({
                 week,
                 year,
@@ -490,6 +488,61 @@ const orderRouter = router({
             }
 
             return result;
+        }),
+    edit: procedure
+        .input(
+            z.strictObject({
+                week: z.number().optional(),
+                year: z.number().optional(),
+                chosenOptions: z.string().array(),
+            }),
+        )
+        .mutation(async ({ ctx, input }) => {
+            const date = new Date();
+
+            const menu = await Menu.findOne({
+                week: input.week || getWeek(date),
+                year: input.year || getWeekYear(date),
+            });
+
+            if (!menu) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Menu not found",
+                });
+            }
+
+            const user = await User.findOne({
+                email: ctx.session?.user?.email,
+            });
+
+            if (!user) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+            }
+
+            const order = await Order.findOne({
+                menu: menu.id,
+                user: user.id,
+            });
+
+            if (!order) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Order not found",
+                });
+            }
+
+            order.order = input.chosenOptions.map((chosen) => {
+                return {
+                    chosen: chosen,
+                    completed: false,
+                };
+            });
+
+            await order.save();
         }),
 });
 
