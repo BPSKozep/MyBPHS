@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import Card from "components/Card";
 import OrderForm from "components/OrderForm";
 import IconSubmitButton from "components/IconSubmitButton";
@@ -24,9 +24,12 @@ import PageWithHeader from "components/PageWithHeader";
 function LunchOrder() {
     const [weekOffset, setWeekOffset] = useState(1);
 
+    const [orderEditing, setOrderEditing] = useState(false);
+
     const [year, week] = useMemo(() => {
         const date = new Date();
         date.setDate(date.getDate() + weekOffset * 7);
+        setOrderEditing(false);
 
         return [getWeekYear(date), getWeek(date)];
     }, [weekOffset]);
@@ -45,6 +48,14 @@ function LunchOrder() {
             ? order.map((day) => day.chosen)
             : Array(5).fill("i_am_not_want_food"),
     );
+
+    useEffect(() => {
+        if (orderExists) {
+            setSelectedOptions(order.map((day) => day.chosen));
+        } else {
+            setSelectedOptions(Array(5).fill("i_am_not_want_food"));
+        }
+    }, [orderExists, weekOffset, order]);
 
     const { mutateAsync: createOrder } = trpc.order.create.useMutation();
 
@@ -66,8 +77,6 @@ function LunchOrder() {
     const showText = isLoading || noMenu || menuClosed;
 
     const userEmail = useSession().data?.user?.email;
-
-    const [orderEditing, setOrderEditing] = useState(false);
 
     return (
         <PageWithHeader title="Ebédrendelés">
@@ -129,6 +138,15 @@ function LunchOrder() {
                                             }}
                                             onClick={() => {
                                                 setOrderEditing(!orderEditing);
+
+                                                const newSelectedOptions =
+                                                    order.map(
+                                                        (day) => day.chosen,
+                                                    );
+
+                                                setSelectedOptions(
+                                                    newSelectedOptions,
+                                                );
                                             }}
                                         >
                                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-600 drop-shadow-2xl">
@@ -142,7 +160,22 @@ function LunchOrder() {
                             )}
 
                             <div className="flex flex-col items-center justify-center gap-4">
-                                <div className="flex w-full items-center justify-between">
+                                <motion.div
+                                    className="flex w-full items-center justify-between"
+                                    initial={{
+                                        opacity: 1,
+                                        height: "auto",
+                                    }}
+                                    animate={{
+                                        opacity: orderEditing ? 0 : 1,
+                                        height: orderEditing ? 0 : "auto",
+                                    }}
+                                    transition={{
+                                        height: {
+                                            delay: orderEditing ? 0.2 : 0,
+                                        },
+                                    }}
+                                >
                                     <IconButton
                                         icon={
                                             <FontAwesomeIcon
@@ -154,12 +187,11 @@ function LunchOrder() {
                                                 (offset) => offset - 1,
                                             )
                                         }
+                                        disabled={orderEditing}
                                     />
                                     <h1 className="mx-1 inline-block text-center text-base font-bold text-white md:text-lg">
                                         {orderExists
-                                            ? orderEditing
-                                                ? `Rendelés szerkesztése (${year}. ${week}. hét)`
-                                                : `Leadott rendelés (${year}. ${week}. hét)`
+                                            ? `Leadott rendelés (${year}. ${week}. hét)`
                                             : `Rendelés (${year}. ${week}. hét)`}
                                     </h1>
                                     <IconButton
@@ -173,8 +205,9 @@ function LunchOrder() {
                                                 (offset) => offset + 1,
                                             )
                                         }
+                                        disabled={orderEditing}
                                     />
-                                </div>
+                                </motion.div>
 
                                 <>
                                     <OrderForm
@@ -198,19 +231,13 @@ function LunchOrder() {
 
                                             return menuCombine(menuDay, false);
                                         })}
-                                        selectedOptions={
-                                            orderExists
-                                                ? orderEditing
-                                                    ? selectedOptions
-                                                    : order.map(
-                                                          (day) => day.chosen,
-                                                      )
-                                                : selectedOptions
-                                        }
+                                        selectedOptions={selectedOptions}
                                         onChange={(chosenOptions) => {
-                                            if (orderExists) return;
-
-                                            setSelectedOptions(chosenOptions);
+                                            if (orderEditing || !orderExists) {
+                                                setSelectedOptions(
+                                                    chosenOptions,
+                                                );
+                                            }
                                         }}
                                     />
 
@@ -251,7 +278,7 @@ function LunchOrder() {
                                                                     type: "Lunch",
                                                                     message:
                                                                         userEmail +
-                                                                        " szerkesztette a rendelését. ✍️",
+                                                                        " beküldte a rendelést. 📨",
                                                                 },
                                                             );
 
@@ -269,43 +296,59 @@ function LunchOrder() {
                                                 />
                                             </motion.div>
                                         )}
-                                    </AnimatePresence>
-                                    {orderEditing && (
-                                        <IconSubmitButton
-                                            icon={
-                                                <FontAwesomeIcon
-                                                    icon={faEdit}
+                                        {orderEditing && (
+                                            <motion.div
+                                                initial={{
+                                                    opacity: 1,
+                                                    height: "auto",
+                                                }}
+                                                exit={{
+                                                    opacity: 0,
+                                                    height: 0,
+                                                }}
+                                                transition={{
+                                                    height: { delay: 2.2 },
+                                                }}
+                                            >
+                                                <IconSubmitButton
+                                                    icon={
+                                                        <FontAwesomeIcon
+                                                            icon={faEdit}
+                                                        />
+                                                    }
+                                                    onClick={async () => {
+                                                        try {
+                                                            await sleep(500);
+
+                                                            await editOrder({
+                                                                week,
+                                                                year,
+                                                                chosenOptions:
+                                                                    selectedOptions,
+                                                            });
+
+                                                            await setOrderEditing(
+                                                                false,
+                                                            );
+
+                                                            await sendDiscordWebhook(
+                                                                {
+                                                                    type: "Lunch",
+                                                                    message:
+                                                                        userEmail +
+                                                                        " szerkesztette a rendelését. ✍️",
+                                                                },
+                                                            );
+
+                                                            return true;
+                                                        } catch (err) {
+                                                            return false;
+                                                        }
+                                                    }}
                                                 />
-                                            }
-                                            onClick={async () => {
-                                                try {
-                                                    await sleep(500);
-
-                                                    await editOrder({
-                                                        week,
-                                                        year,
-                                                        chosenOptions:
-                                                            selectedOptions,
-                                                    });
-
-                                                    await sendDiscordWebhook({
-                                                        type: "Lunch",
-                                                        message:
-                                                            userEmail +
-                                                            " beküldte a rendelést. 📨",
-                                                    });
-
-                                                    sleep(1700).then(() => {
-                                                        refetchOrder();
-                                                    });
-
-                                                    return true;
-                                                } catch (err) {
-                                                    return false;
-                                                }
-                                            }}
-                                        />
-                                    )}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </>
                             </div>
                         </Card>
