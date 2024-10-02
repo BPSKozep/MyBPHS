@@ -6,18 +6,24 @@ import React from "react";
 import { useChat } from "ai/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-function MyBPHSIntelligence() {
+function LaptopPassword() {
     const { messages, input, handleInputChange, handleSubmit } = useChat();
 
     return (
-        <PageWithHeader title="MyBPHS Intelligence ✨">
-            <div className="flex h-full w-full items-start justify-center align-middle">
-                <div className="mx-auto flex h-full w-full max-w-md flex-col">
-                    <div
-                        className="h-full overflow-auto"
-                        style={{ maxHeight: "calc(100vh - 15rem)" }}
-                    >
+        <PageWithHeader
+            title={
+                <span>
+                    <span className="hidden sm:inline">MyBPHS</span>{" "}
+                    Intelligence ✨
+                </span>
+            }
+        >
+            <div className="flex h-full items-start justify-center">
+                <div className="flex h-full w-full max-w-md flex-col">
+                    <div className="flex-1 overflow-y-auto">
                         {messages.map(
                             (message) =>
                                 message && (
@@ -27,9 +33,13 @@ function MyBPHSIntelligence() {
                                     >
                                         <div
                                             key={message.id}
-                                            className={`m-2 whitespace-pre-wrap rounded-lg ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
+                                            className={`space-pre-wrap prose prose-invert m-2 max-w-96 break-words rounded-lg text-white ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
                                         >
-                                            {message.content.trim()}
+                                            <Markdown
+                                                remarkPlugins={[remarkGfm]}
+                                            >
+                                                {message.content.trim()}
+                                            </Markdown>
                                         </div>
                                     </div>
                                 ),
@@ -37,7 +47,7 @@ function MyBPHSIntelligence() {
                     </div>
                     <form
                         onSubmit={handleSubmit}
-                        className="bottom-0 mt-4 flex w-full max-w-md overflow-auto rounded-lg bg-slate-300 shadow-lg"
+                        className="bottom-0 mx-auto mb-10 mt-4 flex h-10 w-full max-w-[90vw] overflow-auto rounded-lg bg-slate-300 shadow-lg"
                     >
                         <input
                             className="h-full w-full bg-slate-300 p-2 text-black placeholder-gray-700"
@@ -55,4 +65,4 @@ function MyBPHSIntelligence() {
     );
 }
 
-export default MyBPHSIntelligence;
+export default LaptopPassword;
