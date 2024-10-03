@@ -6,6 +6,8 @@ import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import sleep from "utils/sleep";
+import { motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { trpc } from "utils/trpc";
 export default function CreateUsers() {
     const [emailFormat, setEmailFormat] = useState<
@@ -19,6 +21,8 @@ export default function CreateUsers() {
     >("bphs-sysadmins@budapest.school");
     const [emailSubject, setEmailSubject] = useState("");
     const [emailText, setEmailText] = useState("");
+    const [buttonLink, setButtonLink] = useState("");
+    const [buttonText, setButtonText] = useState("");
 
     const { mutateAsync: sendEmail } = trpc.email.sendAdminEmail.useMutation();
 
@@ -44,13 +48,60 @@ export default function CreateUsers() {
                         )
                     }
                 >
-                    <option value="general">Altalanos</option>
-                    <option value="update">Hirlevel</option>
+                    <option value="general">Általános</option>
+                    <option value="update">Frissítés</option>
                     <option value="important">Fontos</option>
                 </select>
-                <p className="my-3">Cimzettek</p>
+                <AnimatePresence>
+                    {emailFormat === "update" && (
+                        <motion.div
+                            initial={{
+                                opacity: 0,
+                                height: 0,
+                            }}
+                            animate={{
+                                opacity: emailFormat != "update" ? 0 : 1,
+                                height: emailFormat != "update" ? 0 : "auto",
+                            }}
+                            transition={{
+                                height: {
+                                    delay: emailFormat != "update" ? 0.2 : 0,
+                                },
+                            }}
+                            exit={{
+                                opacity: 0,
+                                height: 0,
+                            }}
+                        >
+                            <>
+                                <p className="my-3">Link</p>
+                                <input
+                                    type="text"
+                                    className="w-60 rounded-lg p-2 text-black sm:w-80"
+                                    value={buttonLink}
+                                    placeholder='https://my.bphs.hu/valami"'
+                                    onChange={(e) =>
+                                        setButtonLink(e.target.value)
+                                    }
+                                />
+                                <p className="my-3">Gomb szöveg</p>
+                                <input
+                                    type="text"
+                                    className="w-60 rounded-lg p-2 text-black sm:w-80"
+                                    value={buttonText}
+                                    placeholder='MBI ✨ on top"'
+                                    onChange={(e) =>
+                                        setButtonText(e.target.value)
+                                    }
+                                />
+                            </>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <p className="my-3">Címzettek</p>
                 <select
-                    className="h-10 w-40 rounded-md border-none p-2 text-center font-bold text-black"
+                    className="h-10 w-52 rounded-md border-none p-2 text-center font-bold text-black"
                     value={emailTo}
                     onChange={(e) =>
                         setEmailTo(
@@ -63,19 +114,19 @@ export default function CreateUsers() {
                     }
                 >
                     <option value="bphs-sysadmins@budapest.school">
-                        Rendszergazdak
+                        Rendszergazdák
                     </option>
                     <option value="jpp-students@budapestschool.org">
                         Mindenki
                     </option>
                     <option value="jpp-students-only@budapestschool.org">
-                        Diakok
+                        Diákok
                     </option>
                     <option value="jpp-teachers@budapestschool.org">
-                        Tanarok
+                        Tanárok
                     </option>
                 </select>
-                <p className="mb-3 mt-5">Email targy</p>
+                <p className="mb-3 mt-5">Email tárgy</p>
                 <input
                     type="text"
                     className="w-60 rounded-lg p-2 text-black sm:w-80"
@@ -83,42 +134,46 @@ export default function CreateUsers() {
                     placeholder='+ "MyBPHS hírlevél"'
                     onChange={(e) => setEmailSubject(e.target.value)}
                 />
-                <p className="mb-3 mt-5">Email szoveg</p>
-                <textarea
-                    className="mb-5 w-72 rounded-lg p-3 text-black sm:w-80"
-                    value={emailText}
-                    onChange={(e) => setEmailText(e.target.value)}
-                ></textarea>
-                <IconSubmitButton
-                    icon={<FontAwesomeIcon icon={faEnvelope} />}
-                    onClick={async () => {
-                        try {
-                            await sleep(500);
+                <p className="mb-3 mt-5">Email szöveg</p>
+                <div className="flex flex-col items-center">
+                    <textarea
+                        className="mb-5 w-72 rounded-lg p-3 text-black sm:w-80"
+                        value={emailText}
+                        onChange={(e) => setEmailText(e.target.value)}
+                    ></textarea>
+                    <IconSubmitButton
+                        icon={<FontAwesomeIcon icon={faEnvelope} />}
+                        onClick={async () => {
+                            try {
+                                await sleep(500);
 
-                            await sendEmail({
-                                emailFormat,
-                                emailTo,
-                                emailSubject,
-                                emailText,
-                            });
-
-                            await sendDiscordWebhook({
-                                type: "Info",
-                                message:
-                                    emailFormat +
-                                    " email elkuldve: " +
+                                await sendEmail({
+                                    emailFormat,
+                                    emailTo,
                                     emailSubject,
-                            });
-                            return true;
-                        } catch (err) {
-                            await sendDiscordWebhook({
-                                type: "Error",
-                                message: String(err),
-                            });
-                            return false;
-                        }
-                    }}
-                />
+                                    emailText,
+                                    buttonLink,
+                                    buttonText,
+                                });
+
+                                await sendDiscordWebhook({
+                                    type: "Info",
+                                    message:
+                                        emailFormat +
+                                        " email elkuldve: " +
+                                        emailSubject,
+                                });
+                                return true;
+                            } catch (err) {
+                                await sendDiscordWebhook({
+                                    type: "Error",
+                                    message: String(err),
+                                });
+                                return false;
+                            }
+                        }}
+                    />
+                </div>
             </Card>
         </div>
     );

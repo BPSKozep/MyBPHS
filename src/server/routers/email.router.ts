@@ -1,6 +1,9 @@
 import { Resend } from "resend";
 import { procedure, router } from "server/trpc";
 import Lunch from "emails/lunch";
+import General from "emails/general";
+import Update from "emails/update";
+import Important from "emails/important";
 import { checkRoles } from "utils/authorization";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -44,6 +47,8 @@ const emailRouter = router({
                 ]),
                 emailSubject: z.string(),
                 emailText: z.string(),
+                buttonLink: z.string().optional(),
+                buttonText: z.string().optional(),
             }),
         )
         .mutation(async ({ ctx, input }) => {
@@ -63,11 +68,27 @@ const emailRouter = router({
                 });
             }
 
+            const subject =
+                input.emailFormat !== "important"
+                    ? input.emailSubject + " | MyBPHS hírlevél"
+                    : "FONTOS MyBPHS uzenet | " + input.emailSubject;
+
             await resend.emails.send({
                 from: "MyBPHS <my@bphs.hu>",
                 to: input.emailTo,
-                subject: input.emailSubject + " | MyBPHS hírlevél",
-                react: Lunch(),
+                subject,
+                react:
+                    input.emailFormat === "general"
+                        ? General({ text: input.emailText })
+                        : input.emailFormat === "update"
+                          ? Update({
+                                text: input.emailText,
+                                link: input.buttonLink,
+                                buttonText: input.buttonText,
+                            })
+                          : Important({
+                                text: input.emailText,
+                            }),
             });
         }),
 });
