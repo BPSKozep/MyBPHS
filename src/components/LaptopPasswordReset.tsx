@@ -17,6 +17,9 @@ function LaptopPasswordReset() {
 
     const inputValid = input.length >= 6;
 
+    const { mutateAsync: sendDiscordWebhook } =
+        trpc.webhook.sendDiscordWebhook.useMutation();
+
     return (
         <div className="flex flex-col items-center text-center">
             <h1 className="mb-5 font-bold text-white">
@@ -60,6 +63,10 @@ function LaptopPasswordReset() {
 
                             return true;
                         } catch (err) {
+                            await sendDiscordWebhook({
+                                type: "Error",
+                                message: String(err),
+                            });
                             return false;
                         }
                     }}

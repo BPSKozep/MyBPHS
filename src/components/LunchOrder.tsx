@@ -290,12 +290,22 @@ function LunchOrder() {
 
                                                             return true;
                                                         } catch (err) {
+                                                            await sendDiscordWebhook(
+                                                                {
+                                                                    type: "Error",
+                                                                    message:
+                                                                        String(
+                                                                            err,
+                                                                        ),
+                                                                },
+                                                            );
                                                             return false;
                                                         }
                                                     }}
                                                 />
                                             </motion.div>
                                         )}
+
                                         {orderEditing && (
                                             <motion.div
                                                 initial={{
@@ -342,6 +352,15 @@ function LunchOrder() {
 
                                                             return true;
                                                         } catch (err) {
+                                                            await sendDiscordWebhook(
+                                                                {
+                                                                    type: "Error",
+                                                                    message:
+                                                                        String(
+                                                                            err,
+                                                                        ),
+                                                                },
+                                                            );
                                                             return false;
                                                         }
                                                     }}

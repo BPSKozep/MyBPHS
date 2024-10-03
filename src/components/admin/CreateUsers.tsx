@@ -15,6 +15,9 @@ export default function CreateUsers() {
 
     const { mutateAsync: createMany } = trpc.user.createMany.useMutation();
 
+    const { mutateAsync: sendDiscordWebhook } =
+        trpc.webhook.sendDiscordWebhook.useMutation();
+
     return (
         <div className="flex flex-col justify-center text-white md:flex-row">
             <Card>
@@ -59,13 +62,17 @@ export default function CreateUsers() {
                                         emails: emails,
                                         names,
                                         roles: new Array(emails.length).fill(
-                                            roles
+                                            roles,
                                         ),
                                         nfcIds,
                                     });
 
                                     return true;
                                 } catch (err) {
+                                    await sendDiscordWebhook({
+                                        type: "Error",
+                                        message: String(err),
+                                    });
                                     return false;
                                 }
                             }}

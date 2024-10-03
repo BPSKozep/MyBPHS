@@ -42,6 +42,10 @@ function CloseMenuOrders() {
 
                             return true;
                         } catch (err) {
+                            await sendDiscordWebhook({
+                                type: "Error",
+                                message: String(err),
+                            });
                             return false;
                         }
                     }}
