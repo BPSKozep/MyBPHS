@@ -317,7 +317,7 @@ function LunchOrder() {
                                                     height: 0,
                                                 }}
                                                 transition={{
-                                                    height: { delay: 2.2 },
+                                                    height: { delay: 0.5 },
                                                 }}
                                             >
                                                 <IconSubmitButton
