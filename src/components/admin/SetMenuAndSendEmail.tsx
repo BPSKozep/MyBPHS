@@ -18,7 +18,7 @@ function SetMenuAndSendEmail() {
                     "a-menu": "",
                     "b-menu": "",
                 };
-            })
+            }),
     );
 
     const { mutateAsync: createMenu } = trpc.menu.create.useMutation();
@@ -58,10 +58,10 @@ function SetMenuAndSendEmail() {
 
                             return true;
                         } catch (err) {
-                            // await sendDiscordWebhook({
-                            //     type: "Error",
-                            //     message: err,
-                            // });
+                            await sendDiscordWebhook({
+                                type: "Error",
+                                message: String(err),
+                            });
                             return false;
                         }
                     }}
@@ -73,7 +73,7 @@ function SetMenuAndSendEmail() {
                     <span className="text-white" key={index}>
                         {email}
                     </span>
-                )
+                ),
             )}
         </div>
     );

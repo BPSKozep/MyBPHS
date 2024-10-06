@@ -1,5 +1,4 @@
 import React from "react";
-import PageWithHeader from "components/PageWithHeader";
 import LunchOrder from "components/LunchOrder";
 
 export const metadata = {
@@ -7,13 +6,7 @@ export const metadata = {
 };
 
 function Order() {
-    return (
-        <>
-            <PageWithHeader title="Ebédrendelés">
-                <LunchOrder />
-            </PageWithHeader>
-        </>
-    );
+    return <LunchOrder />;
 }
 
 export default Order;

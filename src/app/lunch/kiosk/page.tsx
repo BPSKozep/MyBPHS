@@ -1,20 +1,12 @@
-import OnlyRoles from "components/OnlyRoles";
-import PageWithHeader from "components/PageWithHeader";
 import React from "react";
-import KioskComponent from "components/admin/KioskComponent";
+import KioskPage from "components/admin/KioskPage";
 
 export const metadata = {
     title: "Kiosk",
 };
 
 function Kiosk() {
-    return (
-        <PageWithHeader title="Kiosk">
-            <OnlyRoles roles={["administrator", "lunch-system"]}>
-                <KioskComponent />
-            </OnlyRoles>
-        </PageWithHeader>
-    );
+    return <KioskPage />;
 }
 
 export default Kiosk;
