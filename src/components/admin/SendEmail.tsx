@@ -9,6 +9,7 @@ import sleep from "utils/sleep";
 import { motion } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
 import { trpc } from "utils/trpc";
+import UserDropdown from "./UserDropdown";
 export default function CreateUsers() {
     const [emailFormat, setEmailFormat] = useState<
         "general" | "update" | "important"
@@ -23,11 +24,21 @@ export default function CreateUsers() {
     const [emailText, setEmailText] = useState("");
     const [buttonLink, setButtonLink] = useState("");
     const [buttonText, setButtonText] = useState("");
+    const [groupmode, setGroupMode] = useState(true);
+    const [selectedUser, setSelectedUser] = useState("");
 
-    const { mutateAsync: sendEmail } = trpc.email.sendAdminEmail.useMutation();
+    const { mutateAsync: sendGroupEmail } =
+        trpc.email.sendAdminGroupEmail.useMutation();
+
+    const { mutateAsync: sendUserEmail } =
+        trpc.email.sendAdminUserEmail.useMutation();
 
     const { mutateAsync: sendDiscordWebhook } =
         trpc.webhook.sendDiscordWebhook.useMutation();
+
+    const { data: user } = trpc.user.get.useQuery(selectedUser, {
+        enabled: !!selectedUser,
+    });
 
     return (
         <div className="flex flex-col justify-center text-center text-white md:flex-row">
@@ -100,32 +111,57 @@ export default function CreateUsers() {
                 </AnimatePresence>
 
                 <p className="my-3">Címzettek</p>
-                <select
-                    className="h-10 w-52 rounded-md border-none p-2 text-center font-bold text-black"
-                    value={emailTo}
-                    onChange={(e) =>
-                        setEmailTo(
-                            e.target.value as
-                                | "bphs-sysadmins@budapest.school"
-                                | "jpp-students@budapestschool.org"
-                                | "jpp-students-only@budapestschool.org"
-                                | "jpp-teachers@budapestschool.org",
-                        )
-                    }
-                >
-                    <option value="bphs-sysadmins@budapest.school">
-                        Rendszergazdák
-                    </option>
-                    <option value="jpp-students@budapestschool.org">
-                        Mindenki
-                    </option>
-                    <option value="jpp-students-only@budapestschool.org">
-                        Diákok
-                    </option>
-                    <option value="jpp-teachers@budapestschool.org">
-                        Tanárok
-                    </option>
-                </select>
+                <div className="my-3 text-center text-white">
+                    <button
+                        className={`h-12 w-20 rounded-l-xl p-3 transition-all hover:bg-[#3a445d] ${
+                            groupmode === true ? "bg-[#3a445d]" : "bg-[#565e85]"
+                        }`}
+                        onClick={() => setGroupMode(true)}
+                    >
+                        Csoport
+                    </button>
+                    <button
+                        className={`h-12 w-20 rounded-r-xl p-3 transition-all hover:bg-[#3a445d] ${
+                            groupmode === false
+                                ? "bg-[#3a445d]"
+                                : "bg-[#565e85]"
+                        }`}
+                        onClick={() => setGroupMode(false)}
+                    >
+                        Ember
+                    </button>
+                </div>
+                {groupmode ? (
+                    <select
+                        className="h-10 w-52 rounded-md border-none p-2 text-center font-bold text-black"
+                        value={emailTo}
+                        onChange={(e) =>
+                            setEmailTo(
+                                e.target.value as
+                                    | "bphs-sysadmins@budapest.school"
+                                    | "jpp-students@budapestschool.org"
+                                    | "jpp-students-only@budapestschool.org"
+                                    | "jpp-teachers@budapestschool.org",
+                            )
+                        }
+                    >
+                        <option value="bphs-sysadmins@budapest.school">
+                            Rendszergazdák
+                        </option>
+                        <option value="jpp-students@budapestschool.org">
+                            Mindenki
+                        </option>
+                        <option value="jpp-students-only@budapestschool.org">
+                            Diákok
+                        </option>
+                        <option value="jpp-teachers@budapestschool.org">
+                            Tanárok
+                        </option>
+                    </select>
+                ) : (
+                    <UserDropdown onChange={setSelectedUser} />
+                )}
+
                 <p className="mb-3 mt-5">Email tárgy</p>
                 <input
                     type="text"
@@ -147,22 +183,41 @@ export default function CreateUsers() {
                             try {
                                 await sleep(500);
 
-                                await sendEmail({
-                                    emailFormat,
-                                    emailTo,
-                                    emailSubject,
-                                    emailText,
-                                    buttonLink,
-                                    buttonText,
-                                });
-
-                                await sendDiscordWebhook({
-                                    type: "Info",
-                                    message:
-                                        emailFormat +
-                                        " email elkuldve: " +
+                                if (groupmode && !selectedUser && !user) {
+                                    await sendGroupEmail({
+                                        emailFormat,
+                                        emailTo,
                                         emailSubject,
-                                });
+                                        emailText,
+                                        buttonLink,
+                                        buttonText,
+                                    });
+                                    await sendDiscordWebhook({
+                                        type: "Info",
+                                        message:
+                                            emailFormat +
+                                            " csoport email elkuldve: " +
+                                            emailSubject,
+                                    });
+                                } else {
+                                    await sendUserEmail({
+                                        emailFormat,
+                                        emailTo: selectedUser,
+                                        emailSubject,
+                                        emailText,
+                                        buttonLink,
+                                        buttonText,
+                                        user: user ? user.name : "",
+                                    });
+                                    await sendDiscordWebhook({
+                                        type: "Info",
+                                        message:
+                                            selectedUser +
+                                            "-nak email elkuldve: " +
+                                            emailSubject,
+                                    });
+                                }
+
                                 return true;
                             } catch (err) {
                                 await sendDiscordWebhook({
