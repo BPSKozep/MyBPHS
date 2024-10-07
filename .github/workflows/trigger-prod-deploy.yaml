@@ -1,0 +1,28 @@
+name: Trigger Production Deploy as Jamdon2
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    trigger-prod-deploy:
+        if: github.actor == 'markgyoni'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+
+            - name: Configure Git
+              run: |
+                  git config --local user.name "jamdon2"
+                  git config --local user.email "jamdon2@users.noreply.github.com"
+
+            - name: Create empty commit
+              run: |
+                  git commit --allow-empty -m "Trigger Prod Deploy"
+                  git push
+              env:
+                  GITHUB_TOKEN: ${{ secrets.JAMDON2_ACCESS_TOKEN }}
