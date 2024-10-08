@@ -32,7 +32,7 @@ export default function General({ text, user }: GeneralProps) {
                             <Text className="text-lg font-bold leading-6 text-white">
                                 Kedves {user}!
                             </Text>
-                            <Text className="text-lg leading-6 text-white">
+                            <Text className="text-lg leading-6 text-white whitespace-pre-wrap">
                                 {text}
                             </Text>
                             <Hr />
