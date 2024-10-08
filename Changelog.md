@@ -1,3 +1,11 @@
+# 2.3.3 2024-10-07
+
+-   Different greetings for email groups
+
+# 2.3.2 2024-10-07
+
+-   Admin email sending to individual users
+
 # 2.3.1 2024-10-03
 
 -   Admin email sending

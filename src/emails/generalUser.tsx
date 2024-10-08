@@ -11,12 +11,12 @@ import {
 
 import * as React from "react";
 
-interface ImportantProps {
+interface GeneralProps {
     text: string;
-    recipients: string;
+    user: string;
 }
 
-export default function Important({ text, recipients }: ImportantProps) {
+export default function General({ text, user }: GeneralProps) {
     return (
         <Html>
             <Tailwind>
@@ -30,12 +30,11 @@ export default function Important({ text, recipients }: ImportantProps) {
                             ></Img>
                             <Hr />
                             <Text className="text-lg font-bold leading-6 text-white">
-                                {recipients}
+                                Kedves {user}!
                             </Text>
                             <Text className="text-lg leading-6 text-white">
                                 {text}
                             </Text>
-
                             <Hr />
                             <Text className="text-xs leading-4 text-slate-400">
                                 Budapest School Általános Iskola és Gimnázium,

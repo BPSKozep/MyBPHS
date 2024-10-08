@@ -13,10 +13,10 @@ import * as React from "react";
 
 interface ImportantProps {
     text: string;
-    recipients: string;
+    user: string;
 }
 
-export default function Important({ text, recipients }: ImportantProps) {
+export default function Important({ text, user }: ImportantProps) {
     return (
         <Html>
             <Tailwind>
@@ -30,7 +30,7 @@ export default function Important({ text, recipients }: ImportantProps) {
                             ></Img>
                             <Hr />
                             <Text className="text-lg font-bold leading-6 text-white">
-                                {recipients}
+                                Kedves {user}!
                             </Text>
                             <Text className="text-lg leading-6 text-white">
                                 {text}
