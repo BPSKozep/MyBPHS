@@ -24,8 +24,8 @@ jobs:
 
             - name: Create empty commit
               run: |
-                  COMMIT_MESSAGE="Deploy: $(git log -1 --pretty=%B)"
-                  git commit --allow-empty -m "Trigger Dev Deploy"
+                  COMMIT_MESSAGE="Dev Deploy: $(git log -1 --pretty=%B)"
+                  git commit --allow-empty -m "$COMMIT_MESSAGE"
                   git push
               env:
                   GITHUB_TOKEN: ${{ secrets.JAMDON2_ACCESS_TOKEN }}
