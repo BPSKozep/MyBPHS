@@ -13,9 +13,10 @@ import * as React from "react";
 
 interface ImportantProps {
     text: string;
+    recipients: string;
 }
 
-export default function Important({ text }: ImportantProps) {
+export default function Important({ text, recipients }: ImportantProps) {
     return (
         <Html>
             <Tailwind>
@@ -29,7 +30,7 @@ export default function Important({ text }: ImportantProps) {
                             ></Img>
                             <Hr />
                             <Text className="text-lg font-bold leading-6 text-white">
-                                Kedves diákok és tanárok!
+                                {recipients}
                             </Text>
                             <Text className="text-lg leading-6 text-white">
                                 {text}

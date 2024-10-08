@@ -13,9 +13,10 @@ import * as React from "react";
 
 interface GeneralProps {
     text: string;
+    recipients: string;
 }
 
-export default function General({ text }: GeneralProps) {
+export default function General({ text, recipients }: GeneralProps) {
     return (
         <Html>
             <Tailwind>
@@ -29,7 +30,7 @@ export default function General({ text }: GeneralProps) {
                             ></Img>
                             <Hr />
                             <Text className="text-lg font-bold leading-6 text-white">
-                                Kedves diákok és tanárok!
+                                {recipients}
                             </Text>
                             <Text className="text-lg leading-6 text-white">
                                 {text}

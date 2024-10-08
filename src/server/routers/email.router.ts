@@ -76,6 +76,15 @@ const emailRouter = router({
                     ? input.emailSubject + " | MyBPHS hírlevél"
                     : "FONTOS MyBPHS üzenet | " + input.emailSubject;
 
+            const recipients =
+                input.emailTo === "bphs-sysadmins@budapest.school"
+                    ? "Kedves Rendszergazdák!"
+                    : input.emailTo === "jpp-students@budapestschool.org"
+                      ? "Kedves diákok és tanárok!"
+                      : input.emailTo === "jpp-students-only@budapestschool.org"
+                        ? "Kedves diákok!"
+                        : "Kedves tanárok!";
+
             input.emailTo &&
                 (await resend.emails.send({
                     from: "MyBPHS <my@bphs.hu>",
@@ -83,7 +92,7 @@ const emailRouter = router({
                     subject,
                     react:
                         input.emailFormat === "general"
-                            ? General({ text: input.emailText })
+                            ? General({ text: input.emailText, recipients })
                             : input.emailFormat === "update"
                               ? Update({
                                     text: input.emailText,
@@ -92,6 +101,7 @@ const emailRouter = router({
                                 })
                               : Important({
                                     text: input.emailText,
+                                    recipients,
                                 }),
                 }));
         }),
