@@ -32,7 +32,7 @@ export default function Important({ text, user }: ImportantProps) {
                             <Text className="text-lg font-bold leading-6 text-white">
                                 Kedves {user}!
                             </Text>
-                            <Text className="text-lg leading-6 text-white">
+                            <Text className="whitespace-pre-wrap text-lg leading-6 text-white">
                                 {text}
                             </Text>
 

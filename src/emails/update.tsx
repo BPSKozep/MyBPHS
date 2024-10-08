@@ -33,7 +33,7 @@ function Update({ text, link, buttonText }: UpdateProps) {
                             <Text className="text-center text-lg font-bold leading-6 text-white">
                                 Elérhető az új MyBPHS verzió!
                             </Text>
-                            <Text className="text-md leading-6 text-white">
+                            <Text className="text-md whitespace-pre-wrap leading-6 text-white">
                                 {text}
                             </Text>
                             <Section className="text-center">
