@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import Card from "components/Card";
 import OrderForm from "components/OrderForm";
+import ClosedOrderForm from "components/ClosedOrderForm";
 import IconSubmitButton from "components/IconSubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,6 +11,7 @@ import {
     faArrowLeft,
     faArrowRight,
     faEdit,
+    faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { trpc } from "utils/trpc";
 import sleep from "utils/sleep";
@@ -78,6 +80,8 @@ function LunchOrder() {
 
     const userEmail = useSession().data?.user?.email;
 
+    const [closedMenuShown, setClosedMenuShown] = useState(false);
+
     return (
         <PageWithHeader title="Ebédrendelés">
             <div className="flex w-full justify-center text-white">
@@ -85,40 +89,106 @@ function LunchOrder() {
                     {showText && (
                         <Card>
                             <div className="flex flex-col gap-4">
-                                <div className="flex w-full items-center">
+                                <div className="flex w-full items-center justify-center">
                                     <IconButton
                                         icon={
                                             <FontAwesomeIcon
                                                 icon={faArrowLeft}
                                             />
                                         }
-                                        onClick={() =>
+                                        onClick={() => {
                                             setWeekOffset(
                                                 (offset) => offset - 1,
-                                            )
-                                        }
+                                            );
+                                            setClosedMenuShown(false);
+                                        }}
                                     />
-                                    <h1 className="mx-2 text-center text-base font-bold md:text-lg">
-                                        {isLoading && "Menü betöltése..."}
-                                        {noMenu &&
-                                            "Nincs még feltöltve a menü."}
-                                        {menuClosed &&
-                                            "A rendelés már le lett zárva."}
-                                        {` (${year}. ${week}. hét)`}
-                                    </h1>
+                                    <div className="text-center">
+                                        <p className="mx-2 text-center text-lg font-bold md:text-xl">{`${year}. ${week}. hét`}</p>
+                                        <p className="mx-2 text-center text-base font-bold md:text-lg">
+                                            {isLoading && "Menü betöltése..."}
+                                            {noMenu &&
+                                                "Nincs még feltöltve a menü."}
+                                            {menuClosed &&
+                                                "A rendelés már le lett zárva."}
+                                        </p>
+                                    </div>
                                     <IconButton
                                         icon={
                                             <FontAwesomeIcon
                                                 icon={faArrowRight}
                                             />
                                         }
-                                        onClick={() =>
+                                        onClick={() => {
                                             setWeekOffset(
                                                 (offset) => offset + 1,
-                                            )
-                                        }
+                                            );
+                                            setClosedMenuShown(false);
+                                        }}
                                     />
                                 </div>
+                                {menuClosed && (
+                                    <div
+                                        className="flex cursor-pointer flex-row justify-center text-center"
+                                        onClick={() =>
+                                            setClosedMenuShown(!closedMenuShown)
+                                        }
+                                    >
+                                        Menü megtekintése
+                                        <motion.div
+                                            animate={{
+                                                rotate: closedMenuShown
+                                                    ? 180
+                                                    : 0,
+                                            }}
+                                            transition={{
+                                                duration: 0.2,
+                                            }}
+                                            className="ml-3 origin-center"
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faChevronDown}
+                                                className="transition-all"
+                                            />
+                                        </motion.div>
+                                    </div>
+                                )}
+                                <AnimatePresence>
+                                    {closedMenuShown && menu && (
+                                        <motion.div
+                                            variants={{
+                                                opened: {
+                                                    opacity: 1,
+                                                    height: "auto",
+                                                    transition: {
+                                                        opacity: { delay: 0.3 },
+                                                    },
+                                                },
+                                                closed: {
+                                                    opacity: 0,
+                                                    height: 0,
+                                                },
+                                            }}
+                                            initial="closed"
+                                            animate={
+                                                closedMenuShown
+                                                    ? "opened"
+                                                    : "closed"
+                                            }
+                                            exit={{
+                                                opacity: 0,
+                                                height: 0,
+                                                transition: {
+                                                    height: { delay: 0.3 },
+                                                },
+                                            }}
+                                        >
+                                            <ClosedOrderForm
+                                                options={menu.options}
+                                            />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </Card>
                     )}
@@ -182,29 +252,34 @@ function LunchOrder() {
                                                 icon={faArrowLeft}
                                             />
                                         }
-                                        onClick={() =>
+                                        onClick={() => {
                                             setWeekOffset(
                                                 (offset) => offset - 1,
-                                            )
-                                        }
+                                            );
+                                            setClosedMenuShown(false);
+                                        }}
                                         disabled={orderEditing}
                                     />
-                                    <h1 className="mx-1 inline-block text-center text-base font-bold text-white md:text-lg">
-                                        {orderExists
-                                            ? `Leadott rendelés (${year}. ${week}. hét)`
-                                            : `Rendelés (${year}. ${week}. hét)`}
-                                    </h1>
+                                    <div className="text-center">
+                                        <p className="mx-2 text-center text-lg font-bold md:text-xl">{`${year}. ${week}. hét`}</p>
+                                        <p className="mx-1 inline-block text-center text-base font-bold text-white md:text-lg">
+                                            {orderExists
+                                                ? `Leadott rendelés`
+                                                : `Rendelés`}
+                                        </p>
+                                    </div>
                                     <IconButton
                                         icon={
                                             <FontAwesomeIcon
                                                 icon={faArrowRight}
                                             />
                                         }
-                                        onClick={() =>
+                                        onClick={() => {
                                             setWeekOffset(
                                                 (offset) => offset + 1,
-                                            )
-                                        }
+                                            );
+                                            setClosedMenuShown(false);
+                                        }}
                                         disabled={orderEditing}
                                     />
                                 </motion.div>

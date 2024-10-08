@@ -1,3 +1,8 @@
+# 2.3.4 2024-10-08
+
+-   View menu after closure
+-   Design cleanups
+
 # 2.3.3 2024-10-07
 
 -   Different greetings for email groups

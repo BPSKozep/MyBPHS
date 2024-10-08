@@ -6,15 +6,7 @@ import wrapConditional from "utils/wrapConditional";
 
 const days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
-function OrderForm({
-    options,
-    selectedOptions,
-    onChange,
-}: {
-    options: Record<string, string>[];
-    selectedOptions: string[];
-    onChange: (selectedOptions: string[]) => void;
-}) {
+function ClosedOrderForm({ options }: { options: Record<string, string>[] }) {
     const isBigScreen = useMediaQuery({ query: createBreakpoint("lg") });
 
     return (
@@ -40,41 +32,13 @@ function OrderForm({
                             ></div>
                         ) : (
                             <button
-                                className={`overflow-auto rounded-lg ${
-                                    selectedOptions[dayIndex] === id
-                                        ? "bg-[#5d9a84] font-bold shadow-lg"
-                                        : "bg-[#565e85] shadow-md"
-                                } px-3 py-2 shadow-md`}
-                                onClick={() => {
-                                    const newOptions = [...selectedOptions];
-
-                                    newOptions[dayIndex] = id;
-
-                                    onChange(newOptions);
-                                }}
+                                className={`overflow-auto rounded-lg bg-[#565e85] px-3 py-2 shadow-md`}
                                 key={`option-${dayIndex + id}`}
                             >
                                 {option}
                             </button>
                         ),
                     ),
-                    <button
-                        className={`overflow-auto rounded-lg ${
-                            selectedOptions[dayIndex] === "i_am_not_want_food"
-                                ? "bg-[#7c4242] font-bold shadow-lg"
-                                : "bg-[#9a5d5d] shadow-md"
-                        } px-3 py-2`}
-                        onClick={() => {
-                            const newOptions = [...selectedOptions];
-
-                            newOptions[dayIndex] = "i_am_not_want_food";
-
-                            onChange(newOptions);
-                        }}
-                        key={`no-order-${dayIndex}`}
-                    >
-                        Nem kérek ebédet
-                    </button>,
                 ]),
                 isBigScreen,
             )}
@@ -82,4 +46,4 @@ function OrderForm({
     );
 }
 
-export default OrderForm;
+export default ClosedOrderForm;
