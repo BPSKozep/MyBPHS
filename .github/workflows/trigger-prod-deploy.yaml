@@ -24,6 +24,7 @@ jobs:
 
             - name: Create empty commit
               run: |
+                  COMMIT_MESSAGE="Deploy: $(git log -1 --pretty=%B)"
                   git commit --allow-empty -m "Trigger Prod Deploy"
                   git push
               env:
