@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaFloppyDisk } from "react-icons/fa6";
 import IconSubmitButton from "components/IconSubmitButton";
 import Card from "components/Card";
 import { trpc } from "utils/trpc";
@@ -24,7 +23,7 @@ export default function CreateTimetable() {
 
     const timetableOnChange = useCallback(
         (newTimetable: (string | null)[][]) => setTimetable(newTimetable),
-        []
+        [],
     );
 
     useEffect(() => {
@@ -63,7 +62,7 @@ export default function CreateTimetable() {
                                 placeholder="Prioritás"
                             />
                             <IconSubmitButton
-                                icon={<FontAwesomeIcon icon={faFloppyDisk} />}
+                                icon={<FaFloppyDisk />}
                                 onClick={() => {
                                     mutate({
                                         name: groupName,

@@ -2,8 +2,7 @@
 
 import React from "react";
 import IconSubmitButton from "components/IconSubmitButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarXmark } from "@fortawesome/free-solid-svg-icons";
+import { FaCalendarXmark } from "react-icons/fa6";
 import sleep from "utils/sleep";
 import { trpc } from "utils/trpc";
 import { getWeek, getWeekYear } from "utils/isoweek";
@@ -21,7 +20,7 @@ function CloseMenuOrders() {
             </h2>
             <div>
                 <IconSubmitButton
-                    icon={<FontAwesomeIcon icon={faCalendarXmark} />}
+                    icon={<FaCalendarXmark />}
                     onClick={async () => {
                         try {
                             await sleep(500);

@@ -4,8 +4,7 @@ import PageWithHeader from "components/PageWithHeader";
 import React from "react";
 
 import { useChat } from "ai/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { FaPaperPlane } from "react-icons/fa";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -56,7 +55,7 @@ function LaptopPassword() {
                             onChange={handleInputChange}
                         />
                         <button className="w-10 bg-[#565e85] text-gray-200">
-                            <FontAwesomeIcon icon={faPaperPlane} />
+                            <FaPaperPlane />
                         </button>
                     </form>
                 </div>

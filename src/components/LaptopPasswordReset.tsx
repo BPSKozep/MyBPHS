@@ -4,8 +4,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import sleep from "utils/sleep";
 import IconSubmitButton from "components/IconSubmitButton";
-import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaFloppyDisk } from "react-icons/fa6";
 import { trpc } from "utils/trpc";
 
 function LaptopPasswordReset() {
@@ -52,7 +51,7 @@ function LaptopPasswordReset() {
 
             <div className="mt-3">
                 <IconSubmitButton
-                    icon={<FontAwesomeIcon icon={faFloppyDisk} />}
+                    icon={<FaFloppyDisk />}
                     onClick={async () => {
                         try {
                             await sleep(500);

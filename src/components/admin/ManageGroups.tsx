@@ -2,15 +2,14 @@
 
 import React, { useState } from "react";
 import { trpc } from "utils/trpc";
-import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaFloppyDisk } from "react-icons/fa6";
 import Card from "components/Card";
 import IconSubmitButton from "components/IconSubmitButton";
 
 export default function ManageGroups() {
     const { mutate } = trpc.user.batchUpdateGroups.useMutation();
     const [updateMode, setUpdateMode] = useState<"add" | "remove" | "replace">(
-        "replace"
+        "replace",
     );
     const [groups, setGroups] = useState("");
     const [students, setStudents] = useState("");
@@ -40,7 +39,7 @@ export default function ManageGroups() {
                                     e.target.value as
                                         | "add"
                                         | "remove"
-                                        | "replace"
+                                        | "replace",
                                 )
                             }
                         >
@@ -50,7 +49,7 @@ export default function ManageGroups() {
                         </select>
                     </div>
                     <IconSubmitButton
-                        icon={<FontAwesomeIcon icon={faFloppyDisk} />}
+                        icon={<FaFloppyDisk />}
                         onClick={() => {
                             mutate({
                                 mode: updateMode,

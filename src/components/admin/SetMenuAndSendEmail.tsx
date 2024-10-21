@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import { trpc } from "utils/trpc";
 import IconSubmitButton from "components/IconSubmitButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { FaEnvelope } from "react-icons/fa6";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
 import SetMenuForm from "components/admin/SetMenuForm";
@@ -34,7 +33,7 @@ function SetMenuAndSendEmail() {
             <h2 className="mb-3 mt-5 text-white">Mentés és email kiküldése:</h2>
             <div>
                 <IconSubmitButton
-                    icon={<FontAwesomeIcon icon={faEnvelope} />}
+                    icon={<FaEnvelope />}
                     onClick={async () => {
                         try {
                             await sleep(500);
