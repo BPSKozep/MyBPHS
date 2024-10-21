@@ -1,20 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import NFCInput from "components/admin/NFCInput";
 import { trpc } from "utils/trpc";
 import { getWeek, getWeekYear } from "utils/isoweek";
 import UserDropdown from "components/admin/UserDropdown";
 import Loading from "components/Loading";
+import IconButton from "components/IconButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 function TokenCheck() {
     const [nfcId, setNfcId] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [checkMode, setCheckMode] = useState<"user" | "token">("user");
 
-    const date = new Date();
-    const year = getWeekYear(date);
-    const week = getWeek(date);
+    const [weekOffset, setWeekOffset] = useState(1);
+    const [year, week] = useMemo(() => {
+        const date = new Date();
+        date.setDate(date.getDate() + weekOffset * 7);
+
+        return [getWeekYear(date), getWeek(date)];
+    }, [weekOffset]);
 
     const {
         data: NFCUser,
@@ -35,11 +42,16 @@ function TokenCheck() {
     const isUserFetched =
         checkMode === "user" ? isEmailUserFetched : isNFCUserFetched;
 
-    const { data: order } = trpc.order.getAllWeek.useQuery({
-        email: user?.email,
-        year,
-        week,
-    });
+    const { data: order } = trpc.order.getAllWeek.useQuery(
+        {
+            email: user?.email,
+            year,
+            week,
+        },
+        {
+            enabled: !!user,
+        },
+    );
     const orderExists = order && order.length > 0;
 
     return (
@@ -73,6 +85,23 @@ function TokenCheck() {
                     <UserDropdown onChange={setEmail} />
                 </div>
             )}
+            <div className="my-3 flex items-center text-white">
+                <IconButton
+                    icon={<FontAwesomeIcon icon={faArrowLeft} />}
+                    onClick={() => {
+                        setWeekOffset((offset) => offset - 1);
+                    }}
+                />
+                <div className="text-center">
+                    <p className="mx-2 text-center font-bold md:text-lg">{`${year}. ${week}. hét`}</p>
+                </div>
+                <IconButton
+                    icon={<FontAwesomeIcon icon={faArrowRight} />}
+                    onClick={() => {
+                        setWeekOffset((offset) => offset + 1);
+                    }}
+                />
+            </div>
             {nfcId && !user && isUserFetched && (
                 <h2 className="text-white">Nem érvényes NFC token</h2>
             )}
@@ -131,9 +160,9 @@ function TokenCheck() {
             {user && !orderExists && (
                 <>
                     <h1 className="mt-5 text-xl text-white">
-                        Nincs rendelés a jelenlegi hétre
+                        Nincs rendelés erre hétre
                     </h1>
-                    <h2 className="text-white">{user.name}</h2>
+                    {NFCUser && <h2 className="text-white">{user.name}</h2>}
                 </>
             )}
         </>
