@@ -27,7 +27,7 @@ export default function MainHeader() {
             <div className="absolute left-10 flex w-10 items-center justify-end">
                 <PWAInstall />
             </div>
-            <h1 className="text-center text-2xl font-bold text-white">
+            <div className="text-center text-2xl font-bold text-white">
                 {data ? (
                     <h1 className="text-center text-2xl font-bold text-white">
                         <Link href="/">
@@ -51,7 +51,7 @@ export default function MainHeader() {
                         <span className="hidden sm:inline">-ben!</span>
                     </>
                 )}
-            </h1>
+            </div>
             {data && (
                 <div
                     className="absolute right-10 flex w-10 items-center justify-end"
