@@ -45,7 +45,7 @@
         "resend": "^3.2.0",
         "socket.io-client": "^4.8.0",
         "superjson": "^2.2.1",
-        "tailwind-merge": "^2.4.0",
+        "tailwind-merge": "^2.5.5",
         "use-debounce": "^10.0.3",
         "zod": "^3.23.8"
     },
