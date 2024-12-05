@@ -1,11 +1,11 @@
 {
     "name": "mybphs",
-    "version": "2.3.4",
+    "version": "2.3.5",
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "export MYBPHS_VERSION=$(git rev-parse --short HEAD) && next build",
-        "build-win": "next build",
+        "build-prod": "export MYBPHS_GIT_VERSION=$(git rev-parse --short HEAD) && next build",
+        "build": "next build",
         "start": "next start",
         "lint": "next lint",
         "prepare": "husky"

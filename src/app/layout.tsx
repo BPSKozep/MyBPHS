@@ -9,14 +9,13 @@ import Providers from "./providers";
 import MainHeader from "components/MainHeader";
 import IdentifyUser from "components/IdentifyUser";
 import { Metadata, Viewport } from "next";
-import LatestGitCommit from "components/admin/LatestGitCommit";
 import PageTransition from "components/PageTransition";
 
 export const metadata: Metadata = {
-    applicationName: "MyBPHS",
+    applicationName: "MyBPHS - Dev",
     title: {
-        default: "MyBPHS",
-        template: "%s - MyBPHS",
+        default: "MyBPHS - Dev",
+        template: "%s - MyBPHS - Dev",
     },
     description: "Hasznos eszközök a BPS JPP tagjainak",
     manifest: "/manifest.json",
@@ -54,8 +53,6 @@ export default function RootLayout({
                             <div className="box-border flex h-[100vh] w-full flex-col">
                                 <MainHeader />
                                 <PageTransition>{children}</PageTransition>
-                                {process.env.MONGODB_DATABASE ===
-                                    "dev-mybphs" && <LatestGitCommit />}
                             </div>
                         </IdentifyUser>
                     </OnlyAuthed>

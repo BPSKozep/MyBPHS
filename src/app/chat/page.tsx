@@ -18,25 +18,6 @@ function LaptopPassword() {
 
     const [chatAvailable, setChatAvailable] = useState(false);
 
-    const tips = [
-        "Az első válasz mindig több időbe telik",
-        "Elhagyott token?",
-        "Elfelejtett jelszó?",
-        "A jelszavadat soha ne add meg másnak",
-        "Ne használd ugyanazt a jelszót sok helyen",
-        "Egy jelszókezelő nagyon hasznos lehet",
-        "Vigyázz az iskola laptopjaira!",
-    ];
-
-    const [tip, setTip] = useState(
-        tips[Math.floor(Math.random() * tips.length)],
-    );
-
-    useEffect(() => {
-        setTip(tips[Math.floor(Math.random() * tips.length)]);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     setTimeout(() => {
         setChatShown(true);
     }, 4000);
@@ -67,8 +48,6 @@ function LaptopPassword() {
                         className="flex h-full w-full max-w-md flex-col content-center items-center justify-center"
                     >
                         <Loading />
-
-                        <p className="mt-10 font-bold text-white">{tip}</p>
                     </motion.div>
                 )}
                 {!chatAvailable && chatShown && (
