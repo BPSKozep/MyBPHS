@@ -11,6 +11,10 @@ import remarkGfm from "remark-gfm";
 import Loading from "components/Loading";
 import { motion } from "framer-motion";
 
+export const metadata = {
+    title: "MBI ✨",
+};
+
 function LaptopPassword() {
     const { messages, input, handleInputChange, handleSubmit } = useChat();
 
