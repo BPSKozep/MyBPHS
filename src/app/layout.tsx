@@ -9,10 +9,9 @@ import Providers from "./providers";
 import MainHeader from "components/MainHeader";
 import IdentifyUser from "components/IdentifyUser";
 import { Metadata, Viewport } from "next";
-import LatestGitCommit from "components/admin/LatestGitCommit";
 import PageTransition from "components/PageTransition";
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
     applicationName: "MyBPHS",
     title: {
         default: "MyBPHS",
@@ -36,6 +35,16 @@ export const metadata: Metadata = {
     },
 };
 
+if (process.env.MONGODB_DATABASE === "dev-mybphs") {
+    metadata.applicationName = "MyBPHS - Dev";
+    metadata.title = {
+        default: "MyBPHS - Dev",
+        template: "%s - MyBPHS - Dev",
+    };
+}
+
+export { metadata };
+
 export const viewport: Viewport = {
     themeColor: "#111827",
 };
@@ -54,8 +63,6 @@ export default function RootLayout({
                             <div className="box-border flex h-[100vh] w-full flex-col">
                                 <MainHeader />
                                 <PageTransition>{children}</PageTransition>
-                                {process.env.MONGODB_DATABASE ===
-                                    "dev-mybphs" && <LatestGitCommit />}
                             </div>
                         </IdentifyUser>
                     </OnlyAuthed>
