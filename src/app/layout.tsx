@@ -11,11 +11,11 @@ import IdentifyUser from "components/IdentifyUser";
 import { Metadata, Viewport } from "next";
 import PageTransition from "components/PageTransition";
 
-export const metadata: Metadata = {
-    applicationName: "MyBPHS - Dev",
+const metadata: Metadata = {
+    applicationName: "MyBPHS",
     title: {
-        default: "MyBPHS - Dev",
-        template: "%s - MyBPHS - Dev",
+        default: "MyBPHS",
+        template: "%s - MyBPHS",
     },
     description: "Hasznos eszközök a BPS JPP tagjainak",
     manifest: "/manifest.json",
@@ -34,6 +34,16 @@ export const metadata: Metadata = {
         card: "summary_large_image",
     },
 };
+
+if (process.env.MONGODB_DATABASE === "dev-mybphs") {
+    metadata.applicationName = "MyBPHS - Dev";
+    metadata.title = {
+        default: "MyBPHS - Dev",
+        template: "%s - MyBPHS - Dev",
+    };
+}
+
+export { metadata };
 
 export const viewport: Viewport = {
     themeColor: "#111827",
