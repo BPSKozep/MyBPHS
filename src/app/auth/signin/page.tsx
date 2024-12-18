@@ -9,7 +9,7 @@ export const metadata = {
 export default function SignIn() {
     return (
         <div className="flex h-full w-full flex-col items-center justify-center text-white">
-            <Card>
+            <Card padding="p-10">
                 <SignInComponent />
             </Card>
         </div>
