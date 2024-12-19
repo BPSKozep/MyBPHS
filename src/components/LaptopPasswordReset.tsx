@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import sleep from "utils/sleep";
 import IconSubmitButton from "components/IconSubmitButton";
@@ -20,62 +20,81 @@ function LaptopPasswordReset() {
     const { mutateAsync: sendDiscordWebhook } =
         trpc.webhook.sendDiscordWebhook.useMutation();
 
+    const [laptopAvailable, setlaptopAvailable] = useState(true);
+
+    useEffect(() => {
+        fetch("/api/laptop/ping").then((response) => {
+            if (response.status != 200) {
+                setlaptopAvailable(false);
+            }
+        });
+    }, []);
+
     return (
-        <div className="flex flex-col items-center text-center">
-            <h1 className="mb-5 font-bold text-white">
-                Bejelentkezési jelszó be- vagy visszaállítása
-            </h1>
-            <input
-                type="password"
-                placeholder="Jelszó"
-                className="mb-3 rounded-md p-1 text-center transition-all"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-            />
+        <>
+            {laptopAvailable ? (
+                <div className="flex flex-col items-center text-center">
+                    <h1 className="mb-5 font-bold text-white">
+                        Bejelentkezési jelszó be- vagy visszaállítása
+                    </h1>
+                    <input
+                        type="password"
+                        placeholder="Jelszó"
+                        className="mb-3 rounded-md p-1 text-center transition-all"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                    />
 
-            <motion.span
-                className="text-white"
-                initial={{
-                    opacity: 0,
-                    height: 0,
-                }}
-                animate={{
-                    opacity: inputValid ? 0 : 1,
-                    height: inputValid ? 0 : "auto",
-                }}
-                transition={{
-                    height: { delay: inputValid ? 0.2 : 0 },
-                }}
-            >
-                A jelszó legalább 6 karakter hosszú legyen.
-            </motion.span>
+                    <motion.span
+                        className="text-white"
+                        initial={{
+                            opacity: 0,
+                            height: 0,
+                        }}
+                        animate={{
+                            opacity: inputValid ? 0 : 1,
+                            height: inputValid ? 0 : "auto",
+                        }}
+                        transition={{
+                            height: { delay: inputValid ? 0.2 : 0 },
+                        }}
+                    >
+                        A jelszó legalább 6 karakter hosszú legyen.
+                    </motion.span>
 
-            <div className="mt-3">
-                <IconSubmitButton
-                    icon={<FontAwesomeIcon icon={faFloppyDisk} />}
-                    onClick={async () => {
-                        try {
-                            await sleep(500);
+                    <div className="mt-3">
+                        <IconSubmitButton
+                            icon={<FontAwesomeIcon icon={faFloppyDisk} />}
+                            onClick={async () => {
+                                try {
+                                    await sleep(500);
 
-                            await setNewPassword(input);
+                                    await setNewPassword(input);
 
-                            refetchData();
+                                    refetchData();
 
-                            return true;
-                        } catch (err) {
-                            await sendDiscordWebhook({
-                                type: "Error",
-                                message: String(err),
-                            });
-                            return false;
-                        }
-                    }}
-                />
-            </div>
-            <h1 className="mt-5 text-white">
-                Legutoljára módosítva: {data ? data : "Még nem volt"}
-            </h1>
-        </div>
+                                    return true;
+                                } catch (err) {
+                                    await sendDiscordWebhook({
+                                        type: "Error",
+                                        message: String(err),
+                                    });
+                                    return false;
+                                }
+                            }}
+                        />
+                    </div>
+                    <h1 className="mt-5 text-white">
+                        Legutoljára módosítva: {data ? data : "Még nem volt"}
+                    </h1>
+                </div>
+            ) : (
+                <div className="flex h-full w-full flex-col content-center items-center justify-center text-center text-xl font-bold text-white">
+                    <p>A laptop jelszó visszaállítás</p>
+                    <p>jelenleg nem elérhető.</p>
+                </div>
+            )}
+        </>
     );
 }
 
