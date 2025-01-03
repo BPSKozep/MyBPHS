@@ -11,7 +11,7 @@ import remarkGfm from "remark-gfm";
 import Loading from "components/Loading";
 import { motion } from "framer-motion";
 
-function LaptopPassword() {
+function Chat() {
     const { messages, input, handleInputChange, handleSubmit } = useChat();
 
     const [chatShown, setChatShown] = useState(false);
@@ -20,7 +20,7 @@ function LaptopPassword() {
 
     setTimeout(() => {
         setChatShown(true);
-    }, 4000);
+    }, 3000);
 
     useEffect(() => {
         fetch("/api/chat/ping").then((response) => {
@@ -48,6 +48,9 @@ function LaptopPassword() {
                         className="flex h-full w-full max-w-md flex-col content-center items-center justify-center"
                     >
                         <Loading />
+                        <h2 className="mt-5 font-bold text-white">
+                            Csatlakozás a szolgáltatáshoz...
+                        </h2>
                     </motion.div>
                 )}
                 {!chatAvailable && chatShown && (
@@ -101,4 +104,4 @@ function LaptopPassword() {
     );
 }
 
-export default LaptopPassword;
+export default Chat;
