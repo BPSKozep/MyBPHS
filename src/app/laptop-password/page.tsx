@@ -1,4 +1,3 @@
-import Card from "components/Card";
 import LaptopPasswordReset from "components/LaptopPasswordReset";
 import PageWithHeader from "components/PageWithHeader";
 import React from "react";
@@ -11,9 +10,7 @@ function LaptopPassword() {
     return (
         <PageWithHeader title="Laptop Jelszó">
             <div className="flex h-full w-full items-center justify-center align-middle">
-                <Card>
-                    <LaptopPasswordReset />
-                </Card>
+                <LaptopPasswordReset />
             </div>
         </PageWithHeader>
     );
