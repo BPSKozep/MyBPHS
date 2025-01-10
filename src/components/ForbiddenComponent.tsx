@@ -1,7 +1,6 @@
 "use client";
 
-import { faHome } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaHome } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -29,10 +28,7 @@ function ForbiddenComponent() {
                         animate={{ rotate: clicked ? 360 : 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <FontAwesomeIcon
-                            icon={faHome}
-                            className="transition-all"
-                        />
+                        <FaHome className="transition-all" />
                     </motion.div>
                 </div>
             </div>

@@ -1,7 +1,6 @@
 "use client";
 
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaPlus } from "react-icons/fa";
 import React, { useState } from "react";
 import { trpc } from "utils/trpc";
 import SmallLoading from "./SmallLoading";
@@ -53,7 +52,7 @@ export default function OrderCounts({
                                         <SmallLoading />
                                     </div>
                                 ) : (
-                                    <FontAwesomeIcon icon={faPlus} />
+                                    <FaPlus />
                                 )}
                             </button>
                         </td>

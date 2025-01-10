@@ -2,8 +2,7 @@
 
 import OnlyRoles from "components/OnlyRoles";
 import PageWithHeader from "components/PageWithHeader";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faUser, faWrench } from "@fortawesome/free-solid-svg-icons";
+import { FaCheck, FaUser, FaWrench } from "react-icons/fa";
 import IconButton from "components/IconButton";
 import React, { useEffect, useMemo, useState } from "react";
 import { trpc } from "utils/trpc";
@@ -110,7 +109,7 @@ function KioskPage() {
                     <>
                         <div className="inline pr-3">
                             <IconButton
-                                icon={<FontAwesomeIcon icon={faUser} />}
+                                icon={<FaUser />}
                                 onClick={() => {
                                     setNfcId((prevId) => {
                                         const currentIndex =
@@ -128,7 +127,7 @@ function KioskPage() {
                                 <span className="tooltip absolute -left-[12.8rem] -top-2 transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
                                     Fejlesztői mód aktiválva
                                 </span>
-                                <FontAwesomeIcon icon={faWrench} />
+                                <FaWrench />
                             </div>
                         </div>
                     </>
@@ -138,7 +137,7 @@ function KioskPage() {
                             <span className="tooltip absolute -left-[14.5rem] -top-2 transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
                                 Csatlakoztatva a helyi sockethez
                             </span>
-                            <FontAwesomeIcon icon={faCheck} />
+                            <FaCheck />
                         </div>
                     </div>
                 )

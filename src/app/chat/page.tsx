@@ -4,8 +4,7 @@ import PageWithHeader from "components/PageWithHeader";
 import React, { useEffect, useState } from "react";
 
 import { useChat } from "ai/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { FaPaperPlane } from "react-icons/fa";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Loading from "components/Loading";
@@ -84,21 +83,21 @@ function Chat() {
                             )}
                         </div>
                         <form
-                            onSubmit={handleSubmit}
-                            className="bottom-0 mx-auto mb-10 mt-4 flex h-10 w-full max-w-[90vw] overflow-auto rounded-lg bg-slate-300 shadow-lg"
-                        >
-                            <input
-                                className="h-full w-full bg-slate-300 p-2 text-black placeholder-gray-700"
-                                value={input}
-                                placeholder="Üzenet"
-                                onChange={handleInputChange}
-                            />
-                            <button className="w-10 bg-[#565e85] text-gray-200">
-                                <FontAwesomeIcon icon={faPaperPlane} />
-                            </button>
-                        </form>
+                        onSubmit={handleSubmit}
+                        className="bottom-0 mx-auto mb-10 mt-4 flex h-10 w-full max-w-[90vw] overflow-auto rounded-lg bg-slate-300 shadow-lg"
+                    >
+                        <input
+                            className="h-full w-full bg-slate-300 p-2 text-black placeholder-gray-700"
+                            value={input}
+                            placeholder="Üzenet"
+                            onChange={handleInputChange}
+                        />
+                        <button className="w-10 bg-[#565e85] text-gray-200">
+                            <FaPaperPlane />
+                        </button>
+                    </form>
                     </div>
-                )}
+                </div>
             </div>
         </PageWithHeader>
     );

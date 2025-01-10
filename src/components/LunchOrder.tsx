@@ -5,14 +5,13 @@ import Card from "components/Card";
 import OrderForm from "components/OrderForm";
 import ClosedOrderForm from "components/ClosedOrderForm";
 import IconSubmitButton from "components/IconSubmitButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    faEnvelope,
-    faArrowLeft,
-    faArrowRight,
-    faEdit,
-    faChevronDown,
-} from "@fortawesome/free-solid-svg-icons";
+    FaEnvelope,
+    FaArrowLeft,
+    FaArrowRight,
+    FaEdit,
+    FaChevronDown,
+} from "react-icons/fa";
 import { trpc } from "utils/trpc";
 import sleep from "utils/sleep";
 import { getWeek, getWeekYear } from "utils/isoweek";
@@ -91,11 +90,7 @@ function LunchOrder() {
                             <div className="flex flex-col gap-4">
                                 <div className="flex w-full items-center justify-center">
                                     <IconButton
-                                        icon={
-                                            <FontAwesomeIcon
-                                                icon={faArrowLeft}
-                                            />
-                                        }
+                                        icon={<FaArrowLeft />}
                                         onClick={() => {
                                             setWeekOffset(
                                                 (offset) => offset - 1,
@@ -114,11 +109,7 @@ function LunchOrder() {
                                         </p>
                                     </div>
                                     <IconButton
-                                        icon={
-                                            <FontAwesomeIcon
-                                                icon={faArrowRight}
-                                            />
-                                        }
+                                        icon={<FaArrowRight />}
                                         onClick={() => {
                                             setWeekOffset(
                                                 (offset) => offset + 1,
@@ -146,10 +137,7 @@ function LunchOrder() {
                                             }}
                                             className="ml-3 origin-center"
                                         >
-                                            <FontAwesomeIcon
-                                                icon={faChevronDown}
-                                                className="transition-all"
-                                            />
+                                            <FaChevronDown className="transition-all" />
                                         </motion.div>
                                     </div>
                                 )}
@@ -220,9 +208,7 @@ function LunchOrder() {
                                             }}
                                         >
                                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-600 drop-shadow-2xl">
-                                                <FontAwesomeIcon
-                                                    icon={faEdit}
-                                                />
+                                                <FaEdit />
                                             </div>
                                         </motion.button>
                                     </div>
@@ -247,11 +233,7 @@ function LunchOrder() {
                                     }}
                                 >
                                     <IconButton
-                                        icon={
-                                            <FontAwesomeIcon
-                                                icon={faArrowLeft}
-                                            />
-                                        }
+                                        icon={<FaArrowLeft />}
                                         onClick={() => {
                                             setWeekOffset(
                                                 (offset) => offset - 1,
@@ -269,11 +251,7 @@ function LunchOrder() {
                                         </p>
                                     </div>
                                     <IconButton
-                                        icon={
-                                            <FontAwesomeIcon
-                                                icon={faArrowRight}
-                                            />
-                                        }
+                                        icon={<FaArrowRight />}
                                         onClick={() => {
                                             setWeekOffset(
                                                 (offset) => offset + 1,
@@ -332,11 +310,7 @@ function LunchOrder() {
                                                 }}
                                             >
                                                 <IconSubmitButton
-                                                    icon={
-                                                        <FontAwesomeIcon
-                                                            icon={faEnvelope}
-                                                        />
-                                                    }
+                                                    icon={<FaEnvelope />}
                                                     onClick={async () => {
                                                         try {
                                                             await sleep(500);
@@ -396,11 +370,7 @@ function LunchOrder() {
                                                 }}
                                             >
                                                 <IconSubmitButton
-                                                    icon={
-                                                        <FontAwesomeIcon
-                                                            icon={faEdit}
-                                                        />
-                                                    }
+                                                    icon={<FaEdit />}
                                                     onClick={async () => {
                                                         try {
                                                             await sleep(500);

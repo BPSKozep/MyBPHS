@@ -369,6 +369,72 @@ const userRouter = router({
 
             return user?.nfcId || "";
         }),
+    setAutoOrder: procedure
+        .input(
+            z.strictObject({
+                chosenOptions: z.string().array(),
+            }),
+        )
+        .mutation(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "student",
+                "teacher",
+                "lunch-system",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            await User.findOneAndUpdate(
+                { email: ctx.session.user?.email },
+                {
+                    $set: {
+                        autoOrder: input.chosenOptions.map((option) => ({
+                            chosen: option,
+                        })),
+                    },
+                },
+                { upsert: true },
+            );
+        }),
+    getAutoOrder: procedure
+        .output(z.string().array())
+        .query(async ({ ctx }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "student",
+                "teacher",
+                "lunch-system",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const user = await User.findOne({ email: ctx.session.user?.email });
+            console.log(user?.autoOrder?.map((option) => option.chosen));
+            return user?.autoOrder?.map((option) => option.chosen) || [];
+        }),
 });
 
 export default userRouter;

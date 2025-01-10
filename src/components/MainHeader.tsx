@@ -5,15 +5,19 @@ import { trpc } from "utils/trpc";
 import PWAInstall from "components/PWAInstall";
 import Link from "next/link";
 import Sheet from "components/Sheet";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import sleep from "utils/sleep";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { FaRightFromBracket } from "react-icons/fa6";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
+// import Button from "components/Button";
+// import { useRouter, usePathname } from "next/navigation";
 
 export default function MainHeader() {
     const { data } = useSession();
     const [isSheetOpen, setSheetOpen] = useState(false);
+
+    // const router = useRouter();
+    // const path = usePathname();
 
     const { data: NfcId } = trpc.user.getNfcId.useQuery(
         data?.user?.email || "",
@@ -109,9 +113,22 @@ export default function MainHeader() {
                         type="text"
                         disabled
                         value={NfcId || "Nincs adat"}
-                        className="mb-5 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
+                        className="mb-3 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
                 </div>
+                {/* {path != "/auto-order" && (
+                    <div className="my-5 flex flex-col gap-3 align-middle">
+                        <Button
+                            className=""
+                            onClick={() => {
+                                router.push("/auto-order");
+                                setSheetOpen(false);
+                            }}
+                        >
+                            Automatikus rendelés beállítása
+                        </Button>
+                    </div>
+                )} */}
                 <div
                     className="flex cursor-pointer items-center justify-center align-middle text-white"
                     onClick={async () => {
@@ -122,7 +139,7 @@ export default function MainHeader() {
                         });
                     }}
                 >
-                    <FontAwesomeIcon icon={faRightFromBracket} />
+                    <FaRightFromBracket />
                     <p className="ml-2 text-lg">Kijelentkezés</p>
                 </div>
             </Sheet>

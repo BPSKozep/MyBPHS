@@ -3,23 +3,25 @@
 import React, { useState } from "react";
 import Card from "components/Card";
 import IconSubmitButton from "components/IconSubmitButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { FaEnvelope } from "react-icons/fa6";
 import sleep from "utils/sleep";
 import { motion } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
 import { trpc } from "utils/trpc";
 import UserDropdown from "./UserDropdown";
+
 export default function CreateUsers() {
     const [emailFormat, setEmailFormat] = useState<
         "general" | "update" | "important"
     >("general");
+
     const [emailTo, setEmailTo] = useState<
         | "bphs-sysadmins@budapest.school"
         | "jpp-students@budapestschool.org"
         | "jpp-students-only@budapestschool.org"
         | "jpp-teachers@budapestschool.org"
     >("bphs-sysadmins@budapest.school");
+
     const [emailSubject, setEmailSubject] = useState("");
     const [emailText, setEmailText] = useState("");
     const [buttonLink, setButtonLink] = useState("");
@@ -178,7 +180,7 @@ export default function CreateUsers() {
                         onChange={(e) => setEmailText(e.target.value)}
                     ></textarea>
                     <IconSubmitButton
-                        icon={<FontAwesomeIcon icon={faEnvelope} />}
+                        icon={<FaEnvelope />}
                         onClick={async () => {
                             try {
                                 await sleep(500);
