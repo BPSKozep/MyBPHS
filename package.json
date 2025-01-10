@@ -16,7 +16,7 @@
         "@emotion/styled": "^11.13.0",
         "@fontsource-variable/montserrat": "^5.1.0",
         "@fontsource-variable/roboto-slab": "^5.0.20",
-        "@fontsource-variable/source-code-pro": "^5.0.19",
+        "@fontsource-variable/source-code-pro": "^5.1.1",
         "@fontsource/lily-script-one": "^5.1.0",
         "@react-email/components": "^0.0.25",
         "@tanstack/react-query": "^4.29.15",
