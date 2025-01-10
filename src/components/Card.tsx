@@ -1,8 +1,14 @@
 import React, { PropsWithChildren } from "react";
 
-function Card({ children }: PropsWithChildren) {
+interface CardProps extends PropsWithChildren {
+    padding?: string;
+}
+
+function Card({ children, padding = "p-5" }: CardProps) {
     return (
-        <div className="relative m-5 rounded-xl bg-[#242424] p-5 shadow-xl">
+        <div
+            className={`relative m-5 rounded-xl bg-[#242424] shadow-xl ${padding}`}
+        >
             {children}
         </div>
     );

@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import sleep from "utils/sleep";
 import IconSubmitButton from "components/IconSubmitButton";
 import { FaFloppyDisk } from "react-icons/fa6";
 import { trpc } from "utils/trpc";
+import Card from "./Card";
+import Loading from "./Loading";
 
 function LaptopPasswordReset() {
     const [input, setInput] = useState("");
@@ -19,35 +21,73 @@ function LaptopPasswordReset() {
     const { mutateAsync: sendDiscordWebhook } =
         trpc.webhook.sendDiscordWebhook.useMutation();
 
-    return (
-        <div className="flex flex-col items-center text-center">
-            <h1 className="mb-5 font-bold text-white">
-                Bejelentkezési jelszó be- vagy visszaállítása
-            </h1>
-            <input
-                type="password"
-                placeholder="Jelszó"
-                className="mb-3 rounded-md p-1 text-center transition-all"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-            />
+    const [laptopPassResetAvailable, setlaptopAvailable] = useState(true);
 
-            <motion.span
-                className="text-white"
-                initial={{
-                    opacity: 0,
-                    height: 0,
-                }}
-                animate={{
-                    opacity: inputValid ? 0 : 1,
-                    height: inputValid ? 0 : "auto",
-                }}
-                transition={{
-                    height: { delay: inputValid ? 0.2 : 0 },
-                }}
-            >
-                A jelszó legalább 6 karakter hosszú legyen.
-            </motion.span>
+    const [laptopPassResetShown, setLaptopPassResetShown] = useState(false);
+
+    setTimeout(() => {
+        setLaptopPassResetShown(true);
+    }, 3000);
+
+    useEffect(() => {
+        fetch("/api/laptop/ping").then((response) => {
+            if (response.status != 200) {
+                setlaptopAvailable(false);
+            }
+        });
+    }, []);
+
+    return (
+        <>
+            {!laptopPassResetShown && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1, delay: 1 }}
+                    className="flex h-full w-full max-w-md flex-col content-center items-center justify-center"
+                >
+                    <Loading />
+                    <h2 className="mt-5 font-bold text-white">
+                        Csatlakozás a szolgáltatáshoz...
+                    </h2>
+                </motion.div>
+            )}
+            {!laptopPassResetAvailable && laptopPassResetShown && (
+                <div className="flex h-full w-full flex-col content-center items-center justify-center text-center text-xl font-bold text-white">
+                    <p>A laptop jelszó visszaállítás</p>
+                    <p>jelenleg nem elérhető.</p>
+                </div>
+            )}
+            {laptopPassResetAvailable && laptopPassResetShown && (
+                <Card>
+                    <div className="flex flex-col items-center text-center">
+                        <h1 className="mb-5 font-bold text-white">
+                            Bejelentkezési jelszó be- vagy visszaállítása
+                        </h1>
+                        <input
+                            type="password"
+                            placeholder="Jelszó"
+                            className="mb-3 rounded-md p-1 text-center transition-all"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                        />
+
+                        <motion.span
+                            className="text-white"
+                            initial={{
+                                opacity: 0,
+                                height: 0,
+                            }}
+                            animate={{
+                                opacity: inputValid ? 0 : 1,
+                                height: inputValid ? 0 : "auto",
+                            }}
+                            transition={{
+                                height: { delay: inputValid ? 0.2 : 0 },
+                            }}
+                        >
+                            A jelszó legalább 6 karakter hosszú legyen.
+                        </motion.span>
 
             <div className="mt-3">
                 <IconSubmitButton
@@ -55,26 +95,29 @@ function LaptopPasswordReset() {
                     onClick={async () => {
                         try {
                             await sleep(500);
+                                        await setNewPassword(input);
 
-                            await setNewPassword(input);
+                                        refetchData();
 
-                            refetchData();
-
-                            return true;
-                        } catch (err) {
-                            await sendDiscordWebhook({
-                                type: "Error",
-                                message: String(err),
-                            });
-                            return false;
-                        }
-                    }}
-                />
-            </div>
-            <h1 className="mt-5 text-white">
-                Legutoljára módosítva: {data ? data : "Még nem volt"}
-            </h1>
-        </div>
+                                        return true;
+                                    } catch (err) {
+                                        await sendDiscordWebhook({
+                                            type: "Error",
+                                            message: String(err),
+                                        });
+                                        return false;
+                                    }
+                                }}
+                            />
+                        </div>
+                        <h1 className="mt-5 text-white">
+                            Legutoljára módosítva:{" "}
+                            {data ? data : "Még nem volt"}
+                        </h1>
+                    </div>
+                </Card>
+            )}
+        </>
     );
 }
 

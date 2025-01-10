@@ -32,6 +32,7 @@ const userSchema = new Schema<IUser>({
     nfcId: {
         type: String,
         required: true,
+        index: true,
     },
     laptopPasswordChanged: {
         type: Date,

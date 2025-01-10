@@ -4,8 +4,8 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "export MYBPHS_VERSION=$(git rev-parse --short HEAD) && next build",
-        "build-win": "next build",
+        "build-prod": "export MYBPHS_GIT_VERSION=$(git rev-parse --short HEAD) && next build",
+        "build": "next build",
         "start": "next start",
         "lint": "next lint",
         "prepare": "husky"
@@ -43,7 +43,7 @@
         "resend": "^3.2.0",
         "socket.io-client": "^4.8.0",
         "superjson": "^2.2.1",
-        "tailwind-merge": "^2.4.0",
+        "tailwind-merge": "^2.5.5",
         "use-debounce": "^10.0.3",
         "zod": "^3.23.8"
     },
@@ -57,9 +57,9 @@
         "autoprefixer": "^10.4.20",
         "eslint": "^8.57.0",
         "eslint-config-next": "^14.2.4",
-        "eslint-plugin-react": "^7.34.1",
+        "eslint-plugin-react": "^7.37.2",
         "eslint-plugin-react-hooks": "^4.6.2",
-        "husky": "^9.0.11",
+        "husky": "^9.1.7",
         "lint-staged": "^15.2.5",
         "postcss": "^8.4.39",
         "prettier": "^3.3.3",

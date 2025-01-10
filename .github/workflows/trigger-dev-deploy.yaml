@@ -24,7 +24,7 @@ jobs:
 
             - name: Create empty commit
               run: |
-                  COMMIT_MESSAGE="Dev Deploy: $(git log -1 --pretty=%B)"
+                  COMMIT_MESSAGE="DD: $(git log -1 --pretty=%B)"
                   git commit --allow-empty -m "$COMMIT_MESSAGE"
                   git push
               env:
