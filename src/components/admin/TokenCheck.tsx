@@ -7,8 +7,7 @@ import { getWeek, getWeekYear } from "utils/isoweek";
 import UserDropdown from "components/admin/UserDropdown";
 import Loading from "components/Loading";
 import IconButton from "components/IconButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 function TokenCheck() {
     const [nfcId, setNfcId] = useState<string>("");
@@ -87,7 +86,7 @@ function TokenCheck() {
             )}
             <div className="my-3 flex items-center text-white">
                 <IconButton
-                    icon={<FontAwesomeIcon icon={faArrowLeft} />}
+                    icon={<FaArrowLeft />}
                     onClick={() => {
                         setWeekOffset((offset) => offset - 1);
                     }}
@@ -96,7 +95,7 @@ function TokenCheck() {
                     <p className="mx-2 text-center font-bold md:text-lg">{`${year}. ${week}. hét`}</p>
                 </div>
                 <IconButton
-                    icon={<FontAwesomeIcon icon={faArrowRight} />}
+                    icon={<FaArrowRight />}
                     onClick={() => {
                         setWeekOffset((offset) => offset + 1);
                     }}
