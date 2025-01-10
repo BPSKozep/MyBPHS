@@ -9,15 +9,15 @@ import sleep from "utils/sleep";
 import { FaRightFromBracket } from "react-icons/fa6";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import Button from "components/Button";
-import { useRouter, usePathname } from "next/navigation";
+// import Button from "components/Button";
+// import { useRouter, usePathname } from "next/navigation";
 
 export default function MainHeader() {
     const { data } = useSession();
     const [isSheetOpen, setSheetOpen] = useState(false);
 
-    const router = useRouter();
-    const path = usePathname();
+    // const router = useRouter();
+    // const path = usePathname();
 
     const { data: NfcId } = trpc.user.getNfcId.useQuery(
         data?.user?.email || "",
@@ -116,7 +116,7 @@ export default function MainHeader() {
                         className="mb-3 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
                 </div>
-                {path != "/auto-order" && (
+                {/* {path != "/auto-order" && (
                     <div className="my-5 flex flex-col gap-3 align-middle">
                         <Button
                             className=""
@@ -128,7 +128,7 @@ export default function MainHeader() {
                             Automatikus rendelés beállítása
                         </Button>
                     </div>
-                )}
+                )} */}
                 <div
                     className="flex cursor-pointer items-center justify-center align-middle text-white"
                     onClick={async () => {
