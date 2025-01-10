@@ -1,25 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Loading from "./Loading";
 import { signIn } from "next-auth/react";
 
 export default function GoogleSignIn() {
     const [clicked, setClicked] = useState(false);
-
-    const [cdnUp, setCdnUp] = useState(true);
-
-    useEffect(() => {
-        fetch("https://cdn.bpskozep.hu/google.svg")
-            .then((response) => {
-                if (!response.ok) throw new Error("CDN not up");
-                setCdnUp(true);
-            })
-            .catch(() => {
-                setCdnUp(false);
-            });
-    }, []);
 
     return (
         <div
@@ -32,14 +19,13 @@ export default function GoogleSignIn() {
             <div className="relative flex w-full items-center justify-center align-middle">
                 {!clicked ? (
                     <div className="flex items-center space-x-4">
-                        {cdnUp && (
-                            <Image
-                                src="https://cdn.bpskozep.hu/google.svg"
-                                alt="google logo"
-                                width={24}
-                                height={24}
-                            />
-                        )}
+                        <Image
+                            src="https://cdn.bpskozep.hu/google.svg"
+                            alt="google logo"
+                            width={24}
+                            height={24}
+                        />
+
                         <span className="font-bold tracking-wide text-black">
                             Továbblépés Google-lel
                         </span>
