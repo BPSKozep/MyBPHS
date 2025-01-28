@@ -10,6 +10,7 @@ export interface IUser {
     nfcId: string;
     laptopPasswordChanged?: Date;
     autoOrder?: { chosen: string }[];
+    blocked?: boolean;
 }
 
 const userSchema = new Schema<IUser>({
@@ -46,6 +47,10 @@ const userSchema = new Schema<IUser>({
             },
         },
     ],
+    blocked: {
+        type: Boolean,
+        required: false,
+    },
 });
 
 const User: Model<IUser> = mongoose.models.User || model("User", userSchema);

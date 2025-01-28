@@ -210,6 +210,11 @@ const orderRouter = router({
                 });
             }
 
+            if (user.blocked) {
+                user.blocked = false;
+                await user.save();
+            }
+
             let order = await Order.findOne({
                 menu: menu.id,
                 user: user.id,
@@ -391,6 +396,13 @@ const orderRouter = router({
                 });
             }
 
+            if (user.blocked) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "User is blocked",
+                });
+            }
+
             const orderExists = await Order.exists({
                 menu: menu.id,
                 user: user.id,
@@ -520,6 +532,13 @@ const orderRouter = router({
                 throw new TRPCError({
                     code: "NOT_FOUND",
                     message: "User not found",
+                });
+            }
+
+            if (user.blocked) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "User is blocked",
                 });
             }
 

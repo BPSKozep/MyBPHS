@@ -33,6 +33,7 @@ function TokenCheck() {
         data: emailUser,
         isFetched: isEmailUserFetched,
         isLoading: isEmailUserLoading,
+        refetch: refetchEmailUser,
     } = trpc.user.get.useQuery(email, { enabled: checkMode === "user" });
 
     const user = checkMode === "user" ? emailUser : NFCUser;
@@ -52,6 +53,9 @@ function TokenCheck() {
         },
     );
     const orderExists = order && order.length > 0;
+
+    const { mutateAsync: toggleBlocked } =
+        trpc.user.toggleBlocked.useMutation();
 
     return (
         <>
@@ -74,6 +78,7 @@ function TokenCheck() {
                     Token
                 </button>
             </div>
+
             {checkMode === "token" && (
                 <div className="m-3">
                     <NFCInput nfc={true} onChange={setNfcId} />
@@ -83,6 +88,18 @@ function TokenCheck() {
                 <div className="m-3">
                     <UserDropdown onChange={setEmail} />
                 </div>
+            )}
+
+            {user && checkMode === "user" && (
+                <button
+                    className={`rounded-lg ${user.blocked ? "bg-blue-400" : "bg-red-400"} p-3 font-bold text-white transition-all hover:scale-105`}
+                    onClick={async () => {
+                        await toggleBlocked(user.email);
+                        await refetchEmailUser();
+                    }}
+                >
+                    {user.blocked ? "Tiltás feloldása" : "Fiók letiltása"}
+                </button>
             )}
             <div className="my-3 flex items-center text-white">
                 <IconButton
