@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaDownload } from "react-icons/fa";
 
 export default function PWAInstall() {
     const [supportsPWA, setSupportsPWA] = useState(false);
@@ -15,13 +14,13 @@ export default function PWAInstall() {
 
         window.addEventListener(
             "beforeinstallprompt",
-            PWAHandler as EventListenerOrEventListenerObject
+            PWAHandler as EventListenerOrEventListenerObject,
         );
 
         return () =>
             window.removeEventListener(
                 "beforeinstallprompt",
-                PWAHandler as EventListenerOrEventListenerObject
+                PWAHandler as EventListenerOrEventListenerObject,
             );
     }, []);
 
@@ -38,7 +37,7 @@ export default function PWAInstall() {
                 }}
                 className="p-3 text-white"
             >
-                <FontAwesomeIcon icon={faDownload} className="scale-150" />
+                <FaDownload className="scale-150" />
             </button>
         );
 }

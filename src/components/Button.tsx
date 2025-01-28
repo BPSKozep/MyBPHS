@@ -1,18 +1,19 @@
-import React, { ReactNode } from "react";
+import React, { PropsWithChildren } from "react";
 import { motion } from "framer-motion";
 import { twMerge } from "tailwind-merge";
 
-function IconButton({
-    onClick,
-    icon,
-    className,
-    disabled,
-}: {
-    onClick: () => void;
-    icon: ReactNode;
-    className?: string;
+interface IconButtonProps extends PropsWithChildren {
     disabled?: boolean;
-}) {
+    className?: string;
+    onClick?: () => void;
+}
+
+function IconButton({
+    children,
+    disabled,
+    className,
+    onClick,
+}: IconButtonProps) {
     if (disabled) {
         return (
             <motion.button
@@ -22,33 +23,33 @@ function IconButton({
                     times: [0, 0.33, 0.66, 1],
                 }}
                 className={twMerge(
-                    "inline-flex aspect-square h-10 cursor-not-allowed items-center justify-center rounded-lg border-gray-400 bg-slate-700 text-gray-300",
+                    "inline-block aspect-square h-10 cursor-not-allowed rounded-lg border-gray-400 bg-slate-700 text-gray-300",
                     className,
                 )}
                 disabled
             >
-                {icon}
+                {children}
             </motion.button>
         );
     }
 
     return (
         <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileFocus={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileFocus={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             transition={{
                 type: "spring",
                 stiffness: 500,
                 damping: 20,
             }}
             className={twMerge(
-                "inline-flex aspect-square h-10 items-center justify-center rounded-lg bg-slate-600",
+                "inline-block aspect-square h-10 rounded-lg bg-slate-600 text-white",
                 className,
             )}
-            onClick={() => onClick()}
+            onClick={onClick}
         >
-            {icon}
+            {children}
         </motion.button>
     );
 }

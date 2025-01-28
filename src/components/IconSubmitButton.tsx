@@ -3,9 +3,10 @@
 import { ReactNode, useState } from "react";
 import { motion } from "framer-motion";
 import { ObjectValues } from "utils/types";
-import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaCheck } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
 import sleep from "utils/sleep";
+import { twMerge } from "tailwind-merge";
 
 const COLORS = {
     DEFAULT: "#565e85",
@@ -33,20 +34,25 @@ function LoadingIcon() {
 function IconSubmitButton({
     onClick,
     icon,
+    className,
 }: {
     onClick: () => Promise<boolean> | boolean;
     icon: ReactNode;
+    className?: string;
 }) {
     const [isPressed, setIsPressed] = useState(false);
     const [buttonRotation, setButtonRotation] = useState(0);
     const [buttonColor, setButtonColor] = useState<ObjectValues<typeof COLORS>>(
-        COLORS.DEFAULT
+        COLORS.DEFAULT,
     );
     const [currentIcon, setCurrentIcon] = useState<ReactNode>(icon);
 
     return (
         <motion.button
-            className="h-12 w-12 rounded-2xl p-3 text-white"
+            className={twMerge(
+                "h-12 w-12 rounded-2xl p-3 text-white",
+                className,
+            )}
             initial={{
                 scale: 1,
                 backgroundColor: COLORS.DEFAULT,
@@ -86,11 +92,11 @@ function IconSubmitButton({
                 if (result) {
                     setButtonRotation((rotation) => rotation + 360);
                     setButtonColor(COLORS.SUCCESS);
-                    setCurrentIcon(<FontAwesomeIcon icon={faCheck} />);
+                    setCurrentIcon(<FaCheck />);
                 } else {
                     setButtonRotation((rotation) => rotation - 180);
                     setButtonColor(COLORS.ERROR);
-                    setCurrentIcon(<FontAwesomeIcon icon={faXmark} />);
+                    setCurrentIcon(<FaXmark />);
                 }
 
                 await sleep(1500);

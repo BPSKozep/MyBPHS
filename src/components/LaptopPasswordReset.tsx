@@ -4,8 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import sleep from "utils/sleep";
 import IconSubmitButton from "components/IconSubmitButton";
-import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaFloppyDisk } from "react-icons/fa6";
 import { trpc } from "utils/trpc";
 import Card from "./Card";
 import Loading from "./Loading";
@@ -90,13 +89,12 @@ function LaptopPasswordReset() {
                             A jelszó legalább 6 karakter hosszú legyen.
                         </motion.span>
 
-                        <div className="mt-3">
-                            <IconSubmitButton
-                                icon={<FontAwesomeIcon icon={faFloppyDisk} />}
-                                onClick={async () => {
-                                    try {
-                                        await sleep(500);
-
+            <div className="mt-3">
+                <IconSubmitButton
+                    icon={<FaFloppyDisk />}
+                    onClick={async () => {
+                        try {
+                            await sleep(500);
                                         await setNewPassword(input);
 
                                         refetchData();

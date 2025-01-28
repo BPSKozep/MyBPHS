@@ -18,6 +18,7 @@ const userRouter = router({
                     name: z.string(),
                     email: z.string(),
                     roles: z.string().array(),
+                    blocked: z.boolean().optional(),
                 })
                 .nullable(),
         )
@@ -54,6 +55,7 @@ const userRouter = router({
                     name: z.string(),
                     email: z.string(),
                     roles: z.string().array(),
+                    blocked: z.boolean().optional(),
                 })
                 .nullable(),
         )
@@ -368,6 +370,108 @@ const userRouter = router({
             const user = await User.findOne({ email: input });
 
             return user?.nfcId || "";
+        }),
+    setAutoOrder: procedure
+        .input(
+            z.strictObject({
+                chosenOptions: z.string().array(),
+            }),
+        )
+        .mutation(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "student",
+                "teacher",
+                "lunch-system",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            await User.findOneAndUpdate(
+                { email: ctx.session.user?.email },
+                {
+                    $set: {
+                        autoOrder: input.chosenOptions.map((option) => ({
+                            chosen: option,
+                        })),
+                    },
+                },
+                { upsert: true },
+            );
+        }),
+    getAutoOrder: procedure
+        .output(z.string().array())
+        .query(async ({ ctx }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, [
+                "student",
+                "teacher",
+                "lunch-system",
+            ]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const user = await User.findOne({ email: ctx.session.user?.email });
+            console.log(user?.autoOrder?.map((option) => option.chosen));
+            return user?.autoOrder?.map((option) => option.chosen) || [];
+        }),
+    toggleBlocked: procedure
+        .input(z.string())
+        .mutation(async ({ ctx, input }) => {
+            if (!ctx.session) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const user = await User.findOne({
+                email: input,
+            });
+
+            if (!user) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+            }
+
+            user.blocked = !user.blocked;
+
+            await user.save();
+
+            return "OK";
         }),
 });
 

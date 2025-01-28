@@ -1,3 +1,9 @@
+# 2.4.0 2024-10-??
+
+-   TODO: autoOrder
+-   Switch all icons to react-icons
+-   Add className option to IconSubmitButton
+
 # 2.3.4 2024-10-08
 
 -   View menu after closure

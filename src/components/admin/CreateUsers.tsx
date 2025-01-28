@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { trpc } from "utils/trpc";
-import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaFloppyDisk } from "react-icons/fa6";
 import Card from "components/Card";
 import IconSubmitButton from "components/IconSubmitButton";
 
@@ -55,7 +54,7 @@ export default function CreateUsers() {
                     ></textarea>
                     <div className="mt-3">
                         <IconSubmitButton
-                            icon={<FontAwesomeIcon icon={faFloppyDisk} />}
+                            icon={<FaFloppyDisk />}
                             onClick={async () => {
                                 try {
                                     await createMany({

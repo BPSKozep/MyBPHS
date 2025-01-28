@@ -7,8 +7,7 @@ import { getWeek, getWeekYear } from "utils/isoweek";
 import UserDropdown from "components/admin/UserDropdown";
 import Loading from "components/Loading";
 import IconButton from "components/IconButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 function TokenCheck() {
     const [nfcId, setNfcId] = useState<string>("");
@@ -34,6 +33,7 @@ function TokenCheck() {
         data: emailUser,
         isFetched: isEmailUserFetched,
         isLoading: isEmailUserLoading,
+        refetch: refetchEmailUser,
     } = trpc.user.get.useQuery(email, { enabled: checkMode === "user" });
 
     const user = checkMode === "user" ? emailUser : NFCUser;
@@ -53,6 +53,9 @@ function TokenCheck() {
         },
     );
     const orderExists = order && order.length > 0;
+
+    const { mutateAsync: toggleBlocked } =
+        trpc.user.toggleBlocked.useMutation();
 
     return (
         <>
@@ -75,6 +78,7 @@ function TokenCheck() {
                     Token
                 </button>
             </div>
+
             {checkMode === "token" && (
                 <div className="m-3">
                     <NFCInput nfc={true} onChange={setNfcId} />
@@ -85,9 +89,21 @@ function TokenCheck() {
                     <UserDropdown onChange={setEmail} />
                 </div>
             )}
+
+            {user && checkMode === "user" && (
+                <button
+                    className={`rounded-lg ${user.blocked ? "bg-blue-400" : "bg-red-400"} p-3 font-bold text-white transition-all hover:scale-105`}
+                    onClick={async () => {
+                        await toggleBlocked(user.email);
+                        await refetchEmailUser();
+                    }}
+                >
+                    {user.blocked ? "Tiltás feloldása" : "Fiók letiltása"}
+                </button>
+            )}
             <div className="my-3 flex items-center text-white">
                 <IconButton
-                    icon={<FontAwesomeIcon icon={faArrowLeft} />}
+                    icon={<FaArrowLeft />}
                     onClick={() => {
                         setWeekOffset((offset) => offset - 1);
                     }}
@@ -96,7 +112,7 @@ function TokenCheck() {
                     <p className="mx-2 text-center font-bold md:text-lg">{`${year}. ${week}. hét`}</p>
                 </div>
                 <IconButton
-                    icon={<FontAwesomeIcon icon={faArrowRight} />}
+                    icon={<FaArrowRight />}
                     onClick={() => {
                         setWeekOffset((offset) => offset + 1);
                     }}

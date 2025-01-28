@@ -1,8 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faX } from "@fortawesome/free-solid-svg-icons";
+import { FaX } from "react-icons/fa6";
 
 interface SheetProps {
     isOpen: boolean;
@@ -46,12 +45,12 @@ const Sheet = ({ isOpen, onClose, children }: SheetProps) => {
                           className="absolute right-5 top-5 text-white"
                           onClick={onClose}
                       >
-                          <FontAwesomeIcon icon={faX} />
+                          <FaX />
                       </button>
                       {children}
                   </motion.div>
               </div>,
-              document.body
+              document.body,
           )
         : null;
 };
