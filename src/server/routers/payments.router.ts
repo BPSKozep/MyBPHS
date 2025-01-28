@@ -6,7 +6,7 @@ import { TRPCError } from "@trpc/server";
 
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const paymentsRouter = router({
     create: procedure.output(z.string()).mutation(async ({ ctx }) => {
