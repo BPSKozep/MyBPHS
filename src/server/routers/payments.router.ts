@@ -6,7 +6,7 @@ import { TRPCError } from "@trpc/server";
 
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const paymentsRouter = router({
     create: procedure.output(z.string()).mutation(async ({ ctx }) => {
@@ -41,6 +41,7 @@ const paymentsRouter = router({
             line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
             success_url: process.env.NEXTAUTH_URL + "/lunch",
             cancel_url: process.env.NEXTAUTH_URL,
+            allow_promotion_codes: true,
         });
 
         if (!session.url)

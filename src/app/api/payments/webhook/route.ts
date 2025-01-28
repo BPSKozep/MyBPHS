@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import Stripe from "stripe";
 import { User } from "models";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
     const signature = headers().get("stripe-signature") as string;
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     const event = stripe.webhooks.constructEvent(
         await req.text(),
         signature,
-        process.env.STRIPE_WEBHOOK_KEY || "",
+        process.env.STRIPE_WEBHOOK_KEY!,
     );
 
     if (event.type !== "checkout.session.completed")
