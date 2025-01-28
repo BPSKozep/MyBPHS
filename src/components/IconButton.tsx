@@ -22,7 +22,7 @@ function IconButton({
                     times: [0, 0.33, 0.66, 1],
                 }}
                 className={twMerge(
-                    "inline-block aspect-square h-10 cursor-not-allowed rounded-lg border-gray-400 bg-slate-700 text-gray-300",
+                    "inline-flex aspect-square h-10 cursor-not-allowed items-center justify-center rounded-lg border-gray-400 bg-slate-700 text-gray-300",
                     className,
                 )}
                 disabled
@@ -43,7 +43,7 @@ function IconButton({
                 damping: 20,
             }}
             className={twMerge(
-                "inline-block aspect-square h-10 rounded-lg bg-slate-600",
+                "inline-flex aspect-square h-10 items-center justify-center rounded-lg bg-slate-600",
                 className,
             )}
             onClick={() => onClick()}
