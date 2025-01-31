@@ -44,7 +44,7 @@
         "socket.io-client": "^4.8.1",
         "stripe": "^17.6.0",
         "superjson": "^2.2.1",
-        "tailwind-merge": "^2.5.5",
+        "tailwind-merge": "^2.6.0",
         "use-debounce": "^10.0.3",
         "zod": "^3.23.8"
     },
