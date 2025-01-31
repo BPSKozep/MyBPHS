@@ -40,7 +40,7 @@
         "react-markdown": "^9.0.1",
         "react-responsive": "^10.0.0",
         "remark-gfm": "^4.0.0",
-        "resend": "^3.2.0",
+        "resend": "^4.1.1",
         "socket.io-client": "^4.8.1",
         "stripe": "^17.6.0",
         "superjson": "^2.2.1",
