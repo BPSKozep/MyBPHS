@@ -1,6 +1,10 @@
-# 2.4.0 2024-10-??
+# 2.5.0 2025-01-31
 
--   TODO: autoOrder
+-   Replace UserDropdown with UserInput
+-   Add user blocking and lunch order paywall with Stripe
+
+# 2.4.0 2024-10-20
+
 -   Switch all icons to react-icons
 -   Add className option to IconSubmitButton
 

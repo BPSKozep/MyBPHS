@@ -307,6 +307,7 @@ const userRouter = router({
                 z.object({
                     email: z.string(),
                     name: z.string(),
+                    blocked: z.boolean(),
                 }),
             ),
         )
@@ -336,11 +337,13 @@ const userRouter = router({
                 roleFilter = { roles: "administrator" };
             }
 
-            const users = await User.find(roleFilter).select("email name");
+            const users =
+                await User.find(roleFilter).select("email name blocked");
 
             return users.map((user) => ({
                 email: user.email,
                 name: user.name,
+                blocked: user.blocked || false,
             }));
         }),
     getNfcId: procedure

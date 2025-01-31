@@ -14,7 +14,6 @@ if (typeof window !== "undefined") {
         ui_host: "https://eu.posthog.com",
         capture_pageview: false, // Disable automatic pageview capture, as we capture manually
     });
-    console.log("MyBPHS version: " + process.env.npm_package_version);
 }
 
 function getBaseUrl() {
