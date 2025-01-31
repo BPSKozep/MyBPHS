@@ -4,12 +4,12 @@ import React, { useMemo, useState } from "react";
 import NFCInput from "components/admin/NFCInput";
 import { trpc } from "utils/trpc";
 import { getWeek, getWeekYear } from "utils/isoweek";
-import UserDropdown from "components/admin/UserDropdown";
 import Loading from "components/Loading";
 import IconButton from "components/IconButton";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import UserInput from "./UserInput";
 
-function TokenCheck() {
+export default function TokenCheck() {
     const [nfcId, setNfcId] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [checkMode, setCheckMode] = useState<"user" | "token">("user");
@@ -34,7 +34,9 @@ function TokenCheck() {
         isFetched: isEmailUserFetched,
         isLoading: isEmailUserLoading,
         refetch: refetchEmailUser,
-    } = trpc.user.get.useQuery(email, { enabled: checkMode === "user" });
+    } = trpc.user.get.useQuery(email, {
+        enabled: checkMode === "user" && !!email,
+    });
 
     const user = checkMode === "user" ? emailUser : NFCUser;
     const isUserLoading =
@@ -42,16 +44,18 @@ function TokenCheck() {
     const isUserFetched =
         checkMode === "user" ? isEmailUserFetched : isNFCUserFetched;
 
-    const { data: order } = trpc.order.getAllWeek.useQuery(
-        {
-            email: user?.email,
-            year,
-            week,
-        },
-        {
-            enabled: !!user,
-        },
-    );
+    const { data: order, isLoading: orderLoading } =
+        trpc.order.getAllWeek.useQuery(
+            {
+                email: user?.email,
+                year,
+                week,
+            },
+            {
+                enabled: !!user,
+            },
+        );
+
     const orderExists = order && order.length > 0;
 
     const { mutateAsync: toggleBlocked } =
@@ -85,9 +89,11 @@ function TokenCheck() {
                 </div>
             )}
             {checkMode === "user" && (
-                <div className="m-3">
-                    <UserDropdown onChange={setEmail} />
-                </div>
+                <>
+                    <div className="my-3">
+                        <UserInput onSelect={(user) => setEmail(user.email)} />
+                    </div>
+                </>
             )}
 
             {user && checkMode === "user" && (
@@ -173,7 +179,8 @@ function TokenCheck() {
                     </table>
                 </div>
             )}
-            {user && !orderExists && (
+            {user && orderLoading && <Loading />}
+            {user && !orderExists && !orderLoading && (
                 <>
                     <h1 className="mt-5 text-xl text-white">
                         Nincs rendelés erre hétre
@@ -184,5 +191,3 @@ function TokenCheck() {
         </>
     );
 }
-
-export default TokenCheck;

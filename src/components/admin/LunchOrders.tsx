@@ -137,19 +137,19 @@ function Orders() {
                                             {Object.entries(day).map(
                                                 (
                                                     [option, count],
-                                                    optionIndex
+                                                    optionIndex,
                                                 ) => (
                                                     <tr
                                                         className="mt-2"
                                                         key={optionIndex}
                                                     >
-                                                        <td className="whitespace-nowrap bg-gray-900 px-6 py-3 text-left text-sm font-medium text-gray-100">
+                                                        <td className="whitespace-normal break-words bg-gray-900 px-6 py-3 text-left text-sm font-medium text-gray-100">
                                                             {
                                                                 menuCombine(
                                                                     menu
                                                                         .options[
                                                                         dayIndex
-                                                                    ]
+                                                                    ],
                                                                 )[option]
                                                             }
                                                         </td>
@@ -157,7 +157,7 @@ function Orders() {
                                                             {count}
                                                         </td>
                                                     </tr>
-                                                )
+                                                ),
                                             )}
                                         </React.Fragment>
                                     ))}

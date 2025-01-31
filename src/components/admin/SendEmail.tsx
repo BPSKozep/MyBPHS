@@ -8,7 +8,7 @@ import sleep from "utils/sleep";
 import { motion } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
 import { trpc } from "utils/trpc";
-import UserDropdown from "./UserDropdown";
+import UserInput from "./UserInput";
 
 export default function CreateUsers() {
     const [emailFormat, setEmailFormat] = useState<
@@ -161,7 +161,11 @@ export default function CreateUsers() {
                         </option>
                     </select>
                 ) : (
-                    <UserDropdown onChange={setSelectedUser} />
+                    <div className="flex justify-center">
+                        <UserInput
+                            onSelect={(user) => setSelectedUser(user.email)}
+                        />
+                    </div>
                 )}
 
                 <p className="mb-3 mt-5">Email tárgy</p>
