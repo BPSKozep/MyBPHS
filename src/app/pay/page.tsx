@@ -16,7 +16,7 @@ function Pay() {
             <OnlyBlocked>
                 <div className="flex h-full w-full flex-col items-center justify-center align-middle">
                     {!loading && (
-                        <div className="m-3 flex flex-col items-center text-white">
+                        <div className="flex flex-col items-center text-white">
                             <h1 className="m-3 text-xl font-bold">
                                 Fiók letiltva
                             </h1>
@@ -46,7 +46,7 @@ function Pay() {
                                 </p>
                             </div>
                             <button
-                                className="rounded-lg bg-blue-500 p-5 text-lg transition-all hover:scale-105"
+                                className="mt-5 rounded-lg bg-blue-500 p-5 text-lg transition-all hover:scale-105"
                                 onClick={async () => {
                                     setLoading(true);
 

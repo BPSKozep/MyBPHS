@@ -77,6 +77,7 @@ export default function MainHeader() {
                 onClose={() => {
                     setSheetOpen(false);
                 }}
+                side="right"
             >
                 <h1 className="text-2xl font-bold text-white">Felhasználó</h1>
                 <p className="my-3 text-gray-400">
