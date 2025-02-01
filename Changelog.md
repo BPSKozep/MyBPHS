@@ -1,3 +1,7 @@
+# 2.5.1 2025-01-31
+
+-   Overhauled Sheet Component
+
 # 2.5.0 2025-01-31
 
 -   Replace UserDropdown with UserInput
