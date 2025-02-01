@@ -14,7 +14,7 @@ import { useState } from "react";
 
 export default function MainHeader() {
     const { data } = useSession();
-    const [isSheetOpen, setSheetOpen] = useState(true);
+    const [isSheetOpen, setSheetOpen] = useState(false);
 
     // const router = useRouter();
     // const path = usePathname();
