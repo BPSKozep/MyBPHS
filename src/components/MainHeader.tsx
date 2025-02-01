@@ -14,7 +14,7 @@ import { useState } from "react";
 
 export default function MainHeader() {
     const { data } = useSession();
-    const [isSheetOpen, setSheetOpen] = useState(false);
+    const [isSheetOpen, setSheetOpen] = useState(true);
 
     // const router = useRouter();
     // const path = usePathname();
@@ -77,6 +77,7 @@ export default function MainHeader() {
                 onClose={() => {
                     setSheetOpen(false);
                 }}
+                side="right"
             >
                 <h1 className="text-2xl font-bold text-white">Felhasználó</h1>
                 <p className="my-3 text-gray-400">
