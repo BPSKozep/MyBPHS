@@ -122,15 +122,17 @@ function LunchOrder() {
                                         />
                                     </div>
                                     {menuClosed && (
-                                        <div
-                                            className="flex cursor-pointer flex-row justify-center text-center"
+                                        <motion.div
+                                            className="flex cursor-pointer flex-row items-center justify-center gap-2 text-center"
                                             onClick={() =>
                                                 setClosedMenuShown(
                                                     !closedMenuShown,
                                                 )
                                             }
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
                                         >
-                                            Menü megtekintése
+                                            <span>Menü megtekintése</span>
                                             <motion.div
                                                 animate={{
                                                     rotate: closedMenuShown
@@ -138,45 +140,61 @@ function LunchOrder() {
                                                         : 0,
                                                 }}
                                                 transition={{
-                                                    duration: 0.2,
+                                                    type: "spring",
+                                                    stiffness: 200,
+                                                    damping: 20,
                                                 }}
-                                                className="ml-3 origin-center"
                                             >
-                                                <FaChevronDown className="transition-all" />
+                                                <FaChevronDown className="h-4 w-4" />
                                             </motion.div>
-                                        </div>
+                                        </motion.div>
                                     )}
-                                    <AnimatePresence>
+
+                                    <AnimatePresence mode="sync">
                                         {closedMenuShown && menu && (
                                             <motion.div
                                                 variants={{
                                                     opened: {
                                                         opacity: 1,
                                                         height: "auto",
+                                                        y: 0,
                                                         transition: {
+                                                            height: {
+                                                                type: "spring",
+                                                                stiffness: 100,
+                                                                damping: 20,
+                                                            },
                                                             opacity: {
-                                                                delay: 0.3,
+                                                                duration: 0.2,
+                                                            },
+                                                            y: {
+                                                                type: "spring",
+                                                                stiffness: 100,
+                                                                damping: 20,
                                                             },
                                                         },
                                                     },
                                                     closed: {
                                                         opacity: 0,
                                                         height: 0,
+                                                        y: -20,
+                                                        transition: {
+                                                            height: {
+                                                                duration: 0.2,
+                                                            },
+                                                            opacity: {
+                                                                duration: 0.2,
+                                                            },
+                                                            y: {
+                                                                duration: 0.2,
+                                                            },
+                                                        },
                                                     },
                                                 }}
                                                 initial="closed"
-                                                animate={
-                                                    closedMenuShown
-                                                        ? "opened"
-                                                        : "closed"
-                                                }
-                                                exit={{
-                                                    opacity: 0,
-                                                    height: 0,
-                                                    transition: {
-                                                        height: { delay: 0.3 },
-                                                    },
-                                                }}
+                                                animate="opened"
+                                                exit="closed"
+                                                className="overflow-hidden"
                                             >
                                                 <ClosedOrderForm
                                                     options={menu.options}
