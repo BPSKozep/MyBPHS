@@ -26,7 +26,7 @@ export default function GoogleSignIn() {
                             height={24}
                         />
 
-                        <span className="font-bold tracking-wide text-black">
+                        <span className="text-center font-bold tracking-wide text-black">
                             Továbblépés Google-lel
                         </span>
                     </div>
