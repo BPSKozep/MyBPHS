@@ -9,6 +9,7 @@ import sleep from "utils/sleep";
 import { FaRightFromBracket } from "react-icons/fa6";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
+import SmallLoading from "./SmallLoading";
 // import Button from "components/Button";
 // import { useRouter, usePathname } from "next/navigation";
 
@@ -25,6 +26,8 @@ export default function MainHeader() {
             enabled: !!data?.user?.email,
         },
     );
+
+    const [signOutLoading, setSignOutLoading] = useState(false);
 
     return (
         <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
@@ -133,15 +136,24 @@ export default function MainHeader() {
                 <div
                     className="flex cursor-pointer items-center justify-center align-middle text-white"
                     onClick={async () => {
-                        await sleep(500);
-
+                        setSignOutLoading(true);
+                        await sleep(1500);
+                        setSignOutLoading(false);
                         await signOut({
                             callbackUrl: "/",
                         });
                     }}
                 >
-                    <FaRightFromBracket />
-                    <p className="ml-2 text-lg">Kijelentkezés</p>
+                    {!signOutLoading ? (
+                        <div className="flex items-center">
+                            <FaRightFromBracket />
+                            <p className="ml-2 text-lg">Kijelentkezés</p>
+                        </div>
+                    ) : (
+                        <div className="mt-1 flex items-center">
+                            <SmallLoading />
+                        </div>
+                    )}
                 </div>
             </Sheet>
         </header>
