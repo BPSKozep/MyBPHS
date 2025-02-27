@@ -92,7 +92,7 @@ function Chat() {
                                 placeholder="Üzenet"
                                 onChange={handleInputChange}
                             />
-                            <button className="w-10 bg-[#565e85] text-gray-200">
+                            <button className="flex w-10 items-center justify-center bg-[#565e85] text-gray-200">
                                 <FaPaperPlane />
                             </button>
                         </form>
