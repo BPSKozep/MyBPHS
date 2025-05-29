@@ -1,12 +1,12 @@
-import LaptopPasswordReset from "components/LaptopPasswordReset";
-import PageWithHeader from "components/PageWithHeader";
+import LaptopPasswordReset from "@/components/LaptopPasswordReset";
+import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 
 export const metadata = {
     title: "Laptop Jelszó",
 };
 
-function LaptopPassword() {
+export default function LaptopPassword() {
     return (
         <PageWithHeader title="Laptop Jelszó">
             <div className="flex h-full w-full items-center justify-center align-middle">
@@ -15,5 +15,3 @@ function LaptopPassword() {
         </PageWithHeader>
     );
 }
-
-export default LaptopPassword;

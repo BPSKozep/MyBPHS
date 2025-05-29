@@ -2,14 +2,15 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { FaX } from "react-icons/fa6";
 import { twMerge } from "tailwind-merge";
+import { useEffect, useState, type ReactNode } from "react";
 
 export interface SheetProps {
     isOpen: boolean;
     onClose: () => void;
-    children: React.ReactNode;
+    children: ReactNode;
     side?: "left" | "right" | "top" | "bottom";
     className?: string;
 }
@@ -21,9 +22,9 @@ export default function Sheet({
     side = "right",
     className,
 }: SheetProps) {
-    const [isMounted, setIsMounted] = React.useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         setIsMounted(true);
 
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -77,7 +78,7 @@ export default function Sheet({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="bg-background/80 fixed inset-0 backdrop-blur-sm"
+                        className="bg-background/80 fixed inset-0 backdrop-blur-xs"
                         onClick={onClose}
                     />
                     <motion.div
@@ -104,7 +105,7 @@ export default function Sheet({
                         <div className="relative h-full w-full p-6">
                             <button
                                 onClick={onClose}
-                                className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none"
+                                className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"
                             >
                                 <FaX className="h-4 w-4 text-white" />
                                 <span className="sr-only">Close</span>

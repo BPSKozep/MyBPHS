@@ -1,5 +1,5 @@
-import BigLinkButton from "components/BigLinkButton";
-import OnlyRolesComponent from "components/OnlyRolesComponent";
+import BigLinkButton from "@/components/BigLinkButton";
+import OnlyRolesComponent from "@/components/OnlyRolesComponent";
 
 export default function Home() {
     return (

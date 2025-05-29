@@ -1,17 +1,21 @@
 import React from "react";
-import transpose2DArray from "utils/transpose";
+import transpose2DArray from "@/utils/transpose";
 import { useMediaQuery } from "react-responsive";
-import createBreakpoint from "utils/createBreakpoint";
-import wrapConditional from "utils/wrapConditional";
+import createBreakpoint from "@/utils/createBreakpoint";
+import wrapConditional from "@/utils/wrapConditional";
 
 const days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
-function ClosedOrderForm({ options }: { options: Record<string, string>[] }) {
+export default function ClosedOrderForm({
+    options,
+}: {
+    options: Record<string, string>[];
+}) {
     const isBigScreen = useMediaQuery({ query: createBreakpoint("lg") });
 
     return (
         <div
-            className={`grid max-w-[60rem] grid-flow-row break-words ${
+            className={`grid max-w-240 grid-flow-row break-words ${
                 isBigScreen ? "grid-cols-5" : "grid-cols-1"
             } gap-3 rounded-lg bg-zinc-700 p-5 shadow-lg`}
         >
@@ -45,5 +49,3 @@ function ClosedOrderForm({ options }: { options: Record<string, string>[] }) {
         </div>
     );
 }
-
-export default ClosedOrderForm;

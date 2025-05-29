@@ -1,21 +1,20 @@
 "use client";
 
 import React from "react";
-import IconSubmitButton from "components/IconSubmitButton";
+import IconSubmitButton from "@/components/IconSubmitButton";
 import { FaCalendarXmark } from "react-icons/fa6";
-import sleep from "utils/sleep";
-import { trpc } from "utils/trpc";
-import { getWeek, getWeekYear } from "utils/isoweek";
+import sleep from "@/utils/sleep";
+import { api } from "@/trpc/react";
+import { getWeek, getWeekYear } from "@/utils/isoweek";
 
-function CloseMenuOrders() {
-    const { mutateAsync: setIsOpen } = trpc.menu.setIsopen.useMutation();
+export default function CloseMenuOrders() {
+    const setIsOpen = api.menu.setIsopen.useMutation();
 
-    const { mutateAsync: sendDiscordWebhook } =
-        trpc.webhook.sendDiscordWebhook.useMutation();
+    const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
 
     return (
         <>
-            <h2 className="mb-3 mt-5 font-bold text-white">
+            <h2 className="mt-5 mb-3 font-bold text-white">
                 Beküldések lezárása
             </h2>
             <div>
@@ -28,20 +27,20 @@ function CloseMenuOrders() {
                             const date = new Date();
                             date.setDate(date.getDate() + 7);
 
-                            await setIsOpen({
+                            await setIsOpen.mutateAsync({
                                 week: getWeek(date),
                                 year: getWeekYear(date),
                                 isOpen: false,
                             });
 
-                            await sendDiscordWebhook({
+                            await sendDiscordWebhook.mutateAsync({
                                 type: "Lunch",
                                 message: "Beküldések lezárva. ❌",
                             });
 
                             return true;
                         } catch (err) {
-                            await sendDiscordWebhook({
+                            await sendDiscordWebhook.mutateAsync({
                                 type: "Error",
                                 message: String(err),
                             });
@@ -53,5 +52,3 @@ function CloseMenuOrders() {
         </>
     );
 }
-
-export default CloseMenuOrders;

@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    swcMinify: true,
     webpack: (config) => {
         config.experiments = {
             ...config.experiments,
@@ -12,10 +11,7 @@ const nextConfig = {
     images: {
         remotePatterns: [
             {
-                protocol: "https",
                 hostname: "cdn.bpskozep.hu",
-                port: "443",
-                pathname: "**",
             },
         ],
     },
@@ -32,18 +28,6 @@ const nextConfig = {
         ];
     },
     skipTrailingSlashRedirect: true,
-    i18n: {
-        locales: ["en", "hu"],
-        defaultLocale: "hu",
-        localeDetection: false,
-    },
 };
 
 module.exports = nextConfig;
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const withPWA = require("next-pwa")({
-    dest: "public",
-});
-
-module.exports = withPWA(module.exports);

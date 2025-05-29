@@ -1,21 +1,31 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { NextRequest } from "next/server";
-import { appRouter } from "server/routers/_app";
-import { createContext } from "server/context";
+import { type NextRequest } from "next/server";
+
+import { env } from "@/env/server";
+import { appRouter } from "@/server/root";
+import { createTRPCContext } from "@/server/context";
+
+/**
+ * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
+ * handling a HTTP request (e.g. when you make requests from Client Components).
+ */
+const createContext = async (req: NextRequest) => {
+    return createTRPCContext({
+        headers: req.headers,
+    });
+};
 
 const handler = (req: NextRequest) =>
     fetchRequestHandler({
         endpoint: "/api/trpc",
         req,
         router: appRouter,
-        createContext: createContext,
+        createContext: () => createContext(req),
         onError:
-            process.env.NODE_ENV === "development"
+            env.NODE_ENV === "development"
                 ? ({ path, error }) => {
                       console.error(
-                          `❌ tRPC failed on ${path ?? "<no-path>"}: ${
-                              error.message
-                          }`
+                          `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`,
                       );
                   }
                 : undefined,

@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 
-function BigLinkButton({
+export default function BigLinkButton({
     title,
     url,
     disabled,
@@ -56,5 +56,3 @@ function BigLinkButton({
         </motion.button>
     );
 }
-
-export default BigLinkButton;

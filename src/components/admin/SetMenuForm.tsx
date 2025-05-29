@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 const days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
-function SetMenuForm({
+export default function SetMenuForm({
     onChange,
 }: {
     onChange: (options: { "a-menu": string; "b-menu": string }[]) => void;
@@ -15,7 +15,7 @@ function SetMenuForm({
                     "a-menu": "",
                     "b-menu": "",
                 };
-            })
+            }),
     );
 
     useEffect(() => {
@@ -31,18 +31,20 @@ function SetMenuForm({
                     <div className="flex flex-row items-center justify-center">
                         <input
                             type="text"
-                            className="m-2 w-32 rounded-md border-none p-2 text-center font-bold text-black sm:w-40"
+                            className="m-2 w-32 rounded-md border-none bg-white p-2 text-center font-bold text-black sm:w-40"
                             placeholder="A Menü"
-                            value={options[dayIndex]["a-menu"]}
+                            value={options[dayIndex]?.["a-menu"] ?? ""}
                             onChange={(e) => {
                                 setOptions((options) => {
+                                    const currentOption = options[dayIndex];
+                                    if (!currentOption) return options;
+
                                     const option = {
                                         "a-menu": e.target.value,
-                                        "b-menu": options[dayIndex]["b-menu"],
+                                        "b-menu": currentOption["b-menu"],
                                     };
 
                                     const optionsCopy = [...options];
-
                                     optionsCopy[dayIndex] = option;
 
                                     return optionsCopy;
@@ -51,18 +53,20 @@ function SetMenuForm({
                         />
                         <input
                             type="text"
-                            className="m-2 w-32 rounded-md border-none p-2 text-center font-bold text-black sm:w-40"
+                            className="m-2 w-32 rounded-md border-none bg-white p-2 text-center font-bold text-black sm:w-40"
                             placeholder="B Menü"
-                            value={options[dayIndex]["b-menu"]}
+                            value={options[dayIndex]?.["b-menu"] ?? ""}
                             onChange={(e) => {
                                 setOptions((options) => {
+                                    const currentOption = options[dayIndex];
+                                    if (!currentOption) return options;
+
                                     const option = {
-                                        "a-menu": options[dayIndex]["a-menu"],
+                                        "a-menu": currentOption["a-menu"],
                                         "b-menu": e.target.value,
                                     };
 
                                     const optionsCopy = [...options];
-
                                     optionsCopy[dayIndex] = option;
 
                                     return optionsCopy;
@@ -75,5 +79,3 @@ function SetMenuForm({
         </>
     );
 }
-
-export default SetMenuForm;

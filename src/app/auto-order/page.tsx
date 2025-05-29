@@ -1,13 +1,13 @@
-import AutoOrderComponent from "components/AutoOrderComponent";
-import Card from "components/Card";
-import PageWithHeader from "components/PageWithHeader";
+import AutoOrderComponent from "@/components/AutoOrderComponent";
+import Card from "@/components/Card";
+import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 
 export const metadata = {
     title: "Automatikus Rendelés",
 };
 
-function AutoOrder() {
+export default function AutoOrder() {
     return (
         <PageWithHeader title="Automatikus Rendelés">
             <div className="flex h-full w-full items-center justify-center align-middle">
@@ -18,5 +18,3 @@ function AutoOrder() {
         </PageWithHeader>
     );
 }
-
-export default AutoOrder;

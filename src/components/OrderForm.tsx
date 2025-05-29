@@ -1,25 +1,27 @@
 import React from "react";
-import transpose2DArray from "utils/transpose";
+import transpose2DArray from "@/utils/transpose";
 import { useMediaQuery } from "react-responsive";
-import createBreakpoint from "utils/createBreakpoint";
-import wrapConditional from "utils/wrapConditional";
+import createBreakpoint from "@/utils/createBreakpoint";
+import wrapConditional from "@/utils/wrapConditional";
 
 const days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
-function OrderForm({
+export default function OrderForm({
     options,
     selectedOptions,
     onChange,
+    isEditing,
 }: {
     options: Record<string, string>[];
     selectedOptions: string[];
     onChange: (selectedOptions: string[]) => void;
+    isEditing: boolean;
 }) {
     const isBigScreen = useMediaQuery({ query: createBreakpoint("lg") });
 
     return (
         <div
-            className={`grid max-w-[60rem] grid-flow-row break-words ${
+            className={`grid max-w-240 grid-flow-row break-words ${
                 isBigScreen ? "grid-cols-5" : "grid-cols-1"
             } gap-3 rounded-lg bg-zinc-700 p-5 shadow-lg`}
         >
@@ -44,7 +46,9 @@ function OrderForm({
                                     selectedOptions[dayIndex] === id
                                         ? "bg-[#5d9a84] font-bold shadow-lg"
                                         : "bg-[#565e85] shadow-md"
-                                } px-3 py-2 shadow-md`}
+                                } px-3 py-2 shadow-md ${
+                                    isEditing ? "cursor-pointer" : ""
+                                }`}
                                 onClick={() => {
                                     const newOptions = [...selectedOptions];
 
@@ -81,5 +85,3 @@ function OrderForm({
         </div>
     );
 }
-
-export default OrderForm;

@@ -1,40 +1,82 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText, convertToCoreMessages, tool } from "ai";
-import PasswordReset from "emails/password-reset";
+import PasswordReset from "@/emails/password-reset";
 import { generate } from "generate-password";
-import { User } from "models";
-import Chat from "models/Chat.model";
+import { User } from "@/models";
+import Chat from "@/models/Chat.model";
 import { Resend } from "resend";
-import { getServerAuthSession } from "server/auth";
+import { getServerAuthSession } from "@/server/auth";
 import { z } from "zod";
-import mongooseConnect from "clients/mongoose";
+import mongooseConnect from "@/clients/mongoose";
 import { nanoid } from "nanoid";
-
+import { env } from "@/env/server";
 await mongooseConnect();
 
 const SYSTEM = await (
-    await fetch(`${process.env.DOCUMENTS_ENDPOINT}/prompt`, {
+    await fetch(`${env.DOCUMENTS_ENDPOINT}/prompt`, {
         headers: {
-            Authorization: `Bearer ${process.env.DOCUMENTS_AUTH}`,
+            Authorization: `Bearer ${env.DOCUMENTS_AUTH}`,
         },
     })
 ).text();
 
+// Type definitions for better type safety
+interface OpenAITool {
+    type: string;
+    function?: {
+        parameters: Record<string, unknown> & {
+            additionalProperties?: unknown;
+            $schema?: unknown;
+        };
+    };
+}
+
+interface RequestBody extends Record<string, unknown> {
+    tools?: OpenAITool[];
+}
+
+interface ChatMessage {
+    content: string;
+    role: "function" | "user" | "system" | "assistant" | "data" | "tool";
+}
+
+interface ChatRequest {
+    messages: ChatMessage[];
+}
+
+type SearchResult = Record<string, unknown>;
+
 const openai = createOpenAI({
-    baseURL: process.env.LLM_ENDPOINT,
-    apiKey: process.env.LLM_API_KEY,
+    baseURL: env.LLM_ENDPOINT,
+    apiKey: env.LLM_API_KEY,
     async fetch(input, init) {
-        const body = JSON.parse(String(init?.body));
+        // Safely handle the request body
+        if (!init?.body) {
+            return fetch(input, init);
+        }
+
+        let body: RequestBody;
+        try {
+            const bodyString =
+                typeof init.body === "string"
+                    ? init.body
+                    : init.body instanceof ArrayBuffer
+                      ? new TextDecoder().decode(init.body)
+                      : JSON.stringify(init.body);
+            body = JSON.parse(bodyString) as RequestBody;
+        } catch {
+            return fetch(input, init);
+        }
 
         const tools = body.tools;
 
-        if (tools) {
-            const newTools = [];
+        if (tools && Array.isArray(tools)) {
+            const newTools: OpenAITool[] = [];
 
             for (const tool of tools) {
-                if (tool.type === "function") {
+                if (tool.type === "function" && tool.function?.parameters) {
                     delete tool.function.parameters.additionalProperties;
-                    delete tool.function.parameters["$schema"];
+                    delete tool.function.parameters.$schema;
                 }
 
                 newTools.push(tool);
@@ -51,12 +93,12 @@ const openai = createOpenAI({
 
 export const maxDuration = 60;
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
     const session = await getServerAuthSession();
 
-    if (!session || !session.user.name)
+    if (!session?.user?.name)
         return new Response("Unauthorized", { status: 401 });
 
     const user = await User.findOne({
@@ -65,13 +107,14 @@ export async function POST(req: Request) {
 
     if (!user) return new Response("Forbidden", { status: 403 });
 
-    const { messages } = await req.json();
+    const requestData = (await req.json()) as ChatRequest;
+    const { messages } = requestData;
 
     const coreMessages = convertToCoreMessages(messages);
 
     const names = session.user.name.split(" ");
 
-    names.unshift(names.pop() || "");
+    names.unshift(names.pop() ?? "");
 
     const emailName = names.join(" ");
 
@@ -86,19 +129,25 @@ export async function POST(req: Request) {
     let rag_context = "";
 
     try {
-        const res = await fetch(`${process.env.DOCUMENTS_ENDPOINT}/search`, {
+        const lastMessage = coreMessages[coreMessages.length - 1];
+        if (!lastMessage?.content) {
+            throw new Error("No valid message content");
+        }
+
+        const res = await fetch(`${env.DOCUMENTS_ENDPOINT}/search`, {
             headers: {
-                Authorization: `Bearer ${process.env.DOCUMENTS_AUTH}`,
+                Authorization: `Bearer ${env.DOCUMENTS_AUTH}`,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                query: coreMessages[coreMessages.length - 1].content,
+                query: lastMessage.content,
                 num_docs: 1,
             }),
             method: "POST",
         });
 
-        rag_context = (await res.json())[0];
+        const searchResults = (await res.json()) as unknown[];
+        rag_context = (searchResults[0] as string) ?? "No results found.";
     } catch (err) {
         console.log("rag failed", err);
         rag_context = "Retrieval failed.";
@@ -123,7 +172,7 @@ export async function POST(req: Request) {
                 async execute(body) {
                     console.log("ticket", body);
                     try {
-                        await fetch(process.env.TICKET_WEBHOOK!, {
+                        await fetch(env.TICKET_WEBHOOK!, {
                             method: "post",
                             headers: {
                                 "Content-Type": "application/json",
@@ -162,7 +211,7 @@ export async function POST(req: Request) {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json",
-                                    Authorization: `Bearer ${process.env.PU_TOKEN}`,
+                                    Authorization: `Bearer ${env.PU_TOKEN}`,
                                 },
                                 body: JSON.stringify({ password }),
                             },
@@ -173,7 +222,7 @@ export async function POST(req: Request) {
 
                         await resend.emails.send({
                             from: "MyBPHS <my@bphs.hu>",
-                            to: session.user.email || [],
+                            to: session.user.email ?? "",
                             subject: "Ideiglenes laptop jelszó",
                             react: PasswordReset({
                                 name: emailName,
@@ -200,10 +249,10 @@ export async function POST(req: Request) {
                     console.log("search", body);
                     try {
                         const res = await fetch(
-                            `${process.env.DOCUMENTS_ENDPOINT}/search`,
+                            `${env.DOCUMENTS_ENDPOINT}/search`,
                             {
                                 headers: {
-                                    Authorization: `Bearer ${process.env.DOCUMENTS_AUTH}`,
+                                    Authorization: `Bearer ${env.DOCUMENTS_AUTH}`,
                                     "Content-Type": "application/json",
                                 },
                                 body: JSON.stringify({
@@ -214,8 +263,10 @@ export async function POST(req: Request) {
                             },
                         );
 
+                        const searchResults =
+                            (await res.json()) as SearchResult[];
                         return {
-                            results: await res.json(),
+                            results: searchResults,
                         };
                     } catch (err) {
                         console.error(err);
@@ -230,7 +281,7 @@ export async function POST(req: Request) {
         temperature: 0.4,
         async onFinish(event) {
             await new Chat({
-                user: user.id,
+                user: user._id,
                 messages: [...coreMessages, ...event.responseMessages],
             }).save();
         },

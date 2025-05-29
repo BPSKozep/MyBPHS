@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { FaChevronDown, FaSearch } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
-import { trpc } from "utils/trpc";
+import { motion, AnimatePresence } from "motion/react";
+import { api } from "@/trpc/react";
 
 interface User {
     email: string;
@@ -21,9 +21,9 @@ export default function UserInput({ onSelect }: UserInputProps) {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const userInputRef = useRef<HTMLDivElement>(null);
 
-    const { data: usersData } = trpc.user.list.useQuery("all");
+    const usersData = api.user.list.useQuery("all");
 
-    const filteredUsers = (usersData ?? []).filter(
+    const filteredUsers = (usersData.data ?? []).filter(
         (user) =>
             user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             user.email.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -97,11 +97,11 @@ export default function UserInput({ onSelect }: UserInputProps) {
                         className="absolute z-50 mt-1 w-full rounded-md bg-white py-1 shadow-lg"
                     >
                         <div className="relative px-3 pb-2">
-                            <FaSearch className="absolute left-5 top-3 h-3 w-3 text-neutral-400" />
+                            <FaSearch className="absolute top-3 left-5 h-3 w-3 text-neutral-400" />
                             <input
                                 id="user-search"
                                 type="text"
-                                className="w-full rounded-md bg-white py-2 pl-8 pr-3 text-sm font-medium text-black focus:outline-none"
+                                className="w-full rounded-md bg-white py-2 pr-3 pl-8 text-sm font-medium text-black focus:outline-hidden"
                                 placeholder="Felhasználók keresése..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -126,12 +126,12 @@ export default function UserInput({ onSelect }: UserInputProps) {
                                         className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-black hover:bg-neutral-100"
                                     >
                                         <div className="flex flex-col items-start">
-                                            <span className="break-all text-left font-extrabold">
+                                            <span className="text-left font-extrabold break-all">
                                                 {user.name}{" "}
                                                 {user.blocked && "🚫"}
                                             </span>
 
-                                            <span className="break-all text-left text-xs font-semibold text-neutral-700">
+                                            <span className="text-left text-xs font-semibold break-all text-neutral-700">
                                                 {user.email}
                                             </span>
                                         </div>

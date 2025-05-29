@@ -1,24 +1,24 @@
 "use client";
 
-import PageWithHeader from "components/PageWithHeader";
-import Timetable from "components/Timetable";
+import PageWithHeader from "@/components/PageWithHeader";
+import Timetable from "@/components/Timetable";
 import { useSession } from "next-auth/react";
 import React from "react";
-import { trpc } from "utils/trpc";
+import { api } from "@/trpc/react";
 
 const EMPTY_TIMETABLE = Array(5).fill([]);
 
-function TimetableDemo() {
+export default function TimetableDemo() {
     const { data: session } = useSession();
-    const { data: timetable } = trpc.user.getTimetable.useQuery(
-        session?.user?.email || ""
+    const timetable = api.user.getTimetable.useQuery(
+        session?.user?.email ?? "",
     );
 
     return (
         <PageWithHeader title="Órarend">
             <div className="flex h-full w-full items-center justify-center">
                 <Timetable
-                    timetable={timetable || EMPTY_TIMETABLE}
+                    timetable={timetable.data ?? EMPTY_TIMETABLE}
                     timeslots={[
                         "9:00-9:45",
                         "9:55-10:40",
@@ -34,5 +34,3 @@ function TimetableDemo() {
         </PageWithHeader>
     );
 }
-
-export default TimetableDemo;

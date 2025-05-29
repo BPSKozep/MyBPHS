@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import NFCInput from "components/admin/NFCInput";
-import { trpc } from "utils/trpc";
-import { getWeek, getWeekYear } from "utils/isoweek";
-import Loading from "components/Loading";
-import IconButton from "components/IconButton";
+import NFCInput from "@/components/admin/NFCInput";
+import { api } from "@/trpc/react";
+import { getWeek, getWeekYear } from "@/utils/isoweek";
+import Loading from "@/components/Loading";
+import IconButton from "@/components/IconButton";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import UserInput from "./UserInput";
 
@@ -26,7 +26,7 @@ export default function TokenCheck() {
         data: NFCUser,
         isFetched: isNFCUserFetched,
         isLoading: isNFCUserLoading,
-    } = trpc.user.getUserByNfcId.useQuery(nfcId, {
+    } = api.user.getUserByNfcId.useQuery(nfcId, {
         enabled: checkMode === "token",
     });
     const {
@@ -34,7 +34,7 @@ export default function TokenCheck() {
         isFetched: isEmailUserFetched,
         isLoading: isEmailUserLoading,
         refetch: refetchEmailUser,
-    } = trpc.user.get.useQuery(email, {
+    } = api.user.get.useQuery(email, {
         enabled: checkMode === "user" && !!email,
     });
 
@@ -45,7 +45,7 @@ export default function TokenCheck() {
         checkMode === "user" ? isEmailUserFetched : isNFCUserFetched;
 
     const { data: order, isLoading: orderLoading } =
-        trpc.order.getAllWeek.useQuery(
+        api.order.getAllWeek.useQuery(
             {
                 email: user?.email,
                 year,
@@ -53,13 +53,13 @@ export default function TokenCheck() {
             },
             {
                 enabled: !!user,
+                retry: false,
             },
         );
 
     const orderExists = order && order.length > 0;
 
-    const { mutateAsync: toggleBlocked } =
-        trpc.user.toggleBlocked.useMutation();
+    const toggleBlocked = api.user.toggleBlocked.useMutation();
 
     return (
         <>
@@ -100,7 +100,7 @@ export default function TokenCheck() {
                 <button
                     className={`rounded-lg ${user.blocked ? "bg-blue-400" : "bg-red-400"} p-3 font-bold text-white transition-all hover:scale-105`}
                     onClick={async () => {
-                        await toggleBlocked(user.email);
+                        await toggleBlocked.mutateAsync(user.email);
                         await refetchEmailUser();
                     }}
                 >
@@ -139,7 +139,7 @@ export default function TokenCheck() {
                                 <th className="pb-5 pl-5 text-left text-xl">
                                     Nap
                                 </th>
-                                <th className="pb-5 pr-5 text-right text-xl">
+                                <th className="pr-5 pb-5 text-right text-xl">
                                     Rendelt
                                 </th>
                             </tr>

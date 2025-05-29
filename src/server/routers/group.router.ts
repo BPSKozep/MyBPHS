@@ -1,13 +1,13 @@
 import { z } from "zod";
-import { procedure, router } from "server/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
-import { Group } from "models";
+import { Group } from "@/models";
 import { TRPCError } from "@trpc/server";
-import { checkRoles } from "utils/authorization";
-import { IGroup } from "models/Group.model";
+import { checkRoles } from "@/utils/authorization";
+import type { IGroup } from "@/models/Group.model";
 
-const groupRouter = router({
-    get: procedure
+export const groupRouter = createTRPCRouter({
+    get: protectedProcedure
         .input(z.string())
         .output(
             z
@@ -17,16 +17,9 @@ const groupRouter = router({
                     priority: z.number(),
                     override: z.boolean(),
                 })
-                .nullable()
+                .nullable(),
         )
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "teacher",
@@ -40,10 +33,10 @@ const groupRouter = router({
             }
 
             return await Group.findOne({ name: input }).select<IGroup>(
-                "-_id -__v"
+                "-_id -__v",
             );
         }),
-    update: procedure
+    update: protectedProcedure
         .input(
             z.strictObject({
                 name: z.string(),
@@ -53,16 +46,9 @@ const groupRouter = router({
                     priority: z.number(),
                     override: z.boolean(),
                 }),
-            })
+            }),
         )
         .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "teacher",
@@ -80,9 +66,7 @@ const groupRouter = router({
                 input.newValue,
                 {
                     upsert: true,
-                }
+                },
             );
         }),
 });
-
-export default groupRouter;

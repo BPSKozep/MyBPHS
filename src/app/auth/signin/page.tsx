@@ -1,5 +1,5 @@
-import Card from "components/Card";
-import SignInComponent from "components/SignInComponent";
+import Card from "@/components/Card";
+import SignInComponent from "@/components/SignInComponent";
 import React from "react";
 
 export const metadata = {

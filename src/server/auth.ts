@@ -1,12 +1,12 @@
-import mongooseConnect from "clients/mongoose";
-import { User } from "models";
+import mongooseConnect from "@/clients/mongoose";
+import { User } from "@/models";
 import {
     getServerSession,
     type DefaultSession,
     type NextAuthOptions,
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-
+import { env } from "@/env/server";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -44,12 +44,13 @@ export const authOptions: NextAuthOptions = {
     },
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_ID as string,
-            clientSecret: process.env.GOOGLE_SECRET as string,
+            clientId: env.GOOGLE_ID,
+            clientSecret: env.GOOGLE_SECRET,
         }),
     ],
     pages: {
         signIn: "/auth/signin",
+        error: "/auth/error",
     },
 };
 

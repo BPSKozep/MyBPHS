@@ -28,7 +28,9 @@ export default function PWAInstall() {
         return (
             <button
                 onClick={async () => {
-                    PWAPrompt?.prompt();
+                    PWAPrompt?.prompt().catch((error) => {
+                        console.error(error);
+                    });
                     const choice = await PWAPrompt?.userChoice;
 
                     if (choice && choice.outcome === "accepted") {
@@ -37,7 +39,7 @@ export default function PWAInstall() {
                 }}
                 className="p-3 text-white"
             >
-                <FaDownload className="scale-150" />
+                <FaDownload className="scale-150 cursor-pointer" />
             </button>
         );
 }

@@ -1,7 +1,8 @@
-import React, { PropsWithChildren, ReactNode } from "react";
-import PageHeader from "components/PageHeader";
+import type { PropsWithChildren, ReactNode } from "react";
+import React from "react";
+import PageHeader from "@/components/PageHeader";
 
-function PageWithHeader({
+export default function PageWithHeader({
     title,
     homeLocation = "/",
     children,
@@ -24,5 +25,3 @@ function PageWithHeader({
         </>
     );
 }
-
-export default PageWithHeader;

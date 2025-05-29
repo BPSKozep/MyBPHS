@@ -1,12 +1,12 @@
-import { procedure, router } from "server/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { User } from "models";
+import { User } from "@/models";
+import { env } from "@/env/server";
 
-const puToken = process.env.PU_TOKEN;
-
-const adPasswordRouter = router({
-    getLastChanged: procedure.query(async ({ ctx }) => {
+const puToken = env.PU_TOKEN;
+export const adPasswordRouter = createTRPCRouter({
+    getLastChanged: protectedProcedure.query(async ({ ctx }) => {
         const user = await User.findOne({
             email: ctx.session?.user?.email,
         });
@@ -29,7 +29,7 @@ const adPasswordRouter = router({
             return dateTime.format(user.laptopPasswordChanged);
         }
     }),
-    setNewPassword: procedure
+    setNewPassword: protectedProcedure
         .input(z.string().min(6))
         .mutation(async ({ ctx, input }) => {
             const user = await User.findOne({
@@ -51,7 +51,7 @@ const adPasswordRouter = router({
                         Authorization: `Bearer ${puToken}`,
                     },
                     body: JSON.stringify({ password: input }),
-                }
+                },
             );
 
             user.laptopPasswordChanged = new Date();
@@ -59,5 +59,3 @@ const adPasswordRouter = router({
             return;
         }),
 });
-
-export default adPasswordRouter;

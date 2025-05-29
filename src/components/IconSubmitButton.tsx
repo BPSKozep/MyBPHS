@@ -1,11 +1,12 @@
 "use client";
 
-import { ReactNode, useState } from "react";
-import { motion } from "framer-motion";
-import { ObjectValues } from "utils/types";
+import type { ReactNode } from "react";
+import { useState } from "react";
+import { motion } from "motion/react";
+import type { ObjectValues } from "@/utils/types";
 import { FaCheck } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
-import sleep from "utils/sleep";
+import sleep from "@/utils/sleep";
 import { twMerge } from "tailwind-merge";
 
 const COLORS = {
@@ -31,7 +32,7 @@ function LoadingIcon() {
     );
 }
 
-function IconSubmitButton({
+export default function IconSubmitButton({
     onClick,
     icon,
     className,
@@ -50,7 +51,7 @@ function IconSubmitButton({
     return (
         <motion.button
             className={twMerge(
-                "h-12 w-12 rounded-2xl p-3 text-white",
+                "h-12 w-12 cursor-pointer rounded-2xl p-3 text-white",
                 className,
             )}
             initial={{
@@ -63,12 +64,12 @@ function IconSubmitButton({
                 rotate: buttonRotation,
             }}
             transition={{
-                /* FIXME: Temporarily disable spring, see: https://github.com/framer/motion/issues/2369 */
-                // scale: {
-                //     type: "spring",
-                //     damping: 9,
-                //     stiffness: 200,
-                // },
+                /* FIXED: Temporarily (19 months) disable spring, see: https://github.com/framer/motion/issues/2369 🙏🙏🙏 */
+                scale: {
+                    type: "spring",
+                    damping: 9,
+                    stiffness: 200,
+                },
                 rotate: {
                     type: "spring",
                     damping: 20,
@@ -119,5 +120,3 @@ function IconSubmitButton({
         </motion.button>
     );
 }
-
-export default IconSubmitButton;

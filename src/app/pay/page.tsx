@@ -1,14 +1,14 @@
 "use client";
 import React, { useState } from "react";
-import PageWithHeader from "components/PageWithHeader";
-import Loading from "components/Loading";
-import { trpc } from "utils/trpc";
+import PageWithHeader from "@/components/PageWithHeader";
+import Loading from "@/components/Loading";
+import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
-import OnlyBlocked from "components/OnlyBlocked";
+import OnlyBlocked from "@/components/OnlyBlocked";
 
-function Pay() {
+export default function Pay() {
     const [loading, setLoading] = useState(false);
-    const { mutateAsync } = trpc.payments.create.useMutation();
+    const createPayment = api.payments.create.useMutation();
     const router = useRouter();
 
     return (
@@ -51,9 +51,11 @@ function Pay() {
                                     setLoading(true);
 
                                     try {
-                                        const url = await mutateAsync();
+                                        const url =
+                                            await createPayment.mutateAsync();
                                         router.push(url);
-                                    } catch (err) {
+                                    } catch (error) {
+                                        console.error(error);
                                         setLoading(false);
                                     }
                                 }}
@@ -68,5 +70,3 @@ function Pay() {
         </PageWithHeader>
     );
 }
-
-export default Pay;

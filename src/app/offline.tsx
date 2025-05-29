@@ -1,4 +1,4 @@
-import PageWithHeader from "components/PageWithHeader";
+import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 
 export default function NoInternet() {

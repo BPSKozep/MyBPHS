@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import "utils/web-nfc.d.ts";
 
-function NFCInput({
+export default function NFCInput({
     nfc,
     onChange,
 }: {
@@ -20,7 +19,9 @@ function NFCInput({
 
             ndef.addEventListener("reading", onReading);
 
-            ndef.scan();
+            ndef.scan().catch((error) => {
+                console.error(error);
+            });
 
             return () => {
                 ndef.removeEventListener("reading", onReading);
@@ -38,11 +39,9 @@ function NFCInput({
                 type="text"
                 value={data}
                 onChange={(e) => setData(e.target.value)}
-                className="h-10 w-40 rounded-md p-1 text-center"
+                className="h-10 w-40 rounded-md bg-white p-1 text-center text-black"
                 placeholder="Token ID"
             />
         </>
     );
 }
-
-export default NFCInput;

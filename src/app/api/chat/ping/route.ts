@@ -1,9 +1,9 @@
-import { getServerAuthSession } from "server/auth";
+import { getServerAuthSession } from "@/server/auth";
 
 export async function GET() {
     const session = await getServerAuthSession();
 
-    if (!session || !session.user.name)
+    if (!session?.user?.name)
         return new Response("Unauthorized", { status: 401 });
 
     const llmResponse = await fetch("https://llm.bphs.hu");

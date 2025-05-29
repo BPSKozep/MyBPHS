@@ -1,22 +1,15 @@
 import { z } from "zod";
-import { procedure, router } from "server/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
-import { User } from "models";
+import { User } from "@/models";
 import { TRPCError } from "@trpc/server";
-
+import { env } from "@/env/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(env.STRIPE_SECRET_KEY!);
 
-const paymentsRouter = router({
-    create: procedure.output(z.string()).mutation(async ({ ctx }) => {
-        if (!ctx.session) {
-            throw new TRPCError({
-                code: "UNAUTHORIZED",
-                message: "Unauthorized",
-            });
-        }
-
+export const paymentsRouter = createTRPCRouter({
+    create: protectedProcedure.output(z.string()).mutation(async ({ ctx }) => {
         const user = await User.findOne({
             email: ctx.session?.user?.email,
         });
@@ -38,9 +31,9 @@ const paymentsRouter = router({
         const session = await stripe.checkout.sessions.create({
             mode: "payment",
             client_reference_id: user.email,
-            line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-            success_url: process.env.NEXTAUTH_URL + "/lunch",
-            cancel_url: process.env.NEXTAUTH_URL,
+            line_items: [{ price: env.STRIPE_PRICE_ID, quantity: 1 }],
+            success_url: env.NEXTAUTH_URL + "/lunch",
+            cancel_url: env.NEXTAUTH_URL,
             allow_promotion_codes: true,
         });
 
@@ -53,5 +46,3 @@ const paymentsRouter = router({
         return session.url;
     }),
 });
-
-export default paymentsRouter;

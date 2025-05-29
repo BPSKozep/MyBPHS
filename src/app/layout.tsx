@@ -4,12 +4,12 @@ import "@fontsource-variable/roboto-slab";
 import "@fontsource/lily-script-one";
 import "./globals.css";
 
-import OnlyAuthed from "components/OnlyAuthed";
-import Providers from "./providers";
-import MainHeader from "components/MainHeader";
-import IdentifyUser from "components/IdentifyUser";
-import { Metadata, Viewport } from "next";
-import PageTransition from "components/PageTransition";
+import OnlyAuthed from "@/components/OnlyAuthed";
+import Providers from "@/app/providers";
+import MainHeader from "@/components/MainHeader";
+import IdentifyUser from "@/components/IdentifyUser";
+import type { Metadata, Viewport } from "next";
+import PageTransition from "@/components/PageTransition";
 
 const metadata: Metadata = {
     applicationName: "MyBPHS",
@@ -35,14 +35,6 @@ const metadata: Metadata = {
     },
 };
 
-if (process.env.MONGODB_DATABASE === "dev-mybphs") {
-    metadata.applicationName = "MyBPHS - Dev";
-    metadata.title = {
-        default: "MyBPHS - Dev",
-        template: "%s - MyBPHS - Dev",
-    };
-}
-
 export { metadata };
 
 export const viewport: Viewport = {
@@ -60,7 +52,7 @@ export default function RootLayout({
                 <Providers>
                     <OnlyAuthed>
                         <IdentifyUser>
-                            <div className="box-border flex h-[100vh] w-full flex-col">
+                            <div className="box-border flex h-screen w-full flex-col">
                                 <MainHeader />
                                 <PageTransition>{children}</PageTransition>
                             </div>

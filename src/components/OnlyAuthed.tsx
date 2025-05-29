@@ -1,25 +1,27 @@
 "use client";
 
-import { PropsWithChildren, useEffect } from "react";
+import { type PropsWithChildren, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
-import Loading from "components/Loading";
+import Loading from "@/components/Loading";
 import { usePathname } from "next/navigation";
 
 const AUTH_WHITELIST = ["/auth/signin", "/forbidden"];
 
-function OnlyAuthed({ children }: PropsWithChildren) {
-    const { status } = useSession();
+export default function OnlyAuthed({ children }: PropsWithChildren) {
+    const session = useSession();
     const path = usePathname();
 
     const enabled = !AUTH_WHITELIST.includes(path);
 
     useEffect(() => {
-        if (status === "unauthenticated" && enabled) {
-            signIn();
+        if (session.status === "unauthenticated" && enabled) {
+            signIn().catch((error) => {
+                console.error(error);
+            });
         }
-    }, [status, path, enabled]);
+    }, [session.status, path, enabled]);
 
-    if (status === "authenticated" || !enabled) return children;
+    if (session.status === "authenticated" || !enabled) return children;
     else {
         return (
             <div className="flex h-screen items-center justify-center text-xl font-bold">
@@ -28,5 +30,3 @@ function OnlyAuthed({ children }: PropsWithChildren) {
         );
     }
 }
-
-export default OnlyAuthed;

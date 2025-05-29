@@ -1,11 +1,11 @@
 import React from "react";
-import PageWithHeader from "components/PageWithHeader";
-import Card from "components/Card";
-import LunchOrders from "components/admin/LunchOrders";
-import OnlyRoles from "components/OnlyRoles";
-import TokenCheck from "components/admin/TokenCheck";
-import CloseMenuOrders from "components/admin/CloseMenuOrders";
-import SetMenuAndSendEmail from "components/admin/SetMenuAndSendEmail";
+import PageWithHeader from "@/components/PageWithHeader";
+import Card from "@/components/Card";
+import LunchOrders from "@/components/admin/LunchOrders";
+import OnlyRoles from "@/components/OnlyRoles";
+import TokenCheck from "@/components/admin/TokenCheck";
+import CloseMenuOrders from "@/components/admin/CloseMenuOrders";
+import SetMenuAndSendEmail from "@/components/admin/SetMenuAndSendEmail";
 
 export const metadata = {
     title: "Admin / Ebédrendelés",
@@ -25,7 +25,7 @@ export default function LunchAdmin() {
                     <Card>
                         <div className="flex flex-col items-center justify-center text-center">
                             <CloseMenuOrders />
-                            <hr className="border-1 my-5 h-1 w-full bg-gray-900" />
+                            <hr className="my-5 h-1 w-full border bg-gray-900" />
                             <TokenCheck />
                         </div>
                     </Card>

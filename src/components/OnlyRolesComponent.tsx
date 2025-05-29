@@ -1,24 +1,18 @@
-"use client";
+import { type PropsWithChildren, type ReactNode } from "react";
+import { api } from "@/trpc/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/server/auth";
 
-import { useSession } from "next-auth/react";
-import { PropsWithChildren, ReactNode, useMemo } from "react";
-import { trpc } from "utils/trpc";
-
-function OnlyRolesComponent({
+export default async function OnlyRolesComponent({
     roles,
     fallback,
     children,
 }: { roles: string[]; fallback?: ReactNode } & PropsWithChildren) {
-    const { data } = useSession();
-    const { data: user } = trpc.user.get.useQuery(data?.user?.email || "");
-    const isAllowed = useMemo(
-        () => roles.some((role) => user && user.roles.indexOf(role) !== -1),
-        [roles, user]
-    );
+    const session = await getServerSession(authOptions);
+    const user = await api.user.get(session?.user?.email ?? "");
+    const isAllowed = roles.some((role) => user?.roles.includes(role));
 
     if (isAllowed) return children;
 
     return fallback;
 }
-
-export default OnlyRolesComponent;

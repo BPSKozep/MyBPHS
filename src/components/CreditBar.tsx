@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 const months = [
     "Szeptember",
@@ -22,7 +22,7 @@ const creditClasses = {
     PENDING: "bg-[#C3C182] h-4 w-4 rounded-full",
 };
 
-function CreditBar({
+export default function CreditBar({
     progress,
     credits,
 }: {
@@ -32,18 +32,18 @@ function CreditBar({
     return (
         <>
             <div className="flex h-40 flex-col items-stretch overflow-auto rounded-lg">
-                <div className="relative h-[70%] min-w-[65rem] bg-[#242424]">
+                <div className="relative h-[70%] min-w-260 bg-[#242424]">
                     <div className="rounded-full">
                         <motion.div
-                            className={`pointer-events-none absolute left-0 top-1/2 mx-[1.5%] h-10 w-[97%] -translate-y-1/2 ${
+                            className={`pointer-events-none absolute top-1/2 left-0 mx-[1.5%] h-10 w-[97%] -translate-y-1/2 ${
                                 progress === 0 ? "rounded-lg" : "rounded-l-lg"
-                            } bg-[#133B57] [transform-origin:0%_50%]`}
+                            } origin-[0%_50%] bg-[#133B57]`}
                             initial={{ width: 0 }}
                             animate={{
                                 width: `${(() => {
                                     const clampedProgress = Math.min(
                                         Math.max(progress * 100, 0),
-                                        100
+                                        100,
                                     );
 
                                     if (
@@ -58,7 +58,7 @@ function CreditBar({
                         ></motion.div>
                     </div>
 
-                    <div className="absolute left-0 right-0 top-1/2 mx-[2.5%] flex h-1.5 w-[95%] -translate-y-1/2 items-center justify-evenly rounded-lg bg-[#8F8F8F]">
+                    <div className="absolute top-1/2 right-0 left-0 mx-[2.5%] flex h-1.5 w-[95%] -translate-y-1/2 items-center justify-evenly rounded-lg bg-[#8F8F8F]">
                         <motion.div
                             className="absolute left-0 h-1.5 rounded-lg bg-[#838EC7]"
                             initial={{ width: 0 }}
@@ -66,7 +66,7 @@ function CreditBar({
                                 width: `${(() => {
                                     const clampedProgress = Math.min(
                                         Math.max(progress * 100, 0),
-                                        100
+                                        100,
                                     );
 
                                     return clampedProgress;
@@ -87,7 +87,7 @@ function CreditBar({
                         ))}
                     </div>
 
-                    <div className="pointer-events-none absolute left-0 top-1/2 mx-[1.5%] h-10 w-[97%] -translate-y-1/2">
+                    <div className="pointer-events-none absolute top-1/2 left-0 mx-[1.5%] h-10 w-[97%] -translate-y-1/2">
                         <motion.div
                             className="absolute h-10 w-1.5 -translate-x-1/2 rounded-lg bg-[#3F9E7C]"
                             initial={{ left: 0 }}
@@ -95,7 +95,7 @@ function CreditBar({
                                 left: `${(() => {
                                     const clampedProgress = Math.min(
                                         Math.max(progress * 100, 0),
-                                        100
+                                        100,
                                     );
 
                                     if (clampedProgress === 100)
@@ -107,7 +107,7 @@ function CreditBar({
                         ></motion.div>
                     </div>
                 </div>
-                <div className="box-border flex h-[30%] min-w-[65rem] items-center justify-between bg-[#565E85] px-[2.5%]">
+                <div className="box-border flex h-[30%] min-w-260 items-center justify-between bg-[#565E85] px-[2.5%]">
                     {months.map((month) => (
                         <span
                             className="w-[10%] text-center font-extrabold text-white"
@@ -121,5 +121,3 @@ function CreditBar({
         </>
     );
 }
-
-export default CreditBar;

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
-import { User } from "models";
+import { User } from "@/models";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
-    const signature = headers().get("stripe-signature") as string;
+    const signature = (await headers()).get("stripe-signature")!;
 
     const event = stripe.webhooks.constructEvent(
         await req.text(),
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
     if (!user || !user.blocked) {
         if (event.data.object.payment_intent)
-            stripe.refunds.create({
+            await stripe.refunds.create({
                 payment_intent: event.data.object.payment_intent as string,
             });
 

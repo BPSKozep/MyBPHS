@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import Card from "components/Card";
-import OrderForm from "components/OrderForm";
-import ClosedOrderForm from "components/ClosedOrderForm";
-import IconSubmitButton from "components/IconSubmitButton";
+import Card from "@/components/Card";
+import OrderForm from "@/components/OrderForm";
+import ClosedOrderForm from "@/components/ClosedOrderForm";
+import IconSubmitButton from "@/components/IconSubmitButton";
 import {
     FaEnvelope,
     FaArrowLeft,
@@ -12,15 +12,15 @@ import {
     FaEdit,
     FaChevronDown,
 } from "react-icons/fa";
-import { trpc } from "utils/trpc";
-import sleep from "utils/sleep";
-import { getWeek, getWeekYear } from "utils/isoweek";
-import menuCombine from "utils/menuCombine";
-import { AnimatePresence } from "framer-motion";
-import { motion } from "framer-motion";
-import IconButton from "components/IconButton";
+import { api } from "@/trpc/react";
+import sleep from "@/utils/sleep";
+import { getWeek, getWeekYear } from "@/utils/isoweek";
+import menuCombine from "@/utils/menuCombine";
+import { AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
+import IconButton from "@/components/IconButton";
 import { useSession } from "next-auth/react";
-import PageWithHeader from "components/PageWithHeader";
+import PageWithHeader from "@/components/PageWithHeader";
 import Paywall from "./Paywall";
 
 function LunchOrder() {
@@ -36,47 +36,51 @@ function LunchOrder() {
         return [getWeekYear(date), getWeek(date)];
     }, [weekOffset]);
 
-    const { data: menu, isLoading } = trpc.menu.get.useQuery({ year, week });
+    const menu = api.menu.get.useQuery({ year, week });
 
-    const { data: order, refetch: refetchOrder } = trpc.order.get.useQuery({
+    const order = api.order.get.useQuery({
         year,
         week,
     });
 
-    const orderExists = order && order.length > 0;
+    const orderExists = order.data && order.data.length > 0;
 
     const [selectedOptions, setSelectedOptions] = useState<string[]>(
         orderExists
-            ? order.map((day) => day.chosen)
+            ? (order.data?.map((day) => day.chosen) ?? [])
             : Array(5).fill("i_am_not_want_food"),
     );
 
     useEffect(() => {
         if (orderExists) {
-            setSelectedOptions(order.map((day) => day.chosen));
+            setSelectedOptions(order.data?.map((day) => day.chosen) ?? []);
         } else {
             setSelectedOptions(Array(5).fill("i_am_not_want_food"));
         }
-    }, [orderExists, weekOffset, order]);
+    }, [orderExists, weekOffset, order.data]);
 
-    const { mutateAsync: createOrder } = trpc.order.create.useMutation();
+    const createOrder = api.order.create.useMutation();
 
-    const { mutateAsync: editOrder } = trpc.order.edit.useMutation();
+    const editOrder = api.order.edit.useMutation();
 
-    const { mutateAsync: sendDiscordWebhook } =
-        trpc.webhook.sendDiscordWebhook.useMutation();
+    const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
 
     const showMenu =
-        menu &&
-        menu.options.length > 0 &&
-        (orderExists || menu.isOpenForOrders === true);
+        menu.data &&
+        menu.data.options.length > 0 &&
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        (orderExists || menu.data.isOpenForOrders);
 
-    const noMenu = !isLoading && (!menu || menu.options.length === 0);
+    const noMenu =
+        !menu.isLoading && (!menu.data || menu.data.options.length === 0);
 
     const menuClosed =
-        !isLoading && !noMenu && !orderExists && !menu?.isOpenForOrders;
+        !menu.isLoading &&
+        !noMenu &&
+        !orderExists &&
+        !menu.data?.isOpenForOrders;
 
-    const showText = isLoading || noMenu || menuClosed;
+    const showText = menu.isLoading || order.isLoading || noMenu || menuClosed;
 
     const userEmail = useSession().data?.user?.email;
 
@@ -99,11 +103,12 @@ function LunchOrder() {
                                                 );
                                                 setClosedMenuShown(false);
                                             }}
+                                            className="cursor-pointer"
                                         />
                                         <div className="text-center">
                                             <p className="mx-2 text-center text-lg font-bold md:text-xl">{`${year}. ${week}. hét`}</p>
                                             <p className="mx-2 text-center text-base font-bold md:text-lg">
-                                                {isLoading &&
+                                                {menu.isLoading &&
                                                     "Menü betöltése..."}
                                                 {noMenu &&
                                                     "Nincs még feltöltve a menü."}
@@ -119,6 +124,7 @@ function LunchOrder() {
                                                 );
                                                 setClosedMenuShown(false);
                                             }}
+                                            className="cursor-pointer"
                                         />
                                     </div>
                                     {menuClosed && (
@@ -197,7 +203,9 @@ function LunchOrder() {
                                                 className="overflow-hidden"
                                             >
                                                 <ClosedOrderForm
-                                                    options={menu.options}
+                                                    options={
+                                                        menu.data?.options ?? []
+                                                    }
                                                 />
                                             </motion.div>
                                         )}
@@ -207,9 +215,9 @@ function LunchOrder() {
                         )}
                         {showMenu && (
                             <Card>
-                                {orderExists && menu.isOpenForOrders && (
+                                {orderExists && menu.data.isOpenForOrders && (
                                     <div className="mb-5">
-                                        <div className="absolute -right-[0.9rem] -top-[0.9rem]">
+                                        <div className="absolute -top-[0.9rem] -right-[0.9rem]">
                                             <motion.button
                                                 whileHover={{ scale: 1.1 }}
                                                 whileFocus={{ scale: 1.1 }}
@@ -225,7 +233,7 @@ function LunchOrder() {
                                                     );
 
                                                     const newSelectedOptions =
-                                                        order.map(
+                                                        order.data?.map(
                                                             (day) => day.chosen,
                                                         );
 
@@ -234,7 +242,7 @@ function LunchOrder() {
                                                     );
                                                 }}
                                             >
-                                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-600 drop-shadow-2xl">
+                                                <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-slate-600 drop-shadow-2xl">
                                                     <FaEdit />
                                                 </div>
                                             </motion.button>
@@ -268,6 +276,7 @@ function LunchOrder() {
                                                 setClosedMenuShown(false);
                                             }}
                                             disabled={orderEditing}
+                                            className="cursor-pointer"
                                         />
                                         <div className="text-center">
                                             <p className="mx-2 text-center text-lg font-bold md:text-xl">{`${year}. ${week}. hét`}</p>
@@ -286,12 +295,13 @@ function LunchOrder() {
                                                 setClosedMenuShown(false);
                                             }}
                                             disabled={orderEditing}
+                                            className="cursor-pointer"
                                         />
                                     </motion.div>
 
                                     <>
                                         <OrderForm
-                                            options={menu.options.map(
+                                            options={menu.data?.options?.map(
                                                 (menuDay) => {
                                                     if (
                                                         !menuDay["a-menu"] &&
@@ -321,6 +331,7 @@ function LunchOrder() {
                                                     );
                                                 },
                                             )}
+                                            isEditing={orderEditing}
                                             selectedOptions={selectedOptions}
                                             onChange={(chosenOptions) => {
                                                 if (
@@ -357,7 +368,7 @@ function LunchOrder() {
                                                                     500,
                                                                 );
 
-                                                                await createOrder(
+                                                                await createOrder.mutateAsync(
                                                                     {
                                                                         week,
                                                                         year,
@@ -366,7 +377,7 @@ function LunchOrder() {
                                                                     },
                                                                 );
 
-                                                                await sendDiscordWebhook(
+                                                                await sendDiscordWebhook.mutateAsync(
                                                                     {
                                                                         type: "Lunch",
                                                                         message:
@@ -375,15 +386,37 @@ function LunchOrder() {
                                                                     },
                                                                 );
 
-                                                                sleep(
+                                                                await sleep(
                                                                     1700,
-                                                                ).then(() => {
-                                                                    refetchOrder();
-                                                                });
+                                                                )
+                                                                    .then(
+                                                                        () => {
+                                                                            order
+                                                                                .refetch()
+                                                                                .catch(
+                                                                                    (
+                                                                                        error,
+                                                                                    ) => {
+                                                                                        console.error(
+                                                                                            error,
+                                                                                        );
+                                                                                    },
+                                                                                );
+                                                                        },
+                                                                    )
+                                                                    .catch(
+                                                                        (
+                                                                            error,
+                                                                        ) => {
+                                                                            console.error(
+                                                                                error,
+                                                                            );
+                                                                        },
+                                                                    );
 
                                                                 return true;
                                                             } catch (err) {
-                                                                await sendDiscordWebhook(
+                                                                await sendDiscordWebhook.mutateAsync(
                                                                     {
                                                                         type: "Error",
                                                                         message:
@@ -421,7 +454,7 @@ function LunchOrder() {
                                                                     500,
                                                                 );
 
-                                                                await editOrder(
+                                                                await editOrder.mutateAsync(
                                                                     {
                                                                         week,
                                                                         year,
@@ -430,11 +463,11 @@ function LunchOrder() {
                                                                     },
                                                                 );
 
-                                                                await setOrderEditing(
+                                                                setOrderEditing(
                                                                     false,
                                                                 );
 
-                                                                await sendDiscordWebhook(
+                                                                await sendDiscordWebhook.mutateAsync(
                                                                     {
                                                                         type: "Lunch",
                                                                         message:
@@ -445,7 +478,7 @@ function LunchOrder() {
 
                                                                 return true;
                                                             } catch (err) {
-                                                                await sendDiscordWebhook(
+                                                                await sendDiscordWebhook.mutateAsync(
                                                                     {
                                                                         type: "Error",
                                                                         message:

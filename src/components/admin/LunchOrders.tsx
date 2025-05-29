@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { trpc } from "utils/trpc";
-import { getWeek, getWeekYear } from "utils/isoweek";
-import menuCombine from "utils/menuCombine";
-import Loading from "components/Loading";
+import { api } from "@/trpc/react";
+import { getWeek, getWeekYear } from "@/utils/isoweek";
+import menuCombine from "@/utils/menuCombine";
+import Loading from "@/components/Loading";
 
 const days = [
     "Hétfő",
@@ -16,7 +16,7 @@ const days = [
     "Vasárnap",
 ];
 
-function Orders() {
+export default function Orders() {
     const nextWeek = useMemo(() => {
         const date = new Date();
 
@@ -31,7 +31,7 @@ function Orders() {
         data: orderCounts,
         isLoading: isOrderCountsLoading,
         error: isOrderCountsError,
-    } = trpc.order.getOrderCounts.useQuery({
+    } = api.order.getOrderCounts.useQuery({
         year,
         week,
     });
@@ -40,16 +40,16 @@ function Orders() {
         data: menu,
         isLoading: isMenuLoading,
         isError: isMenuError,
-    } = trpc.menu.get.useQuery({
+    } = api.menu.get.useQuery({
         year,
         week,
     });
 
     const isLoading = isOrderCountsLoading || isMenuLoading;
-    const isError = isOrderCountsError || isMenuError;
+    const isError = isOrderCountsError ?? isMenuError;
 
     const displayTable =
-        !isLoading && !isError && (orderCounts?.length || 0) > 0;
+        !isLoading && !isError && (orderCounts?.length ?? 0) > 0;
 
     return (
         <>
@@ -61,7 +61,7 @@ function Orders() {
                     <input
                         type="number"
                         value={year}
-                        className="m-2 w-44 rounded-md border-none p-2 text-center font-bold text-black"
+                        className="m-2 w-44 rounded-md border-none bg-white p-2 text-center font-bold text-black"
                         min={2020}
                         onChange={(e) => {
                             setYear(Number(e.target.value));
@@ -71,7 +71,7 @@ function Orders() {
                     <input
                         type="number"
                         value={week}
-                        className="m-2 w-44 rounded-md border-none p-2 text-center font-bold text-black"
+                        className="m-2 w-44 rounded-md border-none bg-white p-2 text-center font-bold text-black"
                         min={1}
                         max={56}
                         onChange={(e) => {
@@ -143,17 +143,17 @@ function Orders() {
                                                         className="mt-2"
                                                         key={optionIndex}
                                                     >
-                                                        <td className="whitespace-normal break-words bg-gray-900 px-6 py-3 text-left text-sm font-medium text-gray-100">
+                                                        <td className="bg-gray-900 px-6 py-3 text-left text-sm font-medium break-words whitespace-normal text-gray-100">
                                                             {
                                                                 menuCombine(
                                                                     menu
                                                                         .options[
                                                                         dayIndex
-                                                                    ],
+                                                                    ] ?? {},
                                                                 )[option]
                                                             }
                                                         </td>
-                                                        <td className="whitespace-nowrap bg-gray-900 px-6 py-3 text-center text-sm font-medium text-gray-100">
+                                                        <td className="bg-gray-900 px-6 py-3 text-center text-sm font-medium whitespace-nowrap text-gray-100">
                                                             {count}
                                                         </td>
                                                     </tr>
@@ -169,5 +169,3 @@ function Orders() {
         </>
     );
 }
-
-export default Orders;

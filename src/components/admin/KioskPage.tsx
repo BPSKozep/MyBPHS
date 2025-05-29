@@ -1,16 +1,16 @@
 "use client";
 
-import OnlyRoles from "components/OnlyRoles";
-import PageWithHeader from "components/PageWithHeader";
+import OnlyRoles from "@/components/OnlyRoles";
+import PageWithHeader from "@/components/PageWithHeader";
 import { FaCheck, FaUser, FaWrench } from "react-icons/fa";
-import IconButton from "components/IconButton";
+import IconButton from "@/components/IconButton";
 import React, { useEffect, useMemo, useState } from "react";
-import { trpc } from "utils/trpc";
-import OrderCounts from "components/OrderCounts";
+import { api } from "@/trpc/react";
+import OrderCounts from "@/components/OrderCounts";
 import { io } from "socket.io-client";
-import Loading from "components/Loading";
+import Loading from "@/components/Loading";
 
-function KioskPage() {
+export default function KioskPage() {
     const [nfcId, setNfcId] = useState("");
     const [primarySocketFailed, setPrimarySocketFailed] = useState(false);
     const devTags = ["8b2a1345", "4bf41145", "00000000"];
@@ -22,18 +22,18 @@ function KioskPage() {
         data: order,
         isLoading: orderloading,
         error: orderError,
-    } = trpc.order.getOrCreateOrderByNfc.useQuery(nfcId, {
+    } = api.order.getOrCreateOrderByNfc.useQuery(nfcId, {
         staleTime: Infinity,
-        cacheTime: 0,
+        gcTime: 0,
         enabled: !!nfcId,
     });
     const {
         data: user,
         isLoading: userLoading,
         error: userError,
-    } = trpc.user.getUserByNfcId.useQuery(nfcId, {
+    } = api.user.getUserByNfcId.useQuery(nfcId, {
         staleTime: Infinity,
-        cacheTime: 0,
+        gcTime: 0,
         enabled: !!nfcId,
     });
 
@@ -67,14 +67,13 @@ function KioskPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const { mutate: setCompleted } = trpc.order.setCompleted.useMutation();
+    const setCompleted = api.order.setCompleted.useMutation();
 
-    const { mutateAsync: saveKiosk } = trpc.kiosk.save.useMutation();
-    const { data: kioskCounts, refetch: kioskCountsRefetch } =
-        trpc.kiosk.get.useQuery();
+    const saveKiosk = api.kiosk.save.useMutation();
+    const kioskCounts = api.kiosk.get.useQuery();
 
     const loading = orderloading || userLoading;
-    const error = !loading && (orderError || userError || socketFailure);
+    const error = !loading && (orderError ?? userError ?? socketFailure);
 
     const isValidNfc = nfcId.length === 8;
 
@@ -86,16 +85,18 @@ function KioskPage() {
     const orderCounts = useMemo(() => {
         if (!kioskCounts) return {};
 
-        return Object.fromEntries(kioskCounts);
+        return Object.fromEntries(kioskCounts.data ?? []);
     }, [kioskCounts]);
 
     useEffect(() => {
         if (order && !order.orderError) {
-            setCompleted({ nfcId });
+            setCompleted.mutate({ nfcId });
             (async () => {
-                await saveKiosk(order.order);
-                kioskCountsRefetch();
-            })();
+                await saveKiosk.mutateAsync(order.order);
+                await kioskCounts.refetch();
+            })().catch((error) => {
+                console.error(error);
+            });
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,7 +117,9 @@ function KioskPage() {
                                             devTags.indexOf(prevId);
                                         const nextIndex =
                                             (currentIndex + 1) % devTags.length;
-                                        return devTags[nextIndex];
+                                        return (
+                                            devTags[nextIndex] ?? devTags[0]!
+                                        );
                                     });
                                 }}
                             />
@@ -124,7 +127,7 @@ function KioskPage() {
 
                         <div className="inline-flex items-center">
                             <div className="has-tooltip relative">
-                                <span className="tooltip absolute -left-[12.8rem] -top-2 transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
+                                <span className="tooltip absolute -top-2 -left-[12.8rem] transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
                                     Fejlesztői mód aktiválva
                                 </span>
                                 <FaWrench />
@@ -134,7 +137,7 @@ function KioskPage() {
                 ) : (
                     <div className="inline-flex items-center">
                         <div className="has-tooltip relative">
-                            <span className="tooltip absolute -left-[14.5rem] -top-2 transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
+                            <span className="tooltip absolute -top-2 -left-58 transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
                                 Csatlakoztatva a helyi sockethez
                             </span>
                             <FaCheck />
@@ -198,5 +201,3 @@ function KioskPage() {
         </PageWithHeader>
     );
 }
-
-export default KioskPage;

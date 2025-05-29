@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { trpc } from "utils/trpc";
-import IconSubmitButton from "components/IconSubmitButton";
+import { api } from "@/trpc/react";
+import IconSubmitButton from "@/components/IconSubmitButton";
 import { FaEnvelope } from "react-icons/fa6";
-import sleep from "utils/sleep";
-import { getWeek, getWeekYear } from "utils/isoweek";
-import SetMenuForm from "components/admin/SetMenuForm";
+import sleep from "@/utils/sleep";
+import { getWeek, getWeekYear } from "@/utils/isoweek";
+import SetMenuForm from "@/components/admin/SetMenuForm";
 
-function SetMenuAndSendEmail() {
+export default function SetMenuAndSendEmail() {
     const [menuOptions, setMenuOptions] = useState(
         Array(5)
             .fill(0)
@@ -20,17 +20,16 @@ function SetMenuAndSendEmail() {
             }),
     );
 
-    const { mutateAsync: createMenu } = trpc.menu.create.useMutation();
+    const createMenu = api.menu.create.useMutation();
 
-    const { mutateAsync: sendEmail } = trpc.email.sendLunchEmail.useMutation();
+    const sendEmail = api.email.sendLunchEmail.useMutation();
 
-    const { mutateAsync: sendDiscordWebhook } =
-        trpc.webhook.sendDiscordWebhook.useMutation();
+    const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
 
     return (
         <div className="flex flex-col items-center justify-center">
             <SetMenuForm onChange={setMenuOptions} />
-            <h2 className="mb-3 mt-5 text-white">Mentés és email kiküldése:</h2>
+            <h2 className="mt-5 mb-3 text-white">Mentés és email kiküldése:</h2>
             <div>
                 <IconSubmitButton
                     icon={<FaEnvelope />}
@@ -41,15 +40,15 @@ function SetMenuAndSendEmail() {
                             const date = new Date();
                             date.setDate(date.getDate() + 7);
 
-                            await createMenu({
+                            await createMenu.mutateAsync({
                                 options: menuOptions,
                                 week: getWeek(date),
                                 year: getWeekYear(date),
                             });
 
-                            await sendEmail();
+                            await sendEmail.mutateAsync();
 
-                            await sendDiscordWebhook({
+                            await sendDiscordWebhook.mutateAsync({
                                 type: "Lunch",
                                 message:
                                     "Új menü feltöltve, email kiküldve. 📩",
@@ -57,7 +56,7 @@ function SetMenuAndSendEmail() {
 
                             return true;
                         } catch (err) {
-                            await sendDiscordWebhook({
+                            await sendDiscordWebhook.mutateAsync({
                                 type: "Error",
                                 message: String(err),
                             });
@@ -77,5 +76,3 @@ function SetMenuAndSendEmail() {
         </div>
     );
 }
-
-export default SetMenuAndSendEmail;
