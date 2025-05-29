@@ -33,7 +33,6 @@
     "nanoid": "^5.0.7",
     "next": "15.3.2",
     "next-auth": "^4.24.11",
-    "next-intl": "^3.26.3",
     "posthog-js": "^1.235.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
