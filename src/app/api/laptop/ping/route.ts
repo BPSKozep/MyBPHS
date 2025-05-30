@@ -1,11 +1,4 @@
-import { getServerAuthSession } from "@/server/auth";
-
 export async function GET() {
-    const session = await getServerAuthSession();
-
-    if (!session?.user?.name)
-        return new Response("Unauthorized", { status: 401 });
-
     try {
         const puResponse = await fetch("https://pu.bpskozep.hu");
         if (puResponse.status === 200) {
