@@ -354,58 +354,7 @@ export const userRouter = createTRPCRouter({
 
             return user?.nfcId ?? "";
         }),
-    setAutoOrder: protectedProcedure
-        .input(
-            z.strictObject({
-                chosenOptions: z.string().array(),
-            }),
-        )
-        .mutation(async ({ ctx, input }) => {
-            const authorized = await checkRoles(ctx.session, [
-                "student",
-                "teacher",
-                "lunch-system",
-            ]);
 
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
-            }
-
-            await User.findOneAndUpdate(
-                { email: ctx.session.user?.email },
-                {
-                    $set: {
-                        autoOrder: input.chosenOptions.map((option) => ({
-                            chosen: option,
-                        })),
-                    },
-                },
-                { upsert: true },
-            );
-        }),
-    getAutoOrder: protectedProcedure
-        .output(z.string().array())
-        .query(async ({ ctx }) => {
-            const authorized = await checkRoles(ctx.session, [
-                "student",
-                "teacher",
-                "lunch-system",
-            ]);
-
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
-            }
-
-            const user = await User.findOne({ email: ctx.session.user?.email });
-            console.log(user?.autoOrder?.map((option) => option.chosen));
-            return user?.autoOrder?.map((option) => option.chosen) ?? [];
-        }),
     toggleBlocked: protectedProcedure
         .input(z.string())
         .mutation(async ({ ctx, input }) => {
