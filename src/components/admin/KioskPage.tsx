@@ -111,6 +111,7 @@ export default function KioskPage() {
                         <div className="inline pr-3">
                             <IconButton
                                 icon={<FaUser />}
+                                className="cursor-pointer"
                                 onClick={() => {
                                     setNfcId((prevId) => {
                                         const currentIndex =
@@ -126,22 +127,12 @@ export default function KioskPage() {
                         </div>
 
                         <div className="inline-flex items-center">
-                            <div className="has-tooltip relative">
-                                <span className="tooltip absolute -top-2 -left-[12.8rem] transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
-                                    Fejlesztői mód aktiválva
-                                </span>
-                                <FaWrench />
-                            </div>
+                            <FaWrench />
                         </div>
                     </>
                 ) : (
                     <div className="inline-flex items-center">
-                        <div className="has-tooltip relative">
-                            <span className="tooltip absolute -top-2 -left-58 transform rounded-lg bg-slate-800 p-2 text-center text-white shadow-lg transition-all">
-                                Csatlakoztatva a helyi sockethez
-                            </span>
-                            <FaCheck />
-                        </div>
+                        <FaCheck />
                     </div>
                 )
             }

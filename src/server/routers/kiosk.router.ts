@@ -60,13 +60,9 @@ export const kioskRouter = createTRPCRouter({
             });
 
             if (!kiosk) {
-                throw new TRPCError({
-                    code: "NOT_FOUND",
-                    message: "No kiosk data found",
-                });
+                return [];
             }
 
-            // get data
             return Array.from(kiosk.options.entries());
         }),
 });
