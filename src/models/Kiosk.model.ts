@@ -13,6 +13,6 @@ const kioskSchema = new Schema<IKiosk>({
 });
 
 const Kiosk: Model<IKiosk> =
-    mongoose.models.Kiosk || model("Kiosk", kioskSchema);
+    mongoose.models.Kiosk ?? model("Kiosk", kioskSchema);
 
 export default Kiosk;

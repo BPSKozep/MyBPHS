@@ -1,16 +1,17 @@
 import { z } from "zod";
-import { procedure, router } from "server/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
-import { User } from "models";
+import { User } from "@/models";
 import { TRPCError } from "@trpc/server";
-import Group, { IGroup } from "models/Group.model";
-import { Document } from "mongoose";
-import { IGroupOverride } from "models/GroupOverride.model";
-import { checkRoles } from "utils/authorization";
-import { IUser } from "models/User.model";
+import Group from "@/models/Group.model";
+import type { IGroup } from "@/models/Group.model";
+import type { Document } from "mongoose";
+import type { IGroupOverride } from "@/models/GroupOverride.model";
+import { checkRoles } from "@/utils/authorization";
+import type { IUser } from "@/models/User.model";
 
-const userRouter = router({
-    get: procedure
+export const userRouter = createTRPCRouter({
+    get: protectedProcedure
         .input(z.string().email())
         .output(
             z
@@ -23,13 +24,6 @@ const userRouter = router({
                 .nullable(),
         )
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, ["administrator"]);
 
             const requester = await User.findOne({
@@ -47,7 +41,7 @@ const userRouter = router({
                 "-_id -__v",
             );
         }),
-    getUserByNfcId: procedure
+    getUserByNfcId: protectedProcedure
         .input(z.string())
         .output(
             z
@@ -60,13 +54,6 @@ const userRouter = router({
                 .nullable(),
         )
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "lunch-system",
@@ -83,7 +70,7 @@ const userRouter = router({
                 "-_id -__v",
             );
         }),
-    createMany: procedure
+    createMany: protectedProcedure
         .input(
             z.strictObject({
                 names: z.string().array(),
@@ -93,13 +80,6 @@ const userRouter = router({
             }),
         )
         .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, ["administrator"]);
 
             if (!authorized) {
@@ -109,29 +89,47 @@ const userRouter = router({
                 });
             }
 
-            const users: IUser[] = input.names.map((_, index) => {
+            // Ensure all arrays have the same length
+            const length = input.names.length;
+            if (
+                input.emails.length !== length ||
+                input.roles.length !== length ||
+                input.nfcIds.length !== length
+            ) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "All input arrays must have the same length",
+                });
+            }
+
+            const users: IUser[] = input.names.map((name, index) => {
+                const email = input.emails[index];
+                const roles = input.roles[index];
+                const nfcId = input.nfcIds[index];
+
+                // TypeScript now knows these are defined due to length check above
+                if (!email || !roles || !nfcId) {
+                    throw new TRPCError({
+                        code: "BAD_REQUEST",
+                        message: "Missing required fields",
+                    });
+                }
+
                 return {
-                    name: input.names[index],
-                    email: input.emails[index],
-                    roles: input.roles[index],
-                    nfcId: input.nfcIds[index],
+                    name,
+                    email,
+                    roles,
+                    nfcId,
                     groups: [],
                 };
             });
 
             await User.insertMany<IUser>(users);
         }),
-    getTimetable: procedure
+    getTimetable: protectedProcedure
         .input(z.string().email())
         .output(z.string().nullable().array().array())
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, ["administrator"]);
 
             const requester = await User.findOne({
@@ -157,8 +155,8 @@ const userRouter = router({
                 isOverride: boolean;
             }[] = [];
 
-            for (const group of user?.groups || []) {
-                const groupObj: IGroupOverride = group.toObject();
+            for (const group of user?.groups ?? []) {
+                const groupObj = group.toObject() as IGroupOverride;
 
                 timetables.push({
                     timetable: groupObj.timetable,
@@ -168,7 +166,7 @@ const userRouter = router({
                 });
 
                 for (const override of group.overrides) {
-                    const overrideObj: IGroupOverride = override.toObject();
+                    const overrideObj = override.toObject() as IGroupOverride;
 
                     timetables.push({
                         timetable: overrideObj.timetable,
@@ -213,6 +211,9 @@ const userRouter = router({
                     }
 
                     for (const [j, lesson] of day.entries()) {
+                        // Ensure the day array exists and has the required index
+                        compiled_timetable[i] ??= [];
+
                         if (
                             lesson ||
                             !compiled_timetable[i][j] ||
@@ -225,7 +226,7 @@ const userRouter = router({
 
             return compiled_timetable;
         }),
-    batchUpdateGroups: procedure
+    batchUpdateGroups: protectedProcedure
         .input(
             z.strictObject({
                 mode: z.enum(["add", "remove", "replace"]),
@@ -238,13 +239,6 @@ const userRouter = router({
             }),
         )
         .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "teacher",
@@ -300,7 +294,7 @@ const userRouter = router({
                 }
             }
         }),
-    list: procedure
+    list: protectedProcedure
         .input(z.enum(["all", "student", "teacher", "administrator"]))
         .output(
             z.array(
@@ -312,13 +306,6 @@ const userRouter = router({
             ),
         )
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, ["administrator"]);
 
             if (!authorized) {
@@ -343,20 +330,13 @@ const userRouter = router({
             return users.map((user) => ({
                 email: user.email,
                 name: user.name,
-                blocked: user.blocked || false,
+                blocked: user.blocked ?? false,
             }));
         }),
-    getNfcId: procedure
+    getNfcId: protectedProcedure
         .input(z.string().email())
         .output(z.string())
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "student",
                 "teacher",
@@ -372,84 +352,12 @@ const userRouter = router({
 
             const user = await User.findOne({ email: input });
 
-            return user?.nfcId || "";
+            return user?.nfcId ?? "";
         }),
-    setAutoOrder: procedure
-        .input(
-            z.strictObject({
-                chosenOptions: z.string().array(),
-            }),
-        )
-        .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
 
-            const authorized = await checkRoles(ctx.session, [
-                "student",
-                "teacher",
-                "lunch-system",
-            ]);
-
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
-            }
-
-            await User.findOneAndUpdate(
-                { email: ctx.session.user?.email },
-                {
-                    $set: {
-                        autoOrder: input.chosenOptions.map((option) => ({
-                            chosen: option,
-                        })),
-                    },
-                },
-                { upsert: true },
-            );
-        }),
-    getAutoOrder: procedure
-        .output(z.string().array())
-        .query(async ({ ctx }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
-            const authorized = await checkRoles(ctx.session, [
-                "student",
-                "teacher",
-                "lunch-system",
-            ]);
-
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
-            }
-
-            const user = await User.findOne({ email: ctx.session.user?.email });
-            console.log(user?.autoOrder?.map((option) => option.chosen));
-            return user?.autoOrder?.map((option) => option.chosen) || [];
-        }),
-    toggleBlocked: procedure
+    toggleBlocked: protectedProcedure
         .input(z.string())
         .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, ["administrator"]);
 
             if (!authorized) {
@@ -477,5 +385,3 @@ const userRouter = router({
             return "OK";
         }),
 });
-
-export default userRouter;

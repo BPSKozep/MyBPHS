@@ -16,6 +16,6 @@ const menuSchema = new Schema<IMenu>({
     isOpenForOrders: { type: Boolean, default: true },
 });
 
-const Menu: Model<IMenu> = mongoose.models.Menu || model("Menu", menuSchema);
+const Menu: Model<IMenu> = mongoose.models.Menu ?? model("Menu", menuSchema);
 
 export default Menu;

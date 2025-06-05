@@ -1,8 +1,8 @@
 import { FaHome } from "react-icons/fa";
 import Link from "next/link";
-import React, { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 
-function PageHeader({
+export default function PageHeader({
     title,
     homeLocation = "/",
     rightContent,
@@ -12,7 +12,7 @@ function PageHeader({
     rightContent?: ReactNode;
 }) {
     return (
-        <header className="static flex h-16 flex-shrink-0 select-none items-center justify-center">
+        <header className="static flex h-16 shrink-0 items-center justify-center select-none">
             <div className="flex cursor-default items-center text-white">
                 <Link href={homeLocation} className="absolute left-7">
                     <FaHome className="h-5 w-5" />
@@ -27,5 +27,3 @@ function PageHeader({
         </header>
     );
 }
-
-export default PageHeader;

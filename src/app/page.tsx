@@ -1,5 +1,5 @@
-import BigLinkButton from "components/BigLinkButton";
-import OnlyRolesComponent from "components/OnlyRolesComponent";
+import BigLinkButton from "@/components/BigLinkButton";
+import OnlyRolesComponent from "@/components/OnlyRolesComponent";
 
 export default function Home() {
     return (
@@ -10,9 +10,14 @@ export default function Home() {
                     <BigLinkButton
                         title="Laptop jelszó"
                         url="/laptop-password"
+                        statuswebsites={["/api/laptop/ping"]}
                     />
                     <BigLinkButton title="Órarend" url="/timetable" disabled />
-                    <BigLinkButton title="Chat ✨" url="/chat" />
+                    <BigLinkButton
+                        title="Chat ✨"
+                        url="/chat"
+                        statuswebsites={["/api/chat/ping"]}
+                    />
                     <OnlyRolesComponent roles={["administrator"]}>
                         <BigLinkButton title="Admin" url="/admin" />
                     </OnlyRolesComponent>

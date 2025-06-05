@@ -1,28 +1,21 @@
 import { z } from "zod";
-import { procedure, router } from "server/trpc";
-import { Menu } from "models";
-import { IMenu } from "models/Menu.model";
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
+import { Menu } from "@/models";
+import type { IMenu } from "@/models/Menu.model";
 import { TRPCError } from "@trpc/server";
-import { getWeek, getWeekYear } from "utils/isoweek";
-import { checkRoles } from "utils/authorization";
+import { getWeek, getWeekYear } from "@/utils/isoweek";
+import { checkRoles } from "@/utils/authorization";
 
-const menuRouter = router({
-    get: procedure
+export const menuRouter = createTRPCRouter({
+    get: protectedProcedure
         .input(z.strictObject({ week: z.number(), year: z.number() }))
         .output(
             z.strictObject({
                 options: z.record(z.string()).array(),
                 isOpenForOrders: z.boolean(),
-            })
+            }),
         )
-        .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
+        .query(async ({ input }) => {
             const menu = await Menu.findOne({
                 week: input.week,
                 year: input.year,
@@ -35,22 +28,15 @@ const menuRouter = router({
                 isOpenForOrders: menu.isOpenForOrders,
             };
         }),
-    create: procedure
+    create: protectedProcedure
         .input(
             z.strictObject({
                 week: z.number().optional(),
                 year: z.number().optional(),
                 options: z.record(z.string()).array(),
-            })
+            }),
         )
         .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, ["administrator"]);
 
             if (!authorized) {
@@ -62,8 +48,8 @@ const menuRouter = router({
 
             const date = new Date();
 
-            const week = input.week || getWeek(date);
-            const year = input.year || getWeekYear(date);
+            const week = input.week ?? getWeek(date);
+            const year = input.year ?? getWeekYear(date);
 
             const menu = await Menu.exists({
                 week,
@@ -84,22 +70,15 @@ const menuRouter = router({
                 isOpenForOrders: true,
             }).save();
         }),
-    setIsopen: procedure
+    setIsopen: protectedProcedure
         .input(
             z.strictObject({
                 week: z.number(),
                 year: z.number(),
                 isOpen: z.boolean(),
-            })
+            }),
         )
         .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, ["administrator"]);
 
             if (!authorized) {
@@ -131,5 +110,3 @@ const menuRouter = router({
             await menu.save();
         }),
 });
-
-export default menuRouter;

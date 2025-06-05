@@ -13,6 +13,8 @@ import {
 
 import * as React from "react";
 
+import { env } from "@/env/client";
+
 function Lunch() {
     return (
         <Html>
@@ -27,7 +29,7 @@ function Lunch() {
                                 height="42"
                             ></Img>
                             <Hr />
-                            <Text className="text-lg font-bold leading-6 text-white">
+                            <Text className="text-lg leading-6 font-bold text-white">
                                 Kedves diákok és tanárok!
                             </Text>
                             <Text className="text-lg leading-6 text-white">
@@ -38,7 +40,7 @@ function Lunch() {
                             <Section className="text-center">
                                 <Button
                                     className="w-96 cursor-pointer justify-center rounded-lg bg-slate-700 p-5 text-xl font-bold text-white"
-                                    href={`https://${process.env.NEXT_PUBLIC_EMAIL_DOMAIN}/lunch`}
+                                    href={`https://${env.NEXT_PUBLIC_EMAIL_DOMAIN}/lunch`}
                                 >
                                     Megrendelem
                                 </Button>

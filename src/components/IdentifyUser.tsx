@@ -2,7 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import posthog from "posthog-js";
-import { PropsWithChildren, useEffect } from "react";
+import type { PropsWithChildren } from "react";
+import { useEffect } from "react";
 
 export default function IdentifyUser({ children }: PropsWithChildren) {
     const { data } = useSession();

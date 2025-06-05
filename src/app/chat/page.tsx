@@ -1,32 +1,40 @@
 "use client";
 
-import PageWithHeader from "components/PageWithHeader";
+import PageWithHeader from "@/components/PageWithHeader";
 import React, { useEffect, useState } from "react";
 
 import { useChat } from "ai/react";
 import { FaPaperPlane } from "react-icons/fa";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import Loading from "components/Loading";
-import { motion } from "framer-motion";
+import Loading from "@/components/Loading";
+import { motion } from "motion/react";
 
-function Chat() {
+export default function Chat() {
     const { messages, input, handleInputChange, handleSubmit } = useChat();
 
     const [chatShown, setChatShown] = useState(false);
 
     const [chatAvailable, setChatAvailable] = useState(false);
 
-    setTimeout(() => {
-        setChatShown(true);
-    }, 3000);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setChatShown(true);
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
-        fetch("/api/chat/ping").then((response) => {
-            if (response.status === 200) {
-                setChatAvailable(true);
-            }
-        });
+        fetch("/api/chat/ping")
+            .then((response) => {
+                if (response.status === 200) {
+                    setChatAvailable(true);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     }, []);
 
     return (
@@ -70,7 +78,7 @@ function Chat() {
                                         >
                                             <div
                                                 key={message.id}
-                                                className={`space-pre-wrap prose prose-invert m-2 max-w-96 break-words rounded-lg text-white ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
+                                                className={`space-pre-wrap prose prose-invert m-2 max-w-96 rounded-lg break-words text-white ${message.role === "user" ? "bg-slate-500 text-right" : "bg-slate-700 text-left"} p-3 text-white`}
                                             >
                                                 <Markdown
                                                     remarkPlugins={[remarkGfm]}
@@ -84,7 +92,7 @@ function Chat() {
                         </div>
                         <form
                             onSubmit={handleSubmit}
-                            className="bottom-0 mx-auto mb-10 mt-4 flex h-10 w-full max-w-[90vw] overflow-auto rounded-lg bg-slate-300 shadow-lg"
+                            className="bottom-0 mx-auto mt-4 mb-10 flex h-10 w-full max-w-[90vw] overflow-auto rounded-lg bg-slate-300 shadow-lg"
                         >
                             <input
                                 className="h-full w-full bg-slate-300 p-2 text-black placeholder-gray-700"
@@ -102,5 +110,3 @@ function Chat() {
         </PageWithHeader>
     );
 }
-
-export default Chat;

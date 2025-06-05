@@ -1,5 +1,5 @@
-import Card from "components/Card";
-import SignInComponent from "components/SignInComponent";
+import Card from "@/components/Card";
+import SignInComponent from "@/components/SignInComponent";
 import React from "react";
 
 export const metadata = {
@@ -9,7 +9,7 @@ export const metadata = {
 export default function SignIn() {
     return (
         <div className="flex h-full w-full flex-col items-center justify-center text-white">
-            <Card padding="p-10">
+            <Card>
                 <SignInComponent />
             </Card>
         </div>

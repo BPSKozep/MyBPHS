@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import Card from "components/Card";
-import IconSubmitButton from "components/IconSubmitButton";
+import Card from "@/components/Card";
+import IconSubmitButton from "@/components/IconSubmitButton";
 import { FaEnvelope } from "react-icons/fa6";
-import sleep from "utils/sleep";
-import { motion } from "framer-motion";
-import { AnimatePresence } from "framer-motion";
-import { trpc } from "utils/trpc";
+import sleep from "@/utils/sleep";
+import { motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import { api } from "@/trpc/react";
 import UserInput from "./UserInput";
 
 export default function CreateUsers() {
@@ -29,16 +29,13 @@ export default function CreateUsers() {
     const [groupmode, setGroupMode] = useState(true);
     const [selectedUser, setSelectedUser] = useState("");
 
-    const { mutateAsync: sendGroupEmail } =
-        trpc.email.sendAdminGroupEmail.useMutation();
+    const sendGroupEmail = api.email.sendAdminGroupEmail.useMutation();
 
-    const { mutateAsync: sendUserEmail } =
-        trpc.email.sendAdminUserEmail.useMutation();
+    const sendUserEmail = api.email.sendAdminUserEmail.useMutation();
 
-    const { mutateAsync: sendDiscordWebhook } =
-        trpc.webhook.sendDiscordWebhook.useMutation();
+    const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
 
-    const { data: user } = trpc.user.get.useQuery(selectedUser, {
+    const user = api.user.get.useQuery(selectedUser, {
         enabled: !!selectedUser,
     });
 
@@ -50,7 +47,7 @@ export default function CreateUsers() {
                 </div>
                 <p className="my-3">Email formátum</p>
                 <select
-                    className="h-10 w-40 rounded-md border-none p-2 text-center font-bold text-black"
+                    className="h-10 w-40 rounded-md border-none bg-white p-2 text-center font-bold text-black"
                     value={emailFormat}
                     onChange={(e) =>
                         setEmailFormat(
@@ -90,7 +87,7 @@ export default function CreateUsers() {
                                 <p className="my-3">Link</p>
                                 <input
                                     type="text"
-                                    className="w-60 rounded-lg p-2 text-black sm:w-80"
+                                    className="w-60 rounded-lg bg-white p-2 text-black sm:w-80"
                                     value={buttonLink}
                                     placeholder='https://my.bphs.hu/valami"'
                                     onChange={(e) =>
@@ -100,7 +97,7 @@ export default function CreateUsers() {
                                 <p className="my-3">Gomb szöveg</p>
                                 <input
                                     type="text"
-                                    className="w-60 rounded-lg p-2 text-black sm:w-80"
+                                    className="w-60 rounded-lg bg-white p-2 text-black sm:w-80"
                                     value={buttonText}
                                     placeholder='MBI ✨ on top"'
                                     onChange={(e) =>
@@ -135,7 +132,7 @@ export default function CreateUsers() {
                 </div>
                 {groupmode ? (
                     <select
-                        className="h-10 w-52 rounded-md border-none p-2 text-center font-bold text-black"
+                        className="h-10 w-52 rounded-md border-none bg-white p-2 text-center font-bold text-black"
                         value={emailTo}
                         onChange={(e) =>
                             setEmailTo(
@@ -168,18 +165,18 @@ export default function CreateUsers() {
                     </div>
                 )}
 
-                <p className="mb-3 mt-5">Email tárgy</p>
+                <p className="mt-5 mb-3">Email tárgy</p>
                 <input
                     type="text"
-                    className="w-60 rounded-lg p-2 text-black sm:w-80"
+                    className="w-60 rounded-lg bg-white p-2 text-black sm:w-80"
                     value={emailSubject}
                     placeholder='+ "MyBPHS hírlevél"'
                     onChange={(e) => setEmailSubject(e.target.value)}
                 />
-                <p className="mb-3 mt-5">Email szöveg</p>
+                <p className="mt-5 mb-3">Email szöveg</p>
                 <div className="flex flex-col items-center">
                     <textarea
-                        className="mb-5 w-72 rounded-lg p-3 text-black sm:w-80"
+                        className="mb-5 w-72 rounded-lg bg-white p-3 text-black sm:w-80"
                         value={emailText}
                         onChange={(e) => setEmailText(e.target.value)}
                     ></textarea>
@@ -190,7 +187,7 @@ export default function CreateUsers() {
                                 await sleep(500);
 
                                 if (groupmode && !selectedUser && !user) {
-                                    await sendGroupEmail({
+                                    await sendGroupEmail.mutateAsync({
                                         emailFormat,
                                         emailTo,
                                         emailSubject,
@@ -198,7 +195,7 @@ export default function CreateUsers() {
                                         buttonLink,
                                         buttonText,
                                     });
-                                    await sendDiscordWebhook({
+                                    await sendDiscordWebhook.mutateAsync({
                                         type: "Info",
                                         message:
                                             emailFormat +
@@ -206,16 +203,16 @@ export default function CreateUsers() {
                                             emailSubject,
                                     });
                                 } else {
-                                    await sendUserEmail({
+                                    await sendUserEmail.mutateAsync({
                                         emailFormat,
                                         emailTo: selectedUser,
                                         emailSubject,
                                         emailText,
                                         buttonLink,
                                         buttonText,
-                                        user: user ? user.name : "",
+                                        user: user.data?.name ?? "",
                                     });
-                                    await sendDiscordWebhook({
+                                    await sendDiscordWebhook.mutateAsync({
                                         type: "Info",
                                         message:
                                             selectedUser +
@@ -226,7 +223,7 @@ export default function CreateUsers() {
 
                                 return true;
                             } catch (err) {
-                                await sendDiscordWebhook({
+                                await sendDiscordWebhook.mutateAsync({
                                     type: "Error",
                                     message: String(err),
                                 });

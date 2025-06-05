@@ -2,11 +2,11 @@
 
 import React from "react";
 import { FaFloppyDisk } from "react-icons/fa6";
-import IconSubmitButton from "components/IconSubmitButton";
-import Card from "components/Card";
-import { trpc } from "utils/trpc";
+import IconSubmitButton from "@/components/IconSubmitButton";
+import Card from "@/components/Card";
+import { api } from "@/trpc/react";
 import { useDebounce } from "use-debounce";
-import TimetableEditor from "components/admin/TimetableEditor";
+import TimetableEditor from "@/components/admin/TimetableEditor";
 import { useCallback, useEffect, useState } from "react";
 
 const EMPTY_TIMETABLE = Array(5).fill([]);
@@ -18,8 +18,8 @@ export default function CreateTimetable() {
     const [timetable, setTimetable] =
         useState<(string | null)[][]>(EMPTY_TIMETABLE);
 
-    const { data } = trpc.group.get.useQuery(debouncedGroupName);
-    const { mutate } = trpc.group.update.useMutation();
+    const group = api.group.get.useQuery(debouncedGroupName);
+    const updateGroup = api.group.update.useMutation();
 
     const timetableOnChange = useCallback(
         (newTimetable: (string | null)[][]) => setTimetable(newTimetable),
@@ -27,9 +27,9 @@ export default function CreateTimetable() {
     );
 
     useEffect(() => {
-        setTimetable(data?.timetable || EMPTY_TIMETABLE);
-        setPriority(String(data?.priority ?? ""));
-    }, [data]);
+        setTimetable(group.data?.timetable ?? EMPTY_TIMETABLE);
+        setPriority(String(group.data?.priority ?? ""));
+    }, [group.data]);
 
     return (
         <div className="flex flex-col justify-center text-white md:flex-row">
@@ -37,14 +37,14 @@ export default function CreateTimetable() {
                 <div className="flex h-full w-full flex-col items-center justify-center">
                     <div className="flex flex-col items-center sm:flex-row">
                         <input
-                            className="mb-3 mr-3 rounded-xl px-3 py-2 font-bold text-black placeholder:font-normal"
+                            className="mr-3 mb-3 rounded-xl bg-white px-3 py-2 font-bold text-black placeholder:font-normal"
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
                             placeholder="Csoport neve"
                         />
                         <div className="mb-3 flex flex-row items-center">
                             <input
-                                className="my-3 mr-3 w-32 rounded-xl px-3 py-2 font-bold text-black placeholder:font-normal"
+                                className="my-3 mr-3 w-32 rounded-xl bg-white px-3 py-2 font-bold text-black placeholder:font-normal"
                                 value={priority}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -64,7 +64,7 @@ export default function CreateTimetable() {
                             <IconSubmitButton
                                 icon={<FaFloppyDisk />}
                                 onClick={() => {
-                                    mutate({
+                                    updateGroup.mutate({
                                         name: groupName,
                                         newValue: {
                                             name: groupName,

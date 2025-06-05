@@ -1,16 +1,28 @@
-import { inferAsyncReturnType } from "@trpc/server";
-import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import mongooseConnect from "clients/mongoose";
+/**
+ * 1. CONTEXT
+ *
+ * This section defines the "contexts" that are available in the backend API.
+ *
+ * These allow you to access things when processing a request, like the database, the session, etc.
+ *
+ * This helper generates the "internals" for a tRPC context. The API handler and RSC clients each
+ * wrap this and provides the required context.
+ *
+ * @see https://trpc.io/docs/server/context
+ */
+import mongooseConnect from "@/clients/mongoose";
 import { getServerSession } from "next-auth";
-import { authOptions } from "server/auth";
+import { authOptions } from "@/server/auth";
 
-export async function createContext(ctx: FetchCreateContextFnOptions) {
-    const { req } = ctx;
-
+export const createTRPCContext = async (opts: { headers: Headers }) => {
     const mongooseClient = await mongooseConnect();
     const session = await getServerSession(authOptions);
 
-    return { req, mongooseClient, session };
-}
+    return {
+        mongooseClient,
+        session,
+        ...opts,
+    };
+};
 
-export type Context = inferAsyncReturnType<typeof createContext>;
+export type Context = Awaited<ReturnType<typeof createTRPCContext>>;

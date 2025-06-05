@@ -1,14 +1,15 @@
 "use client";
 
 import React from "react";
-import { trpc } from "utils/trpc";
-import PWAInstall from "components/PWAInstall";
+import { api } from "@/trpc/react";
+import PWAInstall from "@/components/PWAInstall";
 import Link from "next/link";
-import Sheet from "components/Sheet";
-import sleep from "utils/sleep";
+import Sheet from "@/components/Sheet";
+import sleep from "@/utils/sleep";
 import { FaRightFromBracket } from "react-icons/fa6";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
+import SmallLoading from "./SmallLoading";
 // import Button from "components/Button";
 // import { useRouter, usePathname } from "next/navigation";
 
@@ -19,15 +20,14 @@ export default function MainHeader() {
     // const router = useRouter();
     // const path = usePathname();
 
-    const { data: NfcId } = trpc.user.getNfcId.useQuery(
-        data?.user?.email || "",
-        {
-            enabled: !!data?.user?.email,
-        },
-    );
+    const NfcId = api.user.getNfcId.useQuery(data?.user?.email ?? "", {
+        enabled: !!data?.user?.email,
+    });
+
+    const [signOutLoading, setSignOutLoading] = useState(false);
 
     return (
-        <header className="flex h-16 flex-shrink-0 select-none items-center justify-center bg-slate-800">
+        <header className="flex h-16 shrink-0 items-center justify-center bg-slate-800 select-none">
             <div className="absolute left-10 flex w-10 items-center justify-end">
                 <PWAInstall />
             </div>
@@ -65,7 +65,7 @@ export default function MainHeader() {
                 >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                        src={data?.user?.image || ""}
+                        src={data?.user?.image ?? ""}
                         alt="Profile picture"
                         className="cursor-pointer rounded-full"
                         draggable="false"
@@ -91,7 +91,7 @@ export default function MainHeader() {
                     <input
                         type="text"
                         disabled
-                        value={data?.user?.name || "Nincs adat"}
+                        value={data?.user?.name ?? "Nincs adat"}
                         className="mb-5 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
                 </div>
@@ -102,7 +102,7 @@ export default function MainHeader() {
                     <input
                         type="text"
                         disabled
-                        value={data?.user?.email || "Nincs adat"}
+                        value={data?.user?.email ?? "Nincs adat"}
                         className="mb-5 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
                 </div>
@@ -113,7 +113,7 @@ export default function MainHeader() {
                     <input
                         type="text"
                         disabled
-                        value={NfcId || "Nincs adat"}
+                        value={NfcId.data ?? "Nincs adat"}
                         className="mb-3 h-10 overflow-scroll rounded-lg bg-white p-[0.1rem] text-center font-bold text-black"
                     />
                 </div>
@@ -133,15 +133,24 @@ export default function MainHeader() {
                 <div
                     className="flex cursor-pointer items-center justify-center align-middle text-white"
                     onClick={async () => {
-                        await sleep(500);
-
+                        setSignOutLoading(true);
+                        await sleep(1500);
+                        setSignOutLoading(false);
                         await signOut({
                             callbackUrl: "/",
                         });
                     }}
                 >
-                    <FaRightFromBracket />
-                    <p className="ml-2 text-lg">Kijelentkezés</p>
+                    {!signOutLoading ? (
+                        <div className="flex items-center">
+                            <FaRightFromBracket />
+                            <p className="ml-2 text-lg">Kijelentkezés</p>
+                        </div>
+                    ) : (
+                        <div className="mt-1 flex items-center">
+                            <SmallLoading />
+                        </div>
+                    )}
                 </div>
             </Sheet>
         </header>

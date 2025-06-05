@@ -1,11 +1,11 @@
 "use client";
 
 import { FaHome } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-function ForbiddenComponent() {
+export default function ForbiddenComponent() {
     const [clicked, setClicked] = useState(false);
     const router = useRouter();
     return (
@@ -35,5 +35,3 @@ function ForbiddenComponent() {
         </div>
     );
 }
-
-export default ForbiddenComponent;

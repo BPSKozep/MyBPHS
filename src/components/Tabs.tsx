@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function Tabs({
+export default function Tabs({
     options,
     defaultOption,
     onChange,
@@ -20,7 +20,7 @@ function Tabs({
     }, [selectedTab, onChange]);
 
     return (
-        <div className="select-none text-white">
+        <div className="text-white select-none">
             {Object.entries(options).map(([key, value], index) => (
                 <div key={key} className="inline-block">
                     <input
@@ -50,5 +50,3 @@ function Tabs({
         </div>
     );
 }
-
-export default Tabs;

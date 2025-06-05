@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
+import { env } from "@/env/server";
 
 export default function mongooseConnect() {
-    return mongoose.connect(process.env.MONGODB_URI as string, {
-        dbName: process.env.MONGODB_DATABASE,
+    return mongoose.connect(env.MONGODB_URI, {
+        dbName: env.MONGODB_DATABASE,
     });
 }

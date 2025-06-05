@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { trpc } from "utils/trpc";
+import { api } from "@/trpc/react";
 import { FaFloppyDisk } from "react-icons/fa6";
-import Card from "components/Card";
-import IconSubmitButton from "components/IconSubmitButton";
+import Card from "@/components/Card";
+import IconSubmitButton from "@/components/IconSubmitButton";
 
 export default function CreateUsers() {
     const [names, setNames] = useState<string[]>([]);
@@ -12,10 +12,9 @@ export default function CreateUsers() {
     const [roles, setRoles] = useState<string[]>([]);
     const [nfcIds, setNfcIds] = useState<string[]>([]);
 
-    const { mutateAsync: createMany } = trpc.user.createMany.useMutation();
+    const createMany = api.user.createMany.useMutation();
 
-    const { mutateAsync: sendDiscordWebhook } =
-        trpc.webhook.sendDiscordWebhook.useMutation();
+    const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
 
     return (
         <div className="flex flex-col justify-center text-white md:flex-row">
@@ -28,28 +27,28 @@ export default function CreateUsers() {
                     <textarea
                         value={names.join("\n")}
                         onChange={(e) => setNames(e.target.value.split("\n"))}
-                        className="h-24 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
+                        className="h-24 w-60 resize-none rounded-md bg-white p-2 text-black sm:h-32 sm:w-96"
                         placeholder={"Kovács Júdás\nBakos Gergely"}
                     ></textarea>
                     <p className="mt-3">Email címek</p>
                     <textarea
                         value={emails.join("\n")}
                         onChange={(e) => setEmails(e.target.value.split("\n"))}
-                        className="h-24 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
+                        className="h-24 w-60 resize-none rounded-md bg-white p-2 text-black sm:h-32 sm:w-96"
                         placeholder={"email@example.com\nemail@example.com"}
                     ></textarea>
                     <p className="mt-3">NFCk</p>
                     <textarea
                         value={nfcIds.join("\n")}
                         onChange={(e) => setNfcIds(e.target.value.split("\n"))}
-                        className="h-24 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
+                        className="h-24 w-60 resize-none rounded-md bg-white p-2 text-black sm:h-32 sm:w-96"
                         placeholder={"f72aeb82\n92fba9c8"}
                     ></textarea>
                     <p className="mt-3">Szerepkör</p>
                     <textarea
                         value={roles.join("\n")}
                         onChange={(e) => setRoles(e.target.value.split("\n"))}
-                        className="h-10 w-60 resize-none rounded-md p-2 text-black sm:h-32 sm:w-96"
+                        className="h-10 w-60 resize-none rounded-md bg-white p-2 text-black sm:h-32 sm:w-96"
                         placeholder={"student"}
                     ></textarea>
                     <div className="mt-3">
@@ -57,18 +56,18 @@ export default function CreateUsers() {
                             icon={<FaFloppyDisk />}
                             onClick={async () => {
                                 try {
-                                    await createMany({
+                                    await createMany.mutateAsync({
                                         emails: emails,
                                         names,
                                         roles: new Array(emails.length).fill(
                                             roles,
-                                        ),
+                                        ) as string[][],
                                         nfcIds,
                                     });
 
                                     return true;
                                 } catch (err) {
-                                    await sendDiscordWebhook({
+                                    await sendDiscordWebhook.mutateAsync({
                                         type: "Error",
                                         message: String(err),
                                     });

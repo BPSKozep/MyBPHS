@@ -1,7 +1,7 @@
-import OnlyRoles from "components/OnlyRoles";
-import PageWithHeader from "components/PageWithHeader";
+import OnlyRoles from "@/components/OnlyRoles";
+import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
-import BigLinkButton from "components/BigLinkButton";
+import BigLinkButton from "@/components/BigLinkButton";
 
 export const metadata = {
     title: "Admin",
@@ -24,10 +24,6 @@ export default function Users() {
                         <BigLinkButton title="Órarend" url="/admin/timetable" />
                         <BigLinkButton title="Csoportok" url="/admin/groups" />
                         <BigLinkButton title="Email" url="/admin/email" />
-                        <BigLinkButton
-                            title="Szinkronizálás"
-                            url="/admin/sync"
-                        />
                     </div>
                 </div>
             </PageWithHeader>

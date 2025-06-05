@@ -1,7 +1,7 @@
-import PageWithHeader from "components/PageWithHeader";
+import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
-import OnlyRoles from "components/OnlyRoles";
-import CreateTimetable from "components/admin/CreateTimetable";
+import OnlyRoles from "@/components/OnlyRoles";
+import CreateTimetable from "@/components/admin/CreateTimetable";
 
 export const metadata = {
     title: "Admin / Órarend",

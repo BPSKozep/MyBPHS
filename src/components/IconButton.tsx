@@ -1,8 +1,8 @@
-import React, { ReactNode } from "react";
-import { motion } from "framer-motion";
+import React, { type ReactNode } from "react";
+import { motion } from "motion/react";
 import { twMerge } from "tailwind-merge";
 
-function IconButton({
+export default function IconButton({
     onClick,
     icon,
     className,
@@ -52,5 +52,3 @@ function IconButton({
         </motion.button>
     );
 }
-
-export default IconButton;

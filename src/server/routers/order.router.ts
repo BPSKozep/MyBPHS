@@ -1,15 +1,15 @@
 import { z } from "zod";
-import { procedure, router } from "server/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
-import { Order, User, Menu } from "models";
-import { getWeek, getWeekYear } from "utils/isoweek";
-import { checkRoles } from "utils/authorization";
+import { Order, User, Menu } from "@/models";
+import { getWeek, getWeekYear } from "@/utils/isoweek";
+import { checkRoles } from "@/utils/authorization";
 import { TRPCError } from "@trpc/server";
-import menuCombine, { menuCombines } from "utils/menuCombine";
-import { IOrder } from "models/Order.model";
+import menuCombine, { menuCombines } from "@/utils/menuCombine";
+import type { IOrder } from "@/models/Order.model";
 
-const orderRouter = router({
-    get: procedure
+export const orderRouter = createTRPCRouter({
+    get: protectedProcedure
         .input(
             z.strictObject({
                 email: z.string().email().optional(),
@@ -23,19 +23,12 @@ const orderRouter = router({
                 .array(),
         )
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "lunch-system",
             ]);
 
-            const email = ctx.session.user?.email || input.email;
+            const email = ctx.session.user?.email ?? input.email;
 
             const requester = await User.findOne({
                 email: ctx.session.user?.email,
@@ -59,8 +52,8 @@ const orderRouter = router({
 
             const date = new Date();
 
-            const year = input.year || getWeekYear(date);
-            const week = input.week || getWeek(date);
+            const year = input.year ?? getWeekYear(date);
+            const week = input.week ?? getWeek(date);
 
             const menu = await Menu.findOne({ year, week });
 
@@ -81,7 +74,7 @@ const orderRouter = router({
 
             return order.toObject().order;
         }),
-    getAllWeek: procedure
+    getAllWeek: protectedProcedure
         .input(
             z.strictObject({
                 email: z.string().email().optional(),
@@ -91,19 +84,12 @@ const orderRouter = router({
         )
         .output(z.string().array())
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "lunch-system",
             ]);
 
-            const email = ctx.session.user?.email || input.email;
+            const email = ctx.session.user?.email ?? input.email;
 
             const requester = await User.findOne({
                 email: ctx.session.user?.email,
@@ -127,8 +113,8 @@ const orderRouter = router({
 
             const date = new Date();
 
-            const year = input.year || getWeekYear(date);
-            const week = input.week || getWeek(date);
+            const year = input.year ?? getWeekYear(date);
+            const week = input.week ?? getWeek(date);
 
             const menu = await Menu.findOne({ year, week });
 
@@ -149,22 +135,15 @@ const orderRouter = router({
 
             const combinedOptions = menuCombines(menu.options);
 
-            const orders = order.order.map(
-                (order, index) => combinedOptions[index][order.chosen],
-            );
+            const orders = order.order
+                .map((order, index) => combinedOptions?.[index]?.[order.chosen])
+                .filter((order): order is string => order !== undefined);
 
             return orders;
         }),
-    getOrCreateOrderByNfc: procedure
+    getOrCreateOrderByNfc: protectedProcedure
         .input(z.string())
         .query(async ({ input, ctx }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "lunch-system",
@@ -216,8 +195,8 @@ const orderRouter = router({
             }
 
             let order = await Order.findOne({
-                menu: menu.id,
-                user: user.id,
+                menu: menu._id,
+                user: user._id,
             });
             if (!order) {
                 await new Order<IOrder>({
@@ -243,13 +222,13 @@ const orderRouter = router({
                             completed: false,
                         },
                     ],
-                    menu: menu.id,
-                    user: user.id,
+                    menu: menu._id,
+                    user: user._id,
                 }).save();
             }
             order = await Order.findOne({
-                menu: menu.id,
-                user: user.id,
+                menu: menu._id,
+                user: user._id,
             });
 
             if (!order) {
@@ -259,9 +238,25 @@ const orderRouter = router({
                 });
             }
 
-            const combinedOptions = menuCombine(menu.options[day]);
+            const menuOptionsForDay = menu.options[day];
+            if (!menuOptionsForDay) {
+                return {
+                    order: "Nincs menü erre a napra",
+                    orderError: true,
+                };
+            }
 
-            const chosen = combinedOptions[order.order[day].chosen];
+            const combinedOptions = menuCombine(menuOptionsForDay);
+
+            const orderForDay = order.order[day];
+            if (!orderForDay) {
+                return {
+                    order: "Nincs rendelés erre a napra",
+                    orderError: true,
+                };
+            }
+
+            const chosen = combinedOptions[orderForDay.chosen];
 
             if (!chosen) {
                 return {
@@ -270,14 +265,14 @@ const orderRouter = router({
                 };
             }
 
-            if (order.order[day].completed) {
+            if (orderForDay.completed) {
                 return {
                     order: `Ebéd már kiadva (${chosen})`,
                     orderError: true,
                 };
             }
 
-            if (order.order[day].chosen === "i_am_not_want_food") {
+            if (orderForDay.chosen === "i_am_not_want_food") {
                 return {
                     order: "Nincs rendelés",
                     orderError: true,
@@ -289,20 +284,13 @@ const orderRouter = router({
                 orderError: false,
             };
         }),
-    setCompleted: procedure
+    setCompleted: protectedProcedure
         .input(
             z.strictObject({
                 nfcId: z.string(),
             }),
         )
         .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "lunch-system",
@@ -342,8 +330,8 @@ const orderRouter = router({
             }
 
             const order = await Order.findOne({
-                user: user.id,
-                menu: menu.id,
+                user: user._id,
+                menu: menu._id,
             });
 
             if (!order) {
@@ -359,10 +347,18 @@ const orderRouter = router({
                 day = 4;
             }
 
-            order.order[day].completed = true;
+            const orderForDay = order.order[day];
+            if (!orderForDay) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "No order exists for this day",
+                });
+            }
+
+            orderForDay.completed = true;
             await order.save();
         }),
-    create: procedure
+    create: protectedProcedure
         .input(
             z.strictObject({
                 week: z.number().optional(),
@@ -374,8 +370,8 @@ const orderRouter = router({
             const date = new Date();
 
             const menu = await Menu.findOne({
-                week: input.week || getWeek(date),
-                year: input.year || getWeekYear(date),
+                week: input.week ?? getWeek(date),
+                year: input.year ?? getWeekYear(date),
             });
 
             if (!menu) {
@@ -404,8 +400,8 @@ const orderRouter = router({
             }
 
             const orderExists = await Order.exists({
-                menu: menu.id,
-                user: user.id,
+                menu: menu._id,
+                user: user._id,
             });
 
             if (orderExists) {
@@ -416,8 +412,8 @@ const orderRouter = router({
             }
 
             await new Order<IOrder>({
-                menu: menu.id,
-                user: user.id,
+                menu: menu._id,
+                user: user._id,
                 order: input.chosenOptions.map((chosen) => {
                     return {
                         chosen: chosen,
@@ -426,17 +422,10 @@ const orderRouter = router({
                 }),
             }).save();
         }),
-    getOrderCounts: procedure
+    getOrderCounts: protectedProcedure
         .input(z.strictObject({ year: z.number(), week: z.number() }))
         .output(z.record(z.string(), z.number()).array())
         .query(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
                 "lunch-system",
@@ -458,7 +447,10 @@ const orderRouter = router({
                 return [];
             }
 
-            const aggregateResult = await Order.aggregate([
+            const aggregateResult = await Order.aggregate<{
+                _id: { chosen: string; day: number };
+                count: number;
+            }>([
                 {
                     $unwind: {
                         path: "$order",
@@ -491,17 +483,19 @@ const orderRouter = router({
             const result: Record<string, number>[] = [];
 
             for (const data of aggregateResult) {
-                const { chosen, day }: { chosen: string; day: number } =
-                    data._id;
+                const { chosen, day } = data._id;
 
                 if (!(day in result)) result[day] = {};
 
-                result[day][chosen] = data.count;
+                const dayResult = result[day];
+                if (dayResult) {
+                    dayResult[chosen] = data.count;
+                }
             }
 
             return result;
         }),
-    edit: procedure
+    edit: protectedProcedure
         .input(
             z.strictObject({
                 week: z.number().optional(),
@@ -513,8 +507,8 @@ const orderRouter = router({
             const date = new Date();
 
             const menu = await Menu.findOne({
-                week: input.week || getWeek(date),
-                year: input.year || getWeekYear(date),
+                week: input.week ?? getWeek(date),
+                year: input.year ?? getWeekYear(date),
             });
 
             if (!menu) {
@@ -543,8 +537,8 @@ const orderRouter = router({
             }
 
             const order = await Order.findOne({
-                menu: menu.id,
-                user: user.id,
+                menu: menu._id,
+                user: user._id,
             });
 
             if (!order) {
@@ -564,5 +558,3 @@ const orderRouter = router({
             await order.save();
         }),
 });
-
-export default orderRouter;

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Tabs from "components/Tabs";
+import Tabs from "@/components/Tabs";
 
 const TIMESLOTS = [
     "9:00-9:45",
@@ -22,7 +22,7 @@ const DAY_TABS = {
     friday: "P",
 };
 
-function TimetableEditor({
+export default function TimetableEditor({
     timetable,
     onChange,
 }: {
@@ -62,6 +62,7 @@ function TimetableEditor({
                                     <input
                                         className="w-28 rounded-xl bg-[#565656] px-3 py-1 text-center"
                                         value={timeslot}
+                                        readOnly
                                     />
                                 </th>
 
@@ -70,17 +71,22 @@ function TimetableEditor({
                                         className="inline-block w-52 rounded-xl bg-[#3A445D] px-3 py-1 text-center font-bold placeholder:font-normal"
                                         placeholder="Lyukasóra"
                                         value={
-                                            currentTimetable[dayIndex]?.[i] ||
+                                            currentTimetable[dayIndex]?.[i] ??
                                             ""
                                         }
                                         onChange={(e) =>
                                             setCurrentTimetable((oldValue) => {
-                                                const copy = JSON.parse(
-                                                    JSON.stringify(oldValue)
-                                                );
+                                                const copy: (
+                                                    | string
+                                                    | null
+                                                )[][] = JSON.parse(
+                                                    JSON.stringify(oldValue),
+                                                ) as (string | null)[][];
 
-                                                copy[dayIndex][i] =
-                                                    e.target.value || null;
+                                                if (copy[dayIndex]) {
+                                                    copy[dayIndex][i] =
+                                                        e.target.value ?? null;
+                                                }
 
                                                 return copy;
                                             })
@@ -95,5 +101,3 @@ function TimetableEditor({
         </div>
     );
 }
-
-export default TimetableEditor;

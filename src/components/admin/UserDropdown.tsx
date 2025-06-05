@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { trpc } from "utils/trpc";
+import { api } from "@/trpc/react";
 
 export default function UserDropdown({
     onChange,
 }: {
     onChange: (data: string) => void;
 }) {
-    const users = trpc.user.list.useQuery("all");
+    const users = api.user.list.useQuery("all");
 
     const [data, setData] = useState("");
 
@@ -20,16 +20,15 @@ export default function UserDropdown({
                 className="h-10 w-40 rounded-md border-none p-2 text-center font-bold text-black"
                 onChange={(e) => setData(e.target.value)}
             >
-                {users.data &&
-                    users.data.map((user) => (
-                        <option
-                            key={user.email}
-                            value={user.email}
-                            className="font-bold"
-                        >
-                            {user.name}
-                        </option>
-                    ))}
+                {users.data?.map((user) => (
+                    <option
+                        key={user.email}
+                        value={user.email}
+                        className="font-bold"
+                    >
+                        {user.name}
+                    </option>
+                ))}
             </select>
         </>
     );

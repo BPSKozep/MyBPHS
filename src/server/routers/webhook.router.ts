@@ -1,31 +1,24 @@
 import { z } from "zod";
-import { procedure, router } from "server/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 import { TRPCError } from "@trpc/server";
+import { env } from "@/env/server";
 
-const webhookRouter = router({
-    sendDiscordWebhook: procedure
+export const webhookRouter = createTRPCRouter({
+    sendDiscordWebhook: protectedProcedure
         .input(
             z.object({
                 type: z.enum(["Info", "Error", "Lunch"]),
                 message: z.string(),
-            })
+            }),
         )
-        .mutation(async ({ ctx, input }) => {
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                });
-            }
-
+        .mutation(async ({ input }) => {
             const webhookUrls = {
-                Info: process.env.INFO_WEBHOOK,
-                Error: process.env.ERROR_WEBHOOK,
-                Lunch: process.env.LUNCH_WEBHOOK,
+                Info: env.INFO_WEBHOOK,
+                Error: env.ERROR_WEBHOOK,
+                Lunch: env.LUNCH_WEBHOOK,
             };
 
-            const webhookUrl =
-                webhookUrls[input.type as keyof typeof webhookUrls];
+            const webhookUrl = webhookUrls[input.type];
             if (!webhookUrl) {
                 throw new TRPCError({
                     code: "BAD_REQUEST",
@@ -50,7 +43,13 @@ const webhookRouter = router({
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    content: localDate + " - " + input.message,
+                    content:
+                        (process.env.NODE_ENV === "production"
+                            ? ""
+                            : "DEV - ") +
+                        localDate +
+                        " - " +
+                        input.message,
                 }),
             });
         }),

@@ -1,17 +1,4 @@
-const flattenColorPalette =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require("tailwindcss/lib/util/flattenColorPalette").default;
-
-function addVariablesForColors({ addBase, theme }) {
-    let allColors = flattenColorPalette(theme("colors"));
-    let newVars = Object.fromEntries(
-        Object.entries(allColors).map(([key, val]) => [`--${key}`, val]),
-    );
-
-    addBase({
-        ":root": newVars,
-    });
-}
+import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -32,5 +19,21 @@ module.exports = {
             },
         },
     },
-    plugins: [addVariablesForColors, require("@tailwindcss/typography")],
+    plugins: [
+        // @ts-ignore
+        ({ addBase, theme }) => {
+            let allColors = flattenColorPalette(theme("colors"));
+            let newVars = Object.fromEntries(
+                Object.entries(allColors).map(([key, val]) => [
+                    `--${key}`,
+                    val,
+                ]),
+            );
+
+            addBase({
+                ":root": newVars,
+            });
+        },
+        require("@tailwindcss/typography"),
+    ],
 };

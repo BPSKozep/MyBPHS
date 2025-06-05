@@ -12,9 +12,11 @@ export default function GoogleSignIn() {
         <div
             onClick={() => {
                 setClicked(true);
-                signIn("google", { callbackUrl: "/" });
+                signIn("google", { callbackUrl: "/" }).catch((error) => {
+                    console.error(error);
+                });
             }}
-            className="flex h-14 w-full max-w-sm cursor-pointer select-none rounded-2xl border-4 bg-gray-300 align-middle transition-all duration-300 hover:border-blue-400"
+            className="flex h-14 w-full max-w-sm cursor-pointer rounded-2xl border-4 bg-gray-300 align-middle transition-all duration-300 select-none hover:border-blue-400"
         >
             <div className="relative flex w-full items-center justify-center align-middle">
                 {!clicked ? (
@@ -26,7 +28,7 @@ export default function GoogleSignIn() {
                             height={24}
                         />
 
-                        <span className="font-bold tracking-wide text-black">
+                        <span className="text-center font-bold tracking-wide text-black">
                             Továbblépés Google-lel
                         </span>
                     </div>

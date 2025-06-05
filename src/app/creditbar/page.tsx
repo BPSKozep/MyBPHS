@@ -1,6 +1,6 @@
 "use client";
 
-import CreditBar from "components/CreditBar";
+import CreditBar from "@/components/CreditBar";
 import React, { useState } from "react";
 
 export default function CreditBarDemo() {

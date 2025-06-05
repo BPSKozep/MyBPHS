@@ -2,21 +2,22 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { PropsWithChildren, useEffect } from "react";
-import { trpc } from "utils/trpc";
+import type { PropsWithChildren } from "react";
+import { useEffect } from "react";
+import { api } from "@/trpc/react";
 import Loading from "./Loading";
 
-function Paywall({ children }: PropsWithChildren) {
+export default function Paywall({ children }: PropsWithChildren) {
     const router = useRouter();
-    const { data } = useSession();
-    const { data: user } = trpc.user.get.useQuery(data?.user?.email || "");
+    const session = useSession();
+    const user = api.user.get.useQuery(session.data?.user?.email ?? "");
 
     useEffect(() => {
-        if (user && user.blocked) router.replace("/pay");
+        if (user.data?.blocked) router.replace("/pay");
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+    }, [user.data]);
 
-    if (user && !user.blocked) return children;
+    if (!user.data?.blocked) return children;
 
     return (
         <div className="flex h-full w-full items-center justify-center align-middle">
@@ -24,5 +25,3 @@ function Paywall({ children }: PropsWithChildren) {
         </div>
     );
 }
-
-export default Paywall;

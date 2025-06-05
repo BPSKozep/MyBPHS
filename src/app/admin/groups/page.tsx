@@ -1,6 +1,6 @@
-import ManageGroups from "components/admin/ManageGroups";
-import OnlyRoles from "components/OnlyRoles";
-import PageWithHeader from "components/PageWithHeader";
+import ManageGroups from "@/components/admin/ManageGroups";
+import OnlyRoles from "@/components/OnlyRoles";
+import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 
 export const metadata = {

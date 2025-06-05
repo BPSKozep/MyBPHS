@@ -1,40 +1,45 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import sleep from "utils/sleep";
-import IconSubmitButton from "components/IconSubmitButton";
+import { motion } from "motion/react";
+import sleep from "@/utils/sleep";
+import IconSubmitButton from "@/components/IconSubmitButton";
 import { FaFloppyDisk } from "react-icons/fa6";
-import { trpc } from "utils/trpc";
+import { api } from "@/trpc/react";
 import Card from "./Card";
 import Loading from "./Loading";
 
-function LaptopPasswordReset() {
+export default function LaptopPasswordReset() {
     const [input, setInput] = useState("");
-    const { data, refetch: refetchData } =
-        trpc.adpassword.getLastChanged.useQuery();
-    const { mutateAsync: setNewPassword } =
-        trpc.adpassword.setNewPassword.useMutation();
+    const lastChanged = api.adpassword.getLastChanged.useQuery();
+    const setNewPassword = api.adpassword.setNewPassword.useMutation();
 
     const inputValid = input.length >= 6;
 
-    const { mutateAsync: sendDiscordWebhook } =
-        trpc.webhook.sendDiscordWebhook.useMutation();
+    const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
 
     const [laptopPassResetAvailable, setlaptopAvailable] = useState(true);
 
     const [laptopPassResetShown, setLaptopPassResetShown] = useState(false);
 
-    setTimeout(() => {
-        setLaptopPassResetShown(true);
-    }, 3000);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLaptopPassResetShown(true);
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
-        fetch("/api/laptop/ping").then((response) => {
-            if (response.status != 200) {
-                setlaptopAvailable(false);
-            }
-        });
+        fetch("/api/laptop/ping")
+            .then((response) => {
+                if (response.status != 200) {
+                    setlaptopAvailable(false);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     }, []);
 
     return (
@@ -67,7 +72,7 @@ function LaptopPasswordReset() {
                         <input
                             type="password"
                             placeholder="Jelszó"
-                            className="mb-3 rounded-md p-1 text-center transition-all"
+                            className="mb-3 rounded-md bg-white p-1 text-center text-black transition-all"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                         />
@@ -89,21 +94,21 @@ function LaptopPasswordReset() {
                             A jelszó legalább 6 karakter hosszú legyen.
                         </motion.span>
 
-            <div className="mt-3">
-                <IconSubmitButton
-                    icon={<FaFloppyDisk />}
-                    onClick={async () => {
-                        try {
-                            await sleep(500);
-                                        await setNewPassword(input);
+                        <div className="mt-3">
+                            <IconSubmitButton
+                                icon={<FaFloppyDisk />}
+                                onClick={async () => {
+                                    try {
+                                        await sleep(500);
+                                        await setNewPassword.mutateAsync(input);
 
-                                        refetchData();
+                                        await lastChanged.refetch();
 
                                         return true;
-                                    } catch (err) {
-                                        await sendDiscordWebhook({
+                                    } catch (error) {
+                                        await sendDiscordWebhook.mutateAsync({
                                             type: "Error",
-                                            message: String(err),
+                                            message: String(error),
                                         });
                                         return false;
                                     }
@@ -112,7 +117,7 @@ function LaptopPasswordReset() {
                         </div>
                         <h1 className="mt-5 text-white">
                             Legutoljára módosítva:{" "}
-                            {data ? data : "Még nem volt"}
+                            {lastChanged.data ?? "Még nem volt"}
                         </h1>
                     </div>
                 </Card>
@@ -120,5 +125,3 @@ function LaptopPasswordReset() {
         </>
     );
 }
-
-export default LaptopPasswordReset;

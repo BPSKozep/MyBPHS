@@ -9,7 +9,6 @@ export interface IUser {
     groups: Types.ObjectId[];
     nfcId: string;
     laptopPasswordChanged?: Date;
-    autoOrder?: { chosen: string }[];
     blocked?: boolean;
 }
 
@@ -39,20 +38,12 @@ const userSchema = new Schema<IUser>({
         type: Date,
         required: false,
     },
-    autoOrder: [
-        {
-            chosen: {
-                type: String,
-                required: false,
-            },
-        },
-    ],
     blocked: {
         type: Boolean,
         required: false,
     },
 });
 
-const User: Model<IUser> = mongoose.models.User || model("User", userSchema);
+const User: Model<IUser> = mongoose.models.User ?? model("User", userSchema);
 
 export default User;

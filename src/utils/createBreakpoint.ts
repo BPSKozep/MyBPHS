@@ -1,10 +1,10 @@
-import resolveConfig from "tailwindcss/resolveConfig";
-import tailwindConfig from "../../tailwind.config";
-
-const screens =
-    (resolveConfig(tailwindConfig).theme?.screens as {
-        [breakpoint: string]: string;
-    }) || {};
+const screens: Record<string, string> = {
+    sm: "640px",
+    md: "768px",
+    lg: "1024px",
+    xl: "1280px",
+    "2xl": "1536px",
+};
 
 export default function createBreakpoint(from?: string, to?: string) {
     if (from && to)
