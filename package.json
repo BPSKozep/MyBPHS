@@ -15,7 +15,7 @@
     "@ai-sdk/openai": "^0.0.63",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.13.0",
-    "@fontsource-variable/montserrat": "^5.1.0",
+    "@fontsource-variable/montserrat": "^5.2.6",
     "@fontsource-variable/roboto-slab": "^5.0.20",
     "@fontsource-variable/source-code-pro": "^5.2.6",
     "@fontsource/lily-script-one": "^5.1.0",
