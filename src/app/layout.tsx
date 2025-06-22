@@ -4,7 +4,6 @@ import "@fontsource-variable/roboto-slab";
 import "@fontsource/lily-script-one";
 import "./globals.css";
 
-import OnlyAuthed from "@/components/OnlyAuthed";
 import Providers from "@/app/providers";
 import MainHeader from "@/components/MainHeader";
 import IdentifyUser from "@/components/IdentifyUser";
@@ -50,14 +49,12 @@ export default function RootLayout({
         <html lang="hu">
             <body>
                 <Providers>
-                    <OnlyAuthed>
-                        <IdentifyUser>
-                            <div className="box-border flex h-screen w-full flex-col">
-                                <MainHeader />
-                                <PageTransition>{children}</PageTransition>
-                            </div>
-                        </IdentifyUser>
-                    </OnlyAuthed>
+                    <IdentifyUser>
+                        <div className="box-border flex h-screen w-full flex-col">
+                            <MainHeader />
+                            <PageTransition>{children}</PageTransition>
+                        </div>
+                    </IdentifyUser>
                 </Providers>
             </body>
         </html>
