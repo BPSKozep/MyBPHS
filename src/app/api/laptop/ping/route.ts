@@ -1,10 +1,16 @@
+import { env } from "@/env/server";
 import { getServerAuthSession } from "@/server/auth";
 
-export async function GET() {
+export async function GET(request: Request) {
+    const authHeader = request.headers.get("authorization");
     const session = await getServerAuthSession();
 
-    if (!session?.user?.name)
-        return new Response("Unauthorized", { status: 401 });
+    if (!session?.user?.name) {
+        const expectedAuth = `Bearer ${env.PING_SECRET}`;
+        if (!authHeader || authHeader !== expectedAuth) {
+            return new Response("Unauthorized", { status: 401 });
+        }
+    }
 
     try {
         const puResponse = await fetch("https://pu.bpskozep.hu");
