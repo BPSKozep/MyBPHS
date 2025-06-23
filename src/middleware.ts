@@ -2,12 +2,14 @@ import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
 const AUTH_WHITELIST = [
-    "/auth/signin",
+    "/auth",
     "/forbidden",
-    "/auth/error",
+    "/auth",
     "/robots.txt",
     "/sitemap.xml",
     "/ingest",
+    "/manifest",
+    "/api",
 ];
 
 export default withAuth(
