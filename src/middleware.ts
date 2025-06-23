@@ -7,6 +7,7 @@ const AUTH_WHITELIST = [
     "/auth/error",
     "/robots.txt",
     "/sitemap.xml",
+    "/ingest",
 ];
 
 export default withAuth(
