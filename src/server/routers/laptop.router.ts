@@ -47,7 +47,7 @@ export const laptopRouter = createTRPCRouter({
 
             const response = await fetch("http://10.0.0.11:5000/deployments", {
                 headers: {
-                    Authorization: `Bearer ${env.PU_TOKEN2}`,
+                    Authorization: `Bearer ${env.PU_TOKEN}`,
                 },
             });
 
@@ -82,7 +82,7 @@ export const laptopRouter = createTRPCRouter({
                 {
                     method: "DELETE",
                     headers: {
-                        Authorization: `Bearer ${env.PU_TOKEN2}`,
+                        Authorization: `Bearer ${env.PU_TOKEN}`,
                     },
                 },
             );
