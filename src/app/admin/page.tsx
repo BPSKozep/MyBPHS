@@ -24,6 +24,7 @@ export default function Users() {
                         <BigLinkButton title="Órarend" url="/admin/timetable" />
                         <BigLinkButton title="Csoportok" url="/admin/groups" />
                         <BigLinkButton title="Email" url="/admin/email" />
+                        <BigLinkButton title="Laptopok" url="/admin/laptops" />
                     </div>
                 </div>
             </PageWithHeader>

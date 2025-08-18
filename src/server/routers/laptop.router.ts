@@ -45,7 +45,7 @@ export const laptopRouter = createTRPCRouter({
                 });
             }
 
-            const response = await fetch("http://10.0.0.11:5000/deployments", {
+            const response = await fetch(`${env.PU_URL}/mdt-deployments`, {
                 headers: {
                     Authorization: `Bearer ${env.PU_TOKEN}`,
                 },
@@ -78,7 +78,7 @@ export const laptopRouter = createTRPCRouter({
             }
 
             const response = await fetch(
-                `http://10.0.0.11:5000/deployments/delete/${input.id}`,
+                `${env.PU_URL}/mdt-deployments/delete/${input.id}`,
                 {
                     method: "DELETE",
                     headers: {

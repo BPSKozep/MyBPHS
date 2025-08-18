@@ -6,6 +6,7 @@ import { type AppRouter } from "@/server/root";
 import { type inferProcedureOutput } from "@trpc/server";
 import Loading from "@/components/Loading";
 import Card from "@/components/Card";
+import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useRef } from "react";
 
 type DeploymentData = inferProcedureOutput<
@@ -35,25 +36,40 @@ function DeploymentCard({
     };
 
     useEffect(() => {
-        if (deployment.DeploymentStatus === 3) return;
-
         const calculateElapsedTime = () => {
             const regex = /\/Date\((\d+)\)\//;
-            const match = regex.exec(deployment.StartTime);
-            if (match?.[1]) {
-                const startTimestamp = parseInt(match[1], 10);
-                const now = Date.now();
-                const elapsed = Math.floor((now - startTimestamp) / 1000);
+            const startMatch = regex.exec(deployment.StartTime);
+            if (startMatch?.[1]) {
+                const startTimestamp = parseInt(startMatch[1], 10);
+                let endTimestamp: number;
+
+                // If deployment has an end time, use that; otherwise use current time
+                if (deployment.EndTime) {
+                    const endMatch = regex.exec(deployment.EndTime);
+                    if (endMatch?.[1]) {
+                        endTimestamp = parseInt(endMatch[1], 10);
+                    } else {
+                        endTimestamp = Date.now();
+                    }
+                } else {
+                    endTimestamp = Date.now();
+                }
+
+                const elapsed = Math.floor(
+                    (endTimestamp - startTimestamp) / 1000,
+                );
                 setElapsedTime(elapsed);
             }
         };
 
         calculateElapsedTime();
 
-        const interval = setInterval(calculateElapsedTime, 1000);
-
-        return () => clearInterval(interval);
-    }, [deployment.StartTime, deployment.DeploymentStatus]);
+        // Only set up interval if deployment doesn't have an end time
+        if (!deployment.EndTime) {
+            const interval = setInterval(calculateElapsedTime, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [deployment.StartTime, deployment.EndTime, deployment.DeploymentStatus]);
 
     const formatElapsedTime = (seconds: number) => {
         const hours = Math.floor(seconds / 3600);
@@ -132,28 +148,27 @@ function DeploymentCard({
                     >
                         {deployment.Name}
                     </h3>
-                    {deployment.DeploymentStatus !== 3 && (
-                        <div className="flex items-center gap-1 text-xs text-gray-400">
-                            <svg
-                                className="h-3 w-3"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12,6 12,12 16,14" />
-                            </svg>
-                            <span className="font-mono">
-                                {formatElapsedTime(elapsedTime)}
-                            </span>
-                        </div>
-                    )}
+                    <div className="flex items-center gap-1 text-xs text-gray-200">
+                        <svg
+                            className="h-3 w-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12,6 12,12 16,14" />
+                        </svg>
+                        <span className="font-mono">
+                            {formatElapsedTime(elapsedTime)}
+                            {deployment.EndTime && ""}
+                        </span>
+                    </div>
                 </div>
-                <span
+                <Badge
                     className={`rounded-full border px-3 py-1 text-xs font-medium ${getStatusColor(deployment.DeploymentStatus)}`}
                 >
                     {getStatusText(deployment.DeploymentStatus)}
-                </span>
+                </Badge>
             </div>
 
             {/* Progress Bar */}
@@ -179,25 +194,32 @@ function DeploymentCard({
 
             {/* Stats Grid */}
             <div className="mb-3 grid grid-cols-3 gap-3 text-xs">
-                <div>
+                <div className="flex flex-col items-center">
                     <p className="font-medium text-gray-400">Lépések</p>
                     <p className="font-mono text-white">
                         {deployment.CurrentStep}/{deployment.TotalSteps}
                     </p>
                 </div>
-                <div>
-                    <p className="font-medium text-gray-400">
+                <div className="flex flex-col items-center">
+                    <p className="mb-1 font-medium text-gray-400">
                         Figyelmeztetések
                     </p>
-                    <p className="font-mono text-yellow-400">
+                    <Badge
+                        className="h-5 min-w-6 rounded-full border-yellow-400 px-1"
+                        variant="default"
+                    >
                         {deployment.Warnings}
-                    </p>
+                    </Badge>
                 </div>
-                <div>
-                    <p className="font-medium text-gray-400">Hibák</p>
-                    <p className="font-mono text-red-400">
+                <div className="flex flex-col items-center">
+                    <p className="mb-1 font-medium text-gray-400">Hibák</p>
+
+                    <Badge
+                        className="h-5 min-w-6 rounded-full border-red-500 px-1"
+                        variant="default"
+                    >
                         {deployment.Errors}
-                    </p>
+                    </Badge>
                 </div>
             </div>
 
@@ -462,7 +484,9 @@ export default function LaptopDeploymentsClient() {
     }
 
     const activeDeployments =
-        deployments?.filter((d) => d.DeploymentStatus !== 3) ?? [];
+        deployments?.filter((d) => d.DeploymentStatus === 1) ?? [];
+    const erroredDeployments =
+        deployments?.filter((d) => d.DeploymentStatus === 2) ?? [];
     const completedDeployments =
         deployments?.filter((d) => d.DeploymentStatus === 3) ?? [];
 
@@ -526,21 +550,18 @@ export default function LaptopDeploymentsClient() {
                 </Card>
                 <Card padding="3">
                     <div className="text-center">
-                        <div className="text-2xl font-bold text-green-400">
-                            {completedDeployments.length}
+                        <div className="text-2xl font-bold text-red-400">
+                            {erroredDeployments.length}
                         </div>
-                        <div className="text-sm text-gray-400">Befejezett</div>
+                        <div className="text-sm text-gray-400">Hibás</div>
                     </div>
                 </Card>
                 <Card padding="3">
                     <div className="text-center">
-                        <div className="text-2xl font-bold text-red-400">
-                            {deployments?.reduce(
-                                (sum, d) => sum + d.Errors,
-                                0,
-                            ) ?? 0}
+                        <div className="text-2xl font-bold text-green-400">
+                            {completedDeployments.length}
                         </div>
-                        <div className="text-sm text-gray-400">Összes hiba</div>
+                        <div className="text-sm text-gray-400">Befejezett</div>
                     </div>
                 </Card>
             </div>
@@ -555,6 +576,27 @@ export default function LaptopDeploymentsClient() {
                     <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                         <AnimatePresence mode="popLayout">
                             {activeDeployments.map((deployment, index) => (
+                                <DeploymentCard
+                                    key={deployment.UniqueID}
+                                    deployment={deployment}
+                                    index={index}
+                                />
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                </div>
+            )}
+
+            {/* Errored Deployments */}
+            {erroredDeployments.length > 0 && (
+                <div>
+                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-white">
+                        <span className="h-3 w-3 animate-pulse rounded-full bg-red-500"></span>
+                        Hibás telepítések ({erroredDeployments.length})
+                    </h2>
+                    <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                        <AnimatePresence mode="popLayout">
+                            {erroredDeployments.map((deployment, index) => (
                                 <DeploymentCard
                                     key={deployment.UniqueID}
                                     deployment={deployment}
