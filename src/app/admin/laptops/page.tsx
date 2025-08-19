@@ -1,6 +1,6 @@
-import OnlyRoles from "@/components/OnlyRoles";
+import OnlyRoles from "@/components/auth/OnlyRoles";
 import PageWithHeader from "@/components/PageWithHeader";
-import LaptopDeploymentsClient from "@/components/admin/LaptopDeploymentsClient";
+import LaptopDeploymentsClient from "@/components/admin/laptops/LaptopDeploymentsClient";
 
 export const metadata = {
     title: "Admin / Laptop Telepítések",

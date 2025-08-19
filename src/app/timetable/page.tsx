@@ -1,7 +1,7 @@
 "use client";
 
 import PageWithHeader from "@/components/PageWithHeader";
-import Timetable from "@/components/Timetable";
+import Timetable from "@/components/timetable/Timetable";
 import { useSession } from "next-auth/react";
 import React from "react";
 import { api } from "@/trpc/react";

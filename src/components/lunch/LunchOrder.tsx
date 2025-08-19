@@ -2,8 +2,8 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import Card from "@/components/Card";
-import OrderForm from "@/components/OrderForm";
-import ClosedOrderForm from "@/components/ClosedOrderForm";
+import OrderForm from "@/components/lunch/OrderForm";
+import ClosedOrderForm from "@/components/lunch/ClosedOrderForm";
 import IconSubmitButton from "@/components/IconSubmitButton";
 import {
     FaEnvelope,
@@ -21,7 +21,7 @@ import { motion } from "motion/react";
 import IconButton from "@/components/IconButton";
 import { useSession } from "next-auth/react";
 import PageWithHeader from "@/components/PageWithHeader";
-import Paywall from "./Paywall";
+import Paywall from "@/components/Paywall";
 
 function LunchOrder() {
     const [weekOffset, setWeekOffset] = useState(1);

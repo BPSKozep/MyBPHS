@@ -6,8 +6,8 @@ import sleep from "@/utils/sleep";
 import IconSubmitButton from "@/components/IconSubmitButton";
 import { FaFloppyDisk } from "react-icons/fa6";
 import { api } from "@/trpc/react";
-import Card from "./Card";
-import Loading from "./Loading";
+import Card from "../Card";
+import Loading from "../Loading";
 
 export default function LaptopPasswordReset() {
     const [input, setInput] = useState("");

@@ -1,5 +1,5 @@
-import ManageGroups from "@/components/admin/ManageGroups";
-import OnlyRoles from "@/components/OnlyRoles";
+import ManageGroups from "@/components/admin/groups/ManageGroups";
+import OnlyRoles from "@/components/auth/OnlyRoles";
 import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 

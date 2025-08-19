@@ -4,7 +4,7 @@ import PageWithHeader from "@/components/PageWithHeader";
 import Loading from "@/components/Loading";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
-import OnlyBlocked from "@/components/OnlyBlocked";
+import OnlyBlocked from "@/components/auth/OnlyBlocked";
 
 export default function Pay() {
     const [loading, setLoading] = useState(false);

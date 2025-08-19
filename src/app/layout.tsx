@@ -6,7 +6,7 @@ import "./globals.css";
 
 import Providers from "@/app/providers";
 import MainHeader from "@/components/MainHeader";
-import IdentifyUser from "@/components/IdentifyUser";
+import IdentifyUser from "@/components/auth/IdentifyUser";
 import type { Metadata, Viewport } from "next";
 import PageTransition from "@/components/PageTransition";
 

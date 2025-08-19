@@ -1,4 +1,4 @@
-import OnlyRoles from "@/components/OnlyRoles";
+import OnlyRoles from "@/components/auth/OnlyRoles";
 import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 import BigLinkButton from "@/components/BigLinkButton";

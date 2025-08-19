@@ -1,6 +1,6 @@
-import OnlyRoles from "@/components/OnlyRoles";
+import OnlyRoles from "@/components/auth/OnlyRoles";
 import PageWithHeader from "@/components/PageWithHeader";
-import UsersDataManager from "@/components/admin/UsersDataManager";
+import UsersDataManager from "@/components/admin/users/UsersDataManager";
 import React from "react";
 
 export const metadata = {

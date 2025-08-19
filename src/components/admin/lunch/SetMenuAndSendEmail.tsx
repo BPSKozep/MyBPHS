@@ -6,7 +6,7 @@ import IconSubmitButton from "@/components/IconSubmitButton";
 import { FaEnvelope } from "react-icons/fa6";
 import sleep from "@/utils/sleep";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
-import SetMenuForm from "@/components/admin/SetMenuForm";
+import SetMenuForm from "@/components/admin/lunch/SetMenuForm";
 
 export default function SetMenuAndSendEmail() {
     const [menuOptions, setMenuOptions] = useState(

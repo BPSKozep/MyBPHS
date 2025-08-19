@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import NFCInput from "@/components/admin/NFCInput";
+import NFCInput from "@/components/admin/lunch/NFCInput";
 import { api } from "@/trpc/react";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
 import Loading from "@/components/Loading";

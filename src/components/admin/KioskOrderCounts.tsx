@@ -3,9 +3,9 @@
 import { FaPlus } from "react-icons/fa";
 import React, { useState } from "react";
 import { api } from "@/trpc/react";
-import SmallLoading from "./SmallLoading";
+import SmallLoading from "../SmallLoading";
 
-export default function OrderCounts({
+export default function KioskOrderCounts({
     data,
 }: {
     data: Record<string, number>;

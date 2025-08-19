@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { PropsWithChildren } from "react";
 import { useEffect } from "react";
 import { api } from "@/trpc/react";
-import Loading from "./Loading";
+import Loading from "../Loading";
 
 export default function OnlyBlocked({ children }: PropsWithChildren) {
     const router = useRouter();

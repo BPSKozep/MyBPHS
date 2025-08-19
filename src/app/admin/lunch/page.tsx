@@ -1,11 +1,11 @@
 import React from "react";
 import PageWithHeader from "@/components/PageWithHeader";
 import Card from "@/components/Card";
-import LunchOrders from "@/components/admin/LunchOrders";
-import OnlyRoles from "@/components/OnlyRoles";
-import TokenCheck from "@/components/admin/TokenCheck";
-import CloseMenuOrders from "@/components/admin/CloseMenuOrders";
-import SetMenuAndSendEmail from "@/components/admin/SetMenuAndSendEmail";
+import LunchOrders from "@/components/admin/lunch/LunchOrders";
+import OnlyRoles from "@/components/auth/OnlyRoles";
+import TokenCheck from "@/components/admin/lunch/TokenCheck";
+import CloseMenuOrders from "@/components/admin/lunch/CloseMenuOrders";
+import SetMenuAndSendEmail from "@/components/admin/lunch/SetMenuAndSendEmail";
 
 export const metadata = {
     title: "Admin / Ebédrendelés",
