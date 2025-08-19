@@ -18,12 +18,17 @@ import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import SmallLoading from "./SmallLoading";
 import Image from "next/image";
+import rolesJson from "@/data/roles.json";
 
 export default function MainHeader() {
     const { data } = useSession();
     const [imageError, setImageError] = useState(false);
 
     const NfcId = api.user.getNfcId.useQuery(data?.user?.email ?? "", {
+        enabled: !!data?.user?.email,
+    });
+
+    const userDetails = api.user.get.useQuery(data?.user?.email ?? "", {
         enabled: !!data?.user?.email,
     });
 
@@ -125,6 +130,22 @@ export default function MainHeader() {
                                             "Névtelen felhasználó"}
                                     </h3>
                                 </div>
+                                {userDetails.data?.roles &&
+                                    userDetails.data.roles.length > 0 && (
+                                        <div className="mt-1 text-xs font-medium text-gray-400">
+                                            {userDetails.data.roles
+                                                .map(
+                                                    (role) =>
+                                                        (
+                                                            rolesJson as Record<
+                                                                string,
+                                                                string
+                                                            >
+                                                        )[role] ?? role,
+                                                )
+                                                .join(", ")}
+                                        </div>
+                                    )}
                             </div>
 
                             {/* User Details */}

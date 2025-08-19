@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function Timetable() {
     return (
-        <OnlyRoles roles={["administrator", "teacher"]}>
+        <OnlyRoles roles={["administrator", "staff"]}>
             <PageWithHeader title="Admin / Órarend" homeLocation="/admin">
                 <CreateTimetable />
             </PageWithHeader>

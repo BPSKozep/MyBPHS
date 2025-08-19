@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function Groups() {
     return (
-        <OnlyRoles roles={["administrator", "teacher"]}>
+        <OnlyRoles roles={["administrator", "staff"]}>
             <PageWithHeader title="Admin / Csoportok" homeLocation="/admin">
                 <ManageGroups />
             </PageWithHeader>
