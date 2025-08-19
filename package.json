@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build-prod": "export MYBPHS_GIT_VERSION=$(git rev-parse --short HEAD) && next build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
