@@ -1,3 +1,9 @@
+# 2.7.0 2025-08-20
+
+- User Data Management
+- Redesign sheet
+- Use more shadcn components
+
 # 2.6.0 2025-05-29
 
 - Next.js 15

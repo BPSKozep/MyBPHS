@@ -585,238 +585,334 @@ export default function UsersDataManager() {
                         </DropdownMenu>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        {/* Delete Button */}
-                        <Button
-                            variant="outline"
-                            onClick={handleDeleteSelected}
-                            disabled={
-                                selectedRows.size === 0 ||
-                                deleteUsersMutation.isPending
-                            }
-                            className={`flex items-center gap-2 transition-colors ${
-                                selectedRows.size > 0
-                                    ? "border-red-600 bg-red-700 text-white hover:bg-red-600 hover:text-white"
-                                    : "border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
-                            }`}
-                            title={`${selectedRows.size} felhasználó törlése`}
-                        >
-                            <TrashIcon className="size-4" />
-                            Törlés{" "}
-                            {selectedRows.size > 0 && `(${selectedRows.size})`}
-                        </Button>
+                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+                        {/* Mobile: Full-width button row */}
+                        <div className="flex w-full gap-2 sm:hidden">
+                            {/* Add User Button */}
+                            <Dialog
+                                open={addUserDialog}
+                                onOpenChange={setAddUserDialog}
+                            >
+                                <DialogTrigger asChild>
+                                    <Button
+                                        variant="default"
+                                        className="flex flex-1 items-center justify-center bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
+                                        title="Új felhasználó"
+                                    >
+                                        <UserPlusIcon className="size-4" />
+                                    </Button>
+                                </DialogTrigger>
+                            </Dialog>
 
-                        {/* Add User Button */}
-                        <Dialog
-                            open={addUserDialog}
-                            onOpenChange={setAddUserDialog}
-                        >
-                            <DialogTrigger asChild>
-                                <Button
-                                    variant="default"
-                                    className="flex items-center bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
-                                >
-                                    <UserPlusIcon className="size-4" />
-                                    Új felhasználó
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-md border-gray-600 bg-[#2e2e2e]">
-                                <DialogHeader>
-                                    <DialogTitle className="text-white">
-                                        Új felhasználó hozzáadása
-                                    </DialogTitle>
-                                    <DialogDescription />
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label
-                                            htmlFor="name"
-                                            className="text-white"
-                                        >
-                                            Név*
-                                        </Label>
-                                        <Input
-                                            id="name"
-                                            value={newUser.name}
-                                            onChange={(e) =>
-                                                setNewUser((prev) => ({
-                                                    ...prev,
-                                                    name: e.target.value,
-                                                }))
-                                            }
-                                            className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
-                                            placeholder="Teljes név"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label
-                                            htmlFor="email"
-                                            className="text-white"
-                                        >
-                                            Email*
-                                        </Label>
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            value={newUser.email}
-                                            onChange={(e) =>
-                                                setNewUser((prev) => ({
-                                                    ...prev,
-                                                    email: e.target.value,
-                                                }))
-                                            }
-                                            className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
-                                            placeholder="pelda@example.com"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label
-                                            htmlFor="nfcId"
-                                            className="text-white"
-                                        >
-                                            NFC ID*
-                                        </Label>
-                                        <Input
-                                            id="nfcId"
-                                            value={newUser.nfcId}
-                                            maxLength={8}
-                                            onChange={(e) =>
-                                                setNewUser((prev) => ({
-                                                    ...prev,
-                                                    nfcId: e.target.value,
-                                                }))
-                                            }
-                                            className="border-gray-600 bg-[#565656] font-mono text-white placeholder:text-gray-300"
-                                            placeholder="12345678"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-white">
-                                            Szerepek*
-                                        </Label>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    className="w-full justify-between border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
-                                                >
-                                                    {newUser.roles.length === 0
-                                                        ? "Válassz szerepeket"
-                                                        : newUser.roles
-                                                              .map(
-                                                                  (role) =>
-                                                                      roles[
-                                                                          role
-                                                                      ] ?? role,
-                                                              )
-                                                              .join(", ")}
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="border-gray-600 bg-[#242424]">
-                                                {roleKeys.map((role) => (
-                                                    <DropdownMenuCheckboxItem
-                                                        key={role}
-                                                        checked={newUser.roles.includes(
-                                                            role,
-                                                        )}
-                                                        onCheckedChange={() =>
-                                                            toggleNewUserRole(
-                                                                role,
-                                                            )
-                                                        }
-                                                        className="font-medium text-white hover:bg-[#2e2e2e] hover:text-white focus:bg-[#2e2e2e] focus:text-white"
-                                                    >
-                                                        {roles[role] ?? role}
-                                                    </DropdownMenuCheckboxItem>
-                                                ))}
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Switch
-                                            id="blocked"
-                                            checked={newUser.blocked}
-                                            onCheckedChange={(
-                                                checked: boolean,
-                                            ) =>
-                                                setNewUser((prev) => ({
-                                                    ...prev,
-                                                    blocked: checked,
-                                                }))
-                                            }
-                                            className="data-[state=checked]:bg-red-600"
-                                        />
-                                        <Label
-                                            htmlFor="blocked"
-                                            className="text-white"
-                                        >
-                                            Blokkolva
-                                        </Label>
-                                    </div>
-                                </div>
-                                <DialogFooter>
+                            {/* Delete Button */}
+                            <Button
+                                variant="outline"
+                                onClick={handleDeleteSelected}
+                                disabled={
+                                    selectedRows.size === 0 ||
+                                    deleteUsersMutation.isPending
+                                }
+                                className={`flex flex-1 items-center justify-center transition-colors ${
+                                    selectedRows.size > 0
+                                        ? "border-red-600 bg-red-700 text-white hover:bg-red-600 hover:text-white"
+                                        : "border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+                                }`}
+                                title={`${selectedRows.size} felhasználó törlése`}
+                            >
+                                <TrashIcon className="size-4" />
+                            </Button>
+
+                            {/* Column Visibility Button */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        onClick={() => setAddUserDialog(false)}
-                                        className="border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+                                        className="flex flex-1 items-center justify-center border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+                                        title="Oszlopok"
                                     >
-                                        Mégse
+                                        <FaColumns className="size-4" />
                                     </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="border-gray-600 bg-[#242424]">
+                                    {columns
+                                        .filter(
+                                            (column) => column.key !== "select",
+                                        )
+                                        .map((column) => (
+                                            <DropdownMenuCheckboxItem
+                                                key={column.key}
+                                                checked={column.visible}
+                                                onCheckedChange={() =>
+                                                    toggleColumnVisibility(
+                                                        column.key,
+                                                    )
+                                                }
+                                                className="font-medium text-white hover:bg-[#2e2e2e] hover:text-white focus:bg-[#2e2e2e] focus:text-white"
+                                            >
+                                                {column.label}
+                                            </DropdownMenuCheckboxItem>
+                                        ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {/* Refresh Button */}
+                            <Button
+                                variant="outline"
+                                onClick={handleRefreshWithLoading}
+                                disabled={isRefreshLoading}
+                                className="flex flex-1 items-center justify-center border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white disabled:opacity-50"
+                                title="Adatok frissítése"
+                            >
+                                <RefreshCwIcon
+                                    className={`size-4 ${isRefreshLoading ? "animate-spin" : ""}`}
+                                />
+                            </Button>
+                        </div>
+
+                        {/* Desktop: Original layout with text */}
+                        <div className="hidden items-center gap-2 sm:flex">
+                            {/* Add User Button */}
+                            <Dialog
+                                open={addUserDialog}
+                                onOpenChange={setAddUserDialog}
+                            >
+                                <DialogTrigger asChild>
                                     <Button
-                                        onClick={handleCreateUser}
-                                        disabled={createUserMutation.isPending}
-                                        className="border-blue-600 bg-blue-700 text-white hover:bg-blue-600 hover:text-white"
+                                        variant="default"
+                                        className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
                                     >
-                                        {createUserMutation.isPending
-                                            ? "Létrehozás..."
-                                            : "Létrehozás"}
+                                        <UserPlusIcon className="size-4" />
+                                        Új felhasználó
                                     </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-
-                        {/* Column Visibility Button */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="flex items-center gap-2 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
-                                >
-                                    <FaColumns className="size-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="border-gray-600 bg-[#242424]">
-                                {columns
-                                    .filter((column) => column.key !== "select")
-                                    .map((column) => (
-                                        <DropdownMenuCheckboxItem
-                                            key={column.key}
-                                            checked={column.visible}
-                                            onCheckedChange={() =>
-                                                toggleColumnVisibility(
-                                                    column.key,
-                                                )
+                                </DialogTrigger>
+                                <DialogContent className="max-w-md border-gray-600 bg-[#2e2e2e]">
+                                    <DialogHeader>
+                                        <DialogTitle className="text-white">
+                                            Új felhasználó hozzáadása
+                                        </DialogTitle>
+                                        <DialogDescription />
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="name"
+                                                className="text-white"
+                                            >
+                                                Név*
+                                            </Label>
+                                            <Input
+                                                id="name"
+                                                value={newUser.name}
+                                                onChange={(e) =>
+                                                    setNewUser((prev) => ({
+                                                        ...prev,
+                                                        name: e.target.value,
+                                                    }))
+                                                }
+                                                className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
+                                                placeholder="Teljes név"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="email"
+                                                className="text-white"
+                                            >
+                                                Email*
+                                            </Label>
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                value={newUser.email}
+                                                onChange={(e) =>
+                                                    setNewUser((prev) => ({
+                                                        ...prev,
+                                                        email: e.target.value,
+                                                    }))
+                                                }
+                                                className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
+                                                placeholder="pelda@example.com"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="nfcId"
+                                                className="text-white"
+                                            >
+                                                NFC ID*
+                                            </Label>
+                                            <Input
+                                                id="nfcId"
+                                                value={newUser.nfcId}
+                                                maxLength={8}
+                                                onChange={(e) =>
+                                                    setNewUser((prev) => ({
+                                                        ...prev,
+                                                        nfcId: e.target.value,
+                                                    }))
+                                                }
+                                                className="border-gray-600 bg-[#565656] font-mono text-white placeholder:text-gray-300"
+                                                placeholder="12345678"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-white">
+                                                Szerepek*
+                                            </Label>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full justify-between border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+                                                    >
+                                                        {newUser.roles
+                                                            .length === 0
+                                                            ? "Válassz szerepeket"
+                                                            : newUser.roles
+                                                                  .map(
+                                                                      (role) =>
+                                                                          roles[
+                                                                              role
+                                                                          ] ??
+                                                                          role,
+                                                                  )
+                                                                  .join(", ")}
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="border-gray-600 bg-[#242424]">
+                                                    {roleKeys.map((role) => (
+                                                        <DropdownMenuCheckboxItem
+                                                            key={role}
+                                                            checked={newUser.roles.includes(
+                                                                role,
+                                                            )}
+                                                            onCheckedChange={() =>
+                                                                toggleNewUserRole(
+                                                                    role,
+                                                                )
+                                                            }
+                                                            className="font-medium text-white hover:bg-[#2e2e2e] hover:text-white focus:bg-[#2e2e2e] focus:text-white"
+                                                        >
+                                                            {roles[role] ??
+                                                                role}
+                                                        </DropdownMenuCheckboxItem>
+                                                    ))}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch
+                                                id="blocked"
+                                                checked={newUser.blocked}
+                                                onCheckedChange={(
+                                                    checked: boolean,
+                                                ) =>
+                                                    setNewUser((prev) => ({
+                                                        ...prev,
+                                                        blocked: checked,
+                                                    }))
+                                                }
+                                                className="data-[state=checked]:bg-red-600"
+                                            />
+                                            <Label
+                                                htmlFor="blocked"
+                                                className="text-white"
+                                            >
+                                                Blokkolva
+                                            </Label>
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() =>
+                                                setAddUserDialog(false)
                                             }
-                                            className="font-medium text-white hover:bg-[#2e2e2e] hover:text-white focus:bg-[#2e2e2e] focus:text-white"
+                                            className="border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
                                         >
-                                            {column.label}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                            Mégse
+                                        </Button>
+                                        <Button
+                                            onClick={handleCreateUser}
+                                            disabled={
+                                                createUserMutation.isPending
+                                            }
+                                            className="border-blue-600 bg-blue-700 text-white hover:bg-blue-600 hover:text-white"
+                                        >
+                                            {createUserMutation.isPending
+                                                ? "Létrehozás..."
+                                                : "Létrehozás"}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
 
-                        {/* Refresh Button */}
-                        <Button
-                            variant="outline"
-                            onClick={handleRefreshWithLoading}
-                            disabled={isRefreshLoading}
-                            className="flex items-center gap-2 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white disabled:opacity-50"
-                            title="Adatok frissítése"
-                        >
-                            <RefreshCwIcon
-                                className={`size-4 ${isRefreshLoading ? "animate-spin" : ""}`}
-                            />
-                        </Button>
+                            {/* Delete Button */}
+                            <Button
+                                variant="outline"
+                                onClick={handleDeleteSelected}
+                                disabled={
+                                    selectedRows.size === 0 ||
+                                    deleteUsersMutation.isPending
+                                }
+                                className={`flex items-center gap-2 transition-colors ${
+                                    selectedRows.size > 0
+                                        ? "border-red-600 bg-red-700 text-white hover:bg-red-600 hover:text-white"
+                                        : "border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+                                }`}
+                                title={`${selectedRows.size} felhasználó törlése`}
+                            >
+                                <TrashIcon className="size-4" />
+                                Törlés{" "}
+                                {selectedRows.size > 0 &&
+                                    `(${selectedRows.size})`}
+                            </Button>
+
+                            {/* Column Visibility Button */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="flex items-center gap-2 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+                                    >
+                                        <FaColumns className="size-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="border-gray-600 bg-[#242424]">
+                                    {columns
+                                        .filter(
+                                            (column) => column.key !== "select",
+                                        )
+                                        .map((column) => (
+                                            <DropdownMenuCheckboxItem
+                                                key={column.key}
+                                                checked={column.visible}
+                                                onCheckedChange={() =>
+                                                    toggleColumnVisibility(
+                                                        column.key,
+                                                    )
+                                                }
+                                                className="font-medium text-white hover:bg-[#2e2e2e] hover:text-white focus:bg-[#2e2e2e] focus:text-white"
+                                            >
+                                                {column.label}
+                                            </DropdownMenuCheckboxItem>
+                                        ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {/* Refresh Button */}
+                            <Button
+                                variant="outline"
+                                onClick={handleRefreshWithLoading}
+                                disabled={isRefreshLoading}
+                                className="flex items-center gap-2 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white disabled:opacity-50"
+                                title="Adatok frissítése"
+                            >
+                                <RefreshCwIcon
+                                    className={`size-4 ${isRefreshLoading ? "animate-spin" : ""}`}
+                                />
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -1249,81 +1345,107 @@ export default function UsersDataManager() {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex flex-col items-center justify-between gap-4 rounded-lg border border-gray-600 bg-[#2e2e2e] p-4 lg:flex-row">
-                    <div className="flex items-center gap-3 text-sm text-gray-300">
-                        <span className="font-medium">Sorok oldalanként:</span>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="h-8 w-16 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
-                                >
-                                    {pageSize}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="border-gray-600 bg-[#242424]">
-                                {PAGE_SIZE_OPTIONS.map((size) => (
-                                    <DropdownMenuItem
-                                        key={size}
-                                        onClick={() => {
-                                            setPageSize(size);
-                                            setPage(1);
-                                        }}
-                                        className="font-medium text-white hover:bg-[#2e2e2e] hover:text-white focus:bg-[#2e2e2e] focus:text-white"
+                <div className="flex flex-col items-center justify-between gap-2 rounded-lg border border-gray-600 bg-[#2e2e2e] p-2 sm:gap-4 sm:p-4 lg:flex-row">
+                    <div className="flex flex-row items-center justify-between gap-10">
+                        <div className="flex items-center gap-2 text-xs text-gray-300 sm:gap-3 sm:text-sm">
+                            <span className="hidden font-medium sm:inline">
+                                Sorok oldalanként:
+                            </span>
+                            <span className="font-medium sm:hidden">
+                                Sorok/oldal:
+                            </span>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="h-6 w-12 border-gray-600 bg-[#565656] text-xs text-white hover:bg-[#454545] hover:text-white sm:h-8 sm:w-16 sm:text-sm"
                                     >
-                                        {size}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                        {pageSize}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="border-gray-600 bg-[#242424]">
+                                    {PAGE_SIZE_OPTIONS.map((size) => (
+                                        <DropdownMenuItem
+                                            key={size}
+                                            onClick={() => {
+                                                setPageSize(size);
+                                                setPage(1);
+                                            }}
+                                            className="font-medium text-white hover:bg-[#2e2e2e] hover:text-white focus:bg-[#2e2e2e] focus:text-white"
+                                        >
+                                            {size}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs font-medium text-gray-300 sm:gap-2 sm:text-sm">
+                            <span className="hidden sm:inline">
+                                Megjelenítés:{" "}
+                                <span className="text-white">
+                                    {Math.min(
+                                        (page - 1) * pageSize + 1,
+                                        filteredAndSortedUsers.length,
+                                    )}
+                                </span>{" "}
+                                -{" "}
+                                <span className="text-white">
+                                    {Math.min(
+                                        page * pageSize,
+                                        filteredAndSortedUsers.length,
+                                    )}
+                                </span>{" "}
+                                /{" "}
+                                <span className="text-white">
+                                    {filteredAndSortedUsers.length}
+                                </span>{" "}
+                                felhasználó
+                            </span>
+                            <span className="sm:hidden">
+                                <span className="text-white">
+                                    {Math.min(
+                                        (page - 1) * pageSize + 1,
+                                        filteredAndSortedUsers.length,
+                                    )}
+                                </span>
+                                -
+                                <span className="text-white">
+                                    {Math.min(
+                                        page * pageSize,
+                                        filteredAndSortedUsers.length,
+                                    )}
+                                </span>
+                                /
+                                <span className="text-white">
+                                    {filteredAndSortedUsers.length}
+                                </span>
+                            </span>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                        <span>
-                            Megjelenítés:{" "}
-                            <span className="text-white">
-                                {Math.min(
-                                    (page - 1) * pageSize + 1,
-                                    filteredAndSortedUsers.length,
-                                )}
-                            </span>{" "}
-                            -{" "}
-                            <span className="text-white">
-                                {Math.min(
-                                    page * pageSize,
-                                    filteredAndSortedUsers.length,
-                                )}
-                            </span>{" "}
-                            /{" "}
-                            <span className="text-white">
-                                {filteredAndSortedUsers.length}
-                            </span>{" "}
-                            felhasználó
-                        </span>
-                    </div>
-
-                    <div className="flex items-center gap-1">
+                    <div className="flex w-full items-center justify-between gap-1 sm:w-auto sm:gap-1">
                         <Button
                             variant="outline"
                             size="icon"
                             onClick={() => setPage(1)}
                             disabled={!canGoPrevious}
-                            className="h-8 w-8 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] disabled:opacity-50"
+                            className="h-6 flex-1 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] disabled:opacity-50 sm:h-8 sm:w-8 sm:flex-none"
                         >
-                            <ChevronsLeftIcon className="size-4" />
+                            <ChevronsLeftIcon className="size-3 sm:size-4" />
                         </Button>
                         <Button
                             variant="outline"
                             size="icon"
                             onClick={() => setPage(page - 1)}
                             disabled={!canGoPrevious}
-                            className="h-8 w-8 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] disabled:opacity-50"
+                            className="h-6 flex-1 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] disabled:opacity-50 sm:h-8 sm:w-8 sm:flex-none"
                         >
-                            <ChevronLeftIcon className="size-4" />
+                            <ChevronLeftIcon className="size-3 sm:size-4" />
                         </Button>
-                        <div className="mx-3 flex items-center gap-2 text-sm font-medium text-gray-300">
-                            <span>Oldal</span>
-                            <span className="min-w-[3rem] rounded border border-gray-600 bg-[#565656] px-2 py-1 text-center text-white">
+                        <div className="mx-1 flex items-center gap-1 text-xs font-medium text-gray-300 sm:mx-3 sm:gap-2 sm:text-sm">
+                            <span className="hidden sm:inline">Oldal</span>
+                            <span className="min-w-[2rem] rounded border border-gray-600 bg-[#565656] px-1 py-0.5 text-center text-xs text-white sm:min-w-[3rem] sm:px-2 sm:py-1 sm:text-sm">
                                 {page}
                             </span>
                             <span>/ {totalPages}</span>
@@ -1333,18 +1455,18 @@ export default function UsersDataManager() {
                             size="icon"
                             onClick={() => setPage(page + 1)}
                             disabled={!canGoNext}
-                            className="h-8 w-8 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] disabled:opacity-50"
+                            className="h-6 flex-1 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] disabled:opacity-50 sm:h-8 sm:w-8 sm:flex-none"
                         >
-                            <ChevronRightIcon className="size-4" />
+                            <ChevronRightIcon className="size-3 sm:size-4" />
                         </Button>
                         <Button
                             variant="outline"
                             size="icon"
                             onClick={() => setPage(totalPages)}
                             disabled={!canGoNext}
-                            className="h-8 w-8 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] disabled:opacity-50"
+                            className="h-6 flex-1 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] disabled:opacity-50 sm:h-8 sm:w-8 sm:flex-none"
                         >
-                            <ChevronsRightIcon className="size-4" />
+                            <ChevronsRightIcon className="size-3 sm:size-4" />
                         </Button>
                     </div>
                 </div>
