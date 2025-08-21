@@ -91,7 +91,7 @@ export default function LaptopPasswordReset() {
                                 height: { delay: inputValid ? 0.2 : 0 },
                             }}
                         >
-                            A jelszó legalább 6 karakter hosszú legyen.
+                            A jelszó legalább 8 karakter hosszú legyen.
                         </motion.span>
 
                         <div className="mt-3">
