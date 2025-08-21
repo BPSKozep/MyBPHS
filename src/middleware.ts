@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 const AUTH_WHITELIST = [
     "/auth",
     "/forbidden",
+    "/onboarding",
     "/auth",
     "/robots.txt",
     "/sitemap.xml",

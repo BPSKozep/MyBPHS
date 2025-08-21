@@ -186,9 +186,9 @@ export default function UsersDataManager() {
         isLoading,
         error,
         refetch: refetchUsers,
-    } = api.user.getAllUsers.useQuery();
+    } = api.user.getAll.useQuery();
 
-    const updateUserMutation = api.user.updateUser.useMutation({
+    const updateUserMutation = api.user.update.useMutation({
         onSuccess: () => {
             void refetchUsers();
             setEditingUserId(null);
@@ -204,7 +204,7 @@ export default function UsersDataManager() {
         },
     });
 
-    const deleteUsersMutation = api.user.deleteUsers.useMutation({
+    const deleteUsersMutation = api.user.delete.useMutation({
         onSuccess: () => {
             void refetchUsers();
             setSelectedRows(new Set());
@@ -219,7 +219,7 @@ export default function UsersDataManager() {
         },
     });
 
-    const createUserMutation = api.user.createUser.useMutation({
+    const createUserMutation = api.user.create.useMutation({
         onSuccess: () => {
             void refetchUsers();
             setAddUserDialog(false);

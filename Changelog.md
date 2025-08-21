@@ -1,3 +1,7 @@
+# 2.8.0 2025-08-21
+
+- Onboarding
+
 # 2.7.0 2025-08-20
 
 - User Data Management

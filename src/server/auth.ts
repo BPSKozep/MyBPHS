@@ -39,6 +39,20 @@ export const authOptions: NextAuthOptions = {
 
             if (user) return true;
 
+            const email = profile?.email;
+            if (
+                email?.endsWith("@jamdon2.dev") ||
+                email?.endsWith("@budapest.school") ||
+                email?.endsWith("@budapestschool.org")
+            ) {
+                // Redirect to onboarding with user info as search params
+                const params = new URLSearchParams({
+                    name: profile?.name ?? "",
+                    email: email,
+                });
+                return `/onboarding?${params.toString()}`;
+            }
+
             return "/forbidden";
         },
     },
