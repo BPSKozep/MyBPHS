@@ -206,7 +206,7 @@ export async function POST(req: Request) {
                         });
 
                         await fetch(
-                            `https://pu.bpskozep.hu/ad/password-reset/${user.email}`,
+                            `${env.PU_URL}/ad/password-reset/${user.email}`,
                             {
                                 method: "POST",
                                 headers: {

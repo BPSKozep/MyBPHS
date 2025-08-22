@@ -1,9 +1,14 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from "@/server/trpc";
 
 import { User } from "@/models";
 import { TRPCError } from "@trpc/server";
 import Group from "@/models/Group.model";
+import mongooseConnect from "@/clients/mongoose";
 import type { IGroup } from "@/models/Group.model";
 import type { Document } from "mongoose";
 import type { IGroupOverride } from "@/models/GroupOverride.model";
@@ -241,7 +246,7 @@ export const userRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
-                "teacher",
+                "staff",
             ]);
 
             if (!authorized) {
@@ -295,7 +300,7 @@ export const userRouter = createTRPCRouter({
             }
         }),
     list: protectedProcedure
-        .input(z.enum(["all", "student", "teacher", "administrator"]))
+        .input(z.enum(["all", "student", "staff", "administrator"]))
         .output(
             z.array(
                 z.object({
@@ -318,8 +323,8 @@ export const userRouter = createTRPCRouter({
             let roleFilter = {};
             if (input === "student") {
                 roleFilter = { roles: "student" };
-            } else if (input === "teacher") {
-                roleFilter = { roles: "teacher" };
+            } else if (input === "staff") {
+                roleFilter = { roles: "staff" };
             } else if (input === "administrator") {
                 roleFilter = { roles: "administrator" };
             }
@@ -339,7 +344,7 @@ export const userRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const authorized = await checkRoles(ctx.session, [
                 "student",
-                "teacher",
+                "staff",
                 "lunch-system",
             ]);
 
@@ -383,5 +388,191 @@ export const userRouter = createTRPCRouter({
             await user.save();
 
             return "OK";
+        }),
+
+    update: protectedProcedure
+        .input(
+            z.object({
+                _id: z.string(),
+                name: z.string(),
+                email: z.string().email(),
+                nfcId: z.string(),
+                roles: z.array(z.string()),
+                blocked: z.boolean(),
+            }),
+        )
+        .mutation(async ({ ctx, input }) => {
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const { _id, ...updateData } = input;
+
+            const updatedUser = await User.findByIdAndUpdate(_id, updateData, {
+                new: true,
+            }).exec();
+
+            if (!updatedUser) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+            }
+
+            return {
+                _id: updatedUser._id?.toString() ?? "",
+                name: updatedUser.name,
+                email: updatedUser.email,
+                nfcId: updatedUser.nfcId,
+                roles: updatedUser.roles,
+                blocked: updatedUser.blocked ?? false,
+            };
+        }),
+
+    // Get all users for client-side management
+    getAll: protectedProcedure
+        .output(
+            z.array(
+                z.object({
+                    _id: z.string(),
+                    name: z.string(),
+                    email: z.string(),
+                    nfcId: z.string(),
+                    laptopPasswordChanged: z.date().nullable(),
+                    roles: z.array(z.string()),
+                    blocked: z.boolean(),
+                }),
+            ),
+        )
+        .query(async ({ ctx }) => {
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            // Get all users, sorted by name
+            const users = await User.find().sort({ name: 1 }).exec();
+
+            return users.map((user) => {
+                return {
+                    _id: user._id?.toString() ?? "",
+                    name: user.name,
+                    email: user.email,
+                    nfcId: user.nfcId,
+                    laptopPasswordChanged: user.laptopPasswordChanged ?? null,
+                    roles: user.roles,
+                    blocked: user.blocked ?? false,
+                };
+            });
+        }),
+
+    // Create a single user
+    create: publicProcedure
+        .input(
+            z.object({
+                name: z.string().min(1),
+                email: z.string().email(),
+                nfcId: z.string().min(1),
+                roles: z.array(z.string()).min(1),
+                blocked: z.boolean().default(false),
+            }),
+        )
+        .mutation(
+            async ({
+                // ctx,
+                input,
+            }) => {
+                // const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+                // if (!authorized) {
+                //     throw new TRPCError({
+                //         code: "FORBIDDEN",
+                //         message: "Access denied to the requested resource",
+                //     });
+                // }
+                await mongooseConnect();
+
+                // Check if user with this email or nfcId already exists
+                const existingUser = await User.findOne({
+                    $or: [{ email: input.email }, { nfcId: input.nfcId }],
+                });
+
+                if (existingUser) {
+                    throw new TRPCError({
+                        code: "CONFLICT",
+                        message:
+                            "User with this email or NFC ID already exists",
+                    });
+                }
+
+                const newUser = await User.create({
+                    name: input.name,
+                    email: input.email,
+                    nfcId: input.nfcId,
+                    roles: input.roles,
+                    blocked: input.blocked,
+                    groups: [],
+                });
+
+                return {
+                    _id: newUser._id?.toString() ?? "",
+                    name: newUser.name,
+                    email: newUser.email,
+                    nfcId: newUser.nfcId,
+                    roles: newUser.roles,
+                    blocked: newUser.blocked ?? false,
+                    laptopPasswordChanged: null,
+                };
+            },
+        ),
+
+    // Delete multiple users
+    delete: protectedProcedure
+        .input(z.array(z.string()))
+        .mutation(async ({ ctx, input }) => {
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            if (input.length === 0) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "No users selected for deletion",
+                });
+            }
+
+            // Delete users by their IDs
+            const result = await User.deleteMany({
+                _id: { $in: input },
+            });
+
+            return {
+                deletedCount: result.deletedCount,
+                message: `${result.deletedCount} felhasználó törölve`,
+            };
+        }),
+
+    // Check if a user exists by email
+    checkExists: publicProcedure
+        .input(z.object({ email: z.string().email() }))
+        .output(z.boolean())
+        .query(async ({ input }) => {
+            await mongooseConnect();
+            const user = await User.findOne({ email: input.email });
+            return !!user;
         }),
 });

@@ -1,4 +1,4 @@
-import LaptopPasswordReset from "@/components/LaptopPasswordReset";
+import LaptopPasswordReset from "@/components/laptop-password/LaptopPasswordReset";
 import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 

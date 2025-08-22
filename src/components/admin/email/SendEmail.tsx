@@ -8,7 +8,7 @@ import sleep from "@/utils/sleep";
 import { motion } from "motion/react";
 import { AnimatePresence } from "motion/react";
 import { api } from "@/trpc/react";
-import UserInput from "./UserInput";
+import UserInput from "../lunch/UserInput";
 
 export default function CreateUsers() {
     const [emailFormat, setEmailFormat] = useState<

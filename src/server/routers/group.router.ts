@@ -22,7 +22,7 @@ export const groupRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
-                "teacher",
+                "staff",
             ]);
 
             if (!authorized) {
@@ -51,7 +51,7 @@ export const groupRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const authorized = await checkRoles(ctx.session, [
                 "administrator",
-                "teacher",
+                "staff",
             ]);
 
             if (!authorized) {

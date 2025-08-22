@@ -42,17 +42,14 @@ export const adPasswordRouter = createTRPCRouter({
                     message: "User not found",
                 });
             }
-            await fetch(
-                `https://pu.bpskozep.hu/ad/password-reset/${user.email}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${puToken}`,
-                    },
-                    body: JSON.stringify({ password: input }),
+            await fetch(`${env.PU_URL}/ad/password-reset/${user.email}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${puToken}`,
                 },
-            );
+                body: JSON.stringify({ password: input }),
+            });
 
             user.laptopPasswordChanged = new Date();
             await user.save();

@@ -27,6 +27,10 @@ export const env = createEnv({
             process.env.NODE_ENV === "production"
                 ? z.string()
                 : z.string().optional(),
+        PU_URL:
+            process.env.NODE_ENV === "production"
+                ? z.string()
+                : z.string().optional(),
         INFO_WEBHOOK:
             process.env.NODE_ENV === "production"
                 ? z.string()

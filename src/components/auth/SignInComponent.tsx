@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import GoogleSignIn from "@/components/GoogleSignIn";
+import GoogleSignIn from "@/components/auth/GoogleSignIn";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 

@@ -6,8 +6,8 @@ import sleep from "@/utils/sleep";
 import IconSubmitButton from "@/components/IconSubmitButton";
 import { FaFloppyDisk } from "react-icons/fa6";
 import { api } from "@/trpc/react";
-import Card from "./Card";
-import Loading from "./Loading";
+import Card from "../Card";
+import Loading from "../Loading";
 
 export default function LaptopPasswordReset() {
     const [input, setInput] = useState("");
@@ -91,7 +91,7 @@ export default function LaptopPasswordReset() {
                                 height: { delay: inputValid ? 0.2 : 0 },
                             }}
                         >
-                            A jelszó legalább 6 karakter hosszú legyen.
+                            A jelszó legalább 8 karakter hosszú legyen.
                         </motion.span>
 
                         <div className="mt-3">

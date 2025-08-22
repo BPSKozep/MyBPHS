@@ -1,6 +1,4 @@
-name: Trigger Production Deploy as Jamdon2
-
-permissions: write-all
+name: Deploy to Vercel Prod
 
 on:
     push:
@@ -8,24 +6,17 @@ on:
             - main
 
 jobs:
-    trigger-prod-deploy:
-        if: github.actor == 'markgyoni'
+    deploy:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
+
+            - name: Deploy to Vercel
+              uses: amondnet/vercel-action@v25
               with:
-                  fetch-depth: 0
-
-            - name: Configure Git
-              run: |
-                  git config --local user.name "jamdon2"
-                  git config --local user.email "jamdon2@users.noreply.github.com"
-
-            - name: Create empty commit
-              run: |
-                  COMMIT_MESSAGE="PD: $(git log -1 --pretty=%B)"
-                  git commit --allow-empty -m "$COMMIT_MESSAGE"
-                  git push
-              env:
-                  GITHUB_TOKEN: ${{ secrets.JAMDON2_ACCESS_TOKEN }}
+                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
+                  vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+                  vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+                  working-directory: "./"
+                  vercel-args: "--prod"

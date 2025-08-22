@@ -1,7 +1,7 @@
 import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
-import OnlyRoles from "@/components/OnlyRoles";
-import CreateTimetable from "@/components/admin/CreateTimetable";
+import OnlyRoles from "@/components/auth/OnlyRoles";
+import CreateTimetable from "@/components/admin/timetable/CreateTimetable";
 
 export const metadata = {
     title: "Admin / Órarend",
@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function Timetable() {
     return (
-        <OnlyRoles roles={["administrator", "teacher"]}>
+        <OnlyRoles roles={["administrator", "staff"]}>
             <PageWithHeader title="Admin / Órarend" homeLocation="/admin">
                 <CreateTimetable />
             </PageWithHeader>

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import Loading from "./Loading";
+import Loading from "../Loading";
 import { signIn } from "next-auth/react";
 
 export default function GoogleSignIn() {

@@ -1,5 +1,5 @@
-import SendEmail from "@/components/admin/SendEmail";
-import OnlyRoles from "@/components/OnlyRoles";
+import SendEmail from "@/components/admin/email/SendEmail";
+import OnlyRoles from "@/components/auth/OnlyRoles";
 import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 

@@ -6,7 +6,7 @@ import IconSubmitButton from "@/components/IconSubmitButton";
 import Card from "@/components/Card";
 import { api } from "@/trpc/react";
 import { useDebounce } from "use-debounce";
-import TimetableEditor from "@/components/admin/TimetableEditor";
+import TimetableEditor from "@/components/admin/timetable/TimetableEditor";
 import { useCallback, useEffect, useState } from "react";
 
 const EMPTY_TIMETABLE = Array(5).fill([]);

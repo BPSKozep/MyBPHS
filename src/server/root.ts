@@ -9,6 +9,7 @@ import { webhookRouter } from "@/server/routers/webhook.router";
 import { adPasswordRouter } from "@/server/routers/adpassword.router";
 import { kioskRouter } from "@/server/routers/kiosk.router";
 import { paymentsRouter } from "@/server/routers/payments.router";
+import { laptopRouter } from "@/server/routers/laptop.router";
 
 export const appRouter = createTRPCRouter({
     user: userRouter,
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
     adpassword: adPasswordRouter,
     kiosk: kioskRouter,
     payments: paymentsRouter,
+    laptop: laptopRouter,
 });
 
 // export type definition of API

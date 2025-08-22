@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     }
 
     try {
-        const puResponse = await fetch("https://pu.bpskozep.hu");
+        const puResponse = await fetch(env.PU_URL ?? "");
         if (puResponse.status === 200) {
             return new Response("Pong", { status: 200 });
         }

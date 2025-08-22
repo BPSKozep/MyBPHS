@@ -1,4 +1,4 @@
-import OnlyRoles from "@/components/OnlyRoles";
+import OnlyRoles from "@/components/auth/OnlyRoles";
 import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 import BigLinkButton from "@/components/BigLinkButton";
@@ -24,6 +24,7 @@ export default function Users() {
                         <BigLinkButton title="Órarend" url="/admin/timetable" />
                         <BigLinkButton title="Csoportok" url="/admin/groups" />
                         <BigLinkButton title="Email" url="/admin/email" />
+                        <BigLinkButton title="Laptopok" url="/admin/laptops" />
                     </div>
                 </div>
             </PageWithHeader>

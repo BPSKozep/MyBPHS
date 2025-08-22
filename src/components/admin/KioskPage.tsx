@@ -1,12 +1,12 @@
 "use client";
 
-import OnlyRoles from "@/components/OnlyRoles";
+import OnlyRoles from "@/components/auth/OnlyRoles";
 import PageWithHeader from "@/components/PageWithHeader";
 import { FaCheck, FaUser, FaWrench } from "react-icons/fa";
 import IconButton from "@/components/IconButton";
 import React, { useEffect, useMemo, useState } from "react";
 import { api } from "@/trpc/react";
-import OrderCounts from "@/components/OrderCounts";
+import KioskOrderCounts from "@/components/admin/KioskOrderCounts";
 import { io } from "socket.io-client";
 import Loading from "@/components/Loading";
 
@@ -184,7 +184,7 @@ export default function KioskPage() {
                             >
                                 {order?.order}
                             </h2>
-                            <OrderCounts data={orderCounts} />
+                            <KioskOrderCounts data={orderCounts} />
                         </div>
                     )}
                 </div>
