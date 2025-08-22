@@ -14,6 +14,7 @@ import type { Document } from "mongoose";
 import type { IGroupOverride } from "@/models/GroupOverride.model";
 import { checkRoles } from "@/utils/authorization";
 import type { IUser } from "@/models/User.model";
+import { sortByPropertyHungarian } from "@/utils/hungarianCollator";
 
 export const userRouter = createTRPCRouter({
     get: protectedProcedure
@@ -459,10 +460,11 @@ export const userRouter = createTRPCRouter({
                 });
             }
 
-            // Get all users, sorted by name
-            const users = await User.find().sort({ name: 1 }).exec();
+            // Get all users, without server-side sorting (will be sorted client-side with Hungarian collation)
+            const users = await User.find().exec();
 
-            return users.map((user) => {
+            // Map users to the response format
+            const mappedUsers = users.map((user) => {
                 return {
                     _id: user._id?.toString() ?? "",
                     name: user.name,
@@ -473,6 +475,9 @@ export const userRouter = createTRPCRouter({
                     blocked: user.blocked ?? false,
                 };
             });
+
+            // Sort by name using Hungarian collation
+            return sortByPropertyHungarian(mappedUsers, (user) => user.name);
         }),
 
     // Create a single user

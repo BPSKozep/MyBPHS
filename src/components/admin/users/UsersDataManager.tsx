@@ -62,6 +62,7 @@ import { cn } from "@/lib/utils";
 import Card from "@/components/Card";
 import Loading from "@/components/Loading";
 import rolesJson from "@/data/roles.json";
+import { compareHungarianIgnoreCase } from "@/utils/hungarianCollator";
 
 type SortDirection = "asc" | "desc";
 type SortableColumn =
@@ -269,45 +270,47 @@ export default function UsersDataManager() {
 
         // Apply sorting (create a copy to avoid mutating)
         const sorted = [...filtered].sort((a, b) => {
-            let aValue: string | number;
-            let bValue: string | number;
+            let compareResult: number = 0;
 
             switch (sortBy) {
                 case "name":
-                    aValue = a.name.toLowerCase();
-                    bValue = b.name.toLowerCase();
+                    // Use Hungarian collation for names
+                    compareResult = compareHungarianIgnoreCase(a.name, b.name);
                     break;
                 case "email":
-                    aValue = a.email.toLowerCase();
-                    bValue = b.email.toLowerCase();
+                    // Use Hungarian collation for emails too (in case they contain Hungarian characters)
+                    compareResult = compareHungarianIgnoreCase(
+                        a.email,
+                        b.email,
+                    );
                     break;
                 case "nfcId":
-                    aValue = a.nfcId.toLowerCase();
-                    bValue = b.nfcId.toLowerCase();
+                    // NFC IDs are usually numeric/alphanumeric, but use Hungarian collation for consistency
+                    compareResult = compareHungarianIgnoreCase(
+                        a.nfcId,
+                        b.nfcId,
+                    );
                     break;
                 case "blocked":
-                    aValue = a.blocked ? 1 : 0;
-                    bValue = b.blocked ? 1 : 0;
+                    const aBlocked = a.blocked ? 1 : 0;
+                    const bBlocked = b.blocked ? 1 : 0;
+                    compareResult = aBlocked - bBlocked;
                     break;
                 case "laptopPasswordChanged":
-                    aValue = a.laptopPasswordChanged
+                    const aTime = a.laptopPasswordChanged
                         ? new Date(a.laptopPasswordChanged).getTime()
                         : 0;
-                    bValue = b.laptopPasswordChanged
+                    const bTime = b.laptopPasswordChanged
                         ? new Date(b.laptopPasswordChanged).getTime()
                         : 0;
+                    compareResult = aTime - bTime;
                     break;
                 default:
                     return 0;
             }
 
-            if (aValue < bValue) {
-                return sortDirection === "asc" ? -1 : 1;
-            }
-            if (aValue > bValue) {
-                return sortDirection === "asc" ? 1 : -1;
-            }
-            return 0;
+            // Apply sort direction
+            return sortDirection === "asc" ? compareResult : -compareResult;
         });
 
         return sorted;
