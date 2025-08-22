@@ -270,7 +270,7 @@ export default function UsersDataManager() {
 
         // Apply sorting (create a copy to avoid mutating)
         const sorted = [...filtered].sort((a, b) => {
-            let compareResult: number = 0;
+            let compareResult = 0;
 
             switch (sortBy) {
                 case "name":

@@ -84,7 +84,7 @@ function hungarianCharacterCompare(a: string, b: string): number {
  * @param options - Additional Intl.Collator options (unused, kept for API compatibility)
  * @returns Comparison function that follows Hungarian alphabetical order
  */
-export function createHungarianCollator(options?: Intl.CollatorOptions): {
+export function createHungarianCollator(_options?: Intl.CollatorOptions): {
     compare: (a: string, b: string) => number;
 } {
     return {
@@ -125,7 +125,7 @@ export function compareHungarianIgnoreCase(a: string, b: string): number {
  */
 export function sortStringsHungarian(
     strings: string[],
-    options?: Intl.CollatorOptions,
+    _options?: Intl.CollatorOptions,
 ): string[] {
     return [...strings].sort(hungarianCharacterCompare);
 }
@@ -140,7 +140,7 @@ export function sortStringsHungarian(
 export function sortByPropertyHungarian<T>(
     objects: T[],
     keySelector: (obj: T) => string,
-    options?: Intl.CollatorOptions,
+    _options?: Intl.CollatorOptions,
 ): T[] {
     return [...objects].sort((a, b) =>
         hungarianCharacterCompare(keySelector(a), keySelector(b)),
@@ -157,7 +157,7 @@ export function sortByPropertyHungarian<T>(
 export function createHungarianComparator<T>(
     keySelector: (obj: T) => string,
     direction: "asc" | "desc" = "asc",
-    options?: Intl.CollatorOptions,
+    _options?: Intl.CollatorOptions,
 ): (a: T, b: T) => number {
     const multiplier = direction === "asc" ? 1 : -1;
 
