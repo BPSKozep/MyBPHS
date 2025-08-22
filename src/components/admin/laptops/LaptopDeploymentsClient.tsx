@@ -389,7 +389,7 @@ export default function LaptopDeploymentsClient() {
     // Sound effect functions
     const playSuccessSound = () => {
         try {
-            const audio = new Audio("/success.wav");
+            const audio = new Audio("/Success.wav");
             audio.volume = 1;
             audio.play().catch(console.warn);
         } catch (error) {
@@ -399,7 +399,7 @@ export default function LaptopDeploymentsClient() {
 
     const playErrorSound = () => {
         try {
-            const audio = new Audio("/error.wav");
+            const audio = new Audio("/Error.wav");
             audio.volume = 1;
             audio.play().catch(console.warn);
         } catch (error) {
@@ -550,7 +550,10 @@ export default function LaptopDeploymentsClient() {
                 </Card>
                 <Card padding="3">
                     <div className="text-center">
-                        <div className="text-2xl font-bold text-red-400">
+                        <div
+                            className="text-2xl font-bold text-red-400"
+                            onClick={playErrorSound}
+                        >
                             {erroredDeployments.length}
                         </div>
                         <div className="text-sm text-gray-400">Hibás</div>
