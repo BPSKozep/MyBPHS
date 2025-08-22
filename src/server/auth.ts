@@ -41,7 +41,6 @@ export const authOptions: NextAuthOptions = {
 
             const email = profile?.email;
             if (
-                email?.endsWith("@jamdon2.dev") ||
                 email?.endsWith("@budapest.school") ||
                 email?.endsWith("@budapestschool.org")
             ) {
