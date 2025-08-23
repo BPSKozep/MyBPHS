@@ -453,6 +453,7 @@ export const userRouter = createTRPCRouter({
                     laptopPasswordChanged: z.date().nullable(),
                     roles: z.array(z.string()),
                     blocked: z.boolean(),
+                    hasADAccount: z.boolean(),
                 }),
             ),
         )
@@ -469,6 +470,44 @@ export const userRouter = createTRPCRouter({
             // Get all users, without server-side sorting (will be sorted client-side with Hungarian collation)
             const users = await User.find().exec();
 
+            // Fetch AD users list with graceful error handling
+            let adUserEmails = new Set<string>();
+            try {
+                const puToken = env.PU_TOKEN;
+                if (puToken && env.PU_URL) {
+                    const response = await fetch(
+                        `${env.PU_URL}/ad/list-users`,
+                        {
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${puToken}`,
+                            },
+                        },
+                    );
+
+                    if (response.ok) {
+                        const adUsers: unknown = await response.json();
+                        const typedAdUsers = adUsers as {
+                            UserPrincipalName: string;
+                            Name: string;
+                            SamAccountName: string;
+                            Enabled: boolean;
+                        }[];
+                        adUserEmails = new Set(
+                            typedAdUsers.map(
+                                (adUser) => adUser.UserPrincipalName,
+                            ),
+                        );
+                    }
+                }
+            } catch (error) {
+                // Silently continue without AD data if service is unavailable
+                console.warn(
+                    "AD service unavailable, continuing without AD status:",
+                    error,
+                );
+            }
+
             // Map users to the response format
             const mappedUsers = users.map((user) => {
                 return {
@@ -479,6 +518,7 @@ export const userRouter = createTRPCRouter({
                     laptopPasswordChanged: user.laptopPasswordChanged ?? null,
                     roles: user.roles,
                     blocked: user.blocked ?? false,
+                    hasADAccount: adUserEmails.has(user.email),
                 };
             });
 

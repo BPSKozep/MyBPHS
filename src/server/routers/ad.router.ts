@@ -5,8 +5,8 @@ import { User } from "@/models";
 import { env } from "@/env/server";
 
 const puToken = env.PU_TOKEN;
-export const adPasswordRouter = createTRPCRouter({
-    getLastChanged: protectedProcedure.query(async ({ ctx }) => {
+export const adRouter = createTRPCRouter({
+    getPasswordLastChanged: protectedProcedure.query(async ({ ctx }) => {
         const user = await User.findOne({
             email: ctx.session?.user?.email,
         });
@@ -55,4 +55,36 @@ export const adPasswordRouter = createTRPCRouter({
             await user.save();
             return;
         }),
+
+    listUsers: protectedProcedure.query(async () => {
+        try {
+            const response = await fetch(`${env.PU_URL}/ad/list-users`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${puToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Failed to fetch AD users list",
+                });
+            }
+
+            const adUsers: unknown = await response.json();
+            return adUsers as {
+                UserPrincipalName: string;
+                Name: string;
+                SamAccountName: string;
+                Enabled: boolean;
+            }[];
+        } catch (error) {
+            console.error("Error fetching AD users:", error);
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to fetch AD users list",
+            });
+        }
+    }),
 });
