@@ -1,16 +1,16 @@
-import LaptopPasswordReset from "@/components/laptop-password/LaptopPasswordReset";
+import SchoolPasswordReset from "@/components/school-password/SchoolPasswordReset";
 import PageWithHeader from "@/components/PageWithHeader";
 import React from "react";
 
 export const metadata = {
-    title: "Laptop Jelszó",
+    title: "Iskolai Jelszó",
 };
 
-export default function LaptopPassword() {
+export default function SchoolPassword() {
     return (
-        <PageWithHeader title="Laptop Jelszó">
+        <PageWithHeader title="Iskolai Jelszó">
             <div className="flex h-full w-full items-center justify-center align-middle">
-                <LaptopPasswordReset />
+                <SchoolPasswordReset />
             </div>
         </PageWithHeader>
     );

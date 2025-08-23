@@ -9,7 +9,7 @@ import { api } from "@/trpc/react";
 import Card from "../Card";
 import Loading from "../Loading";
 
-export default function LaptopPasswordReset() {
+export default function SchoolPasswordReset() {
     const [input, setInput] = useState("");
     const lastChanged = api.ad.getPasswordLastChanged.useQuery();
     const setNewPassword = api.ad.setNewPassword.useMutation();

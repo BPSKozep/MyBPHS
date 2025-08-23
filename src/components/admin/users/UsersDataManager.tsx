@@ -128,7 +128,7 @@ const defaultColumns: ColumnConfig[] = [
     { key: "blocked", label: "Blokkolva", sortable: true, visible: true },
     {
         key: "laptopPasswordChanged",
-        label: "Laptop jelszó módosítva",
+        label: "Iskolai jelszó módosítva",
         sortable: true,
         visible: true,
     },

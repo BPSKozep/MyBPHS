@@ -223,7 +223,7 @@ export async function POST(req: Request) {
                         await resend.emails.send({
                             from: "MyBPHS <my@bphs.hu>",
                             to: session.user.email ?? "",
-                            subject: "Ideiglenes laptop jelszó",
+                            subject: "Ideiglenes iskolai jelszó",
                             react: PasswordReset({
                                 name: emailName,
                                 password: password,
