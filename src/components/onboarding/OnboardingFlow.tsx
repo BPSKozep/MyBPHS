@@ -4,9 +4,11 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/Card";
-import WelcomeStep from "./steps/Welcome";
-import NFCStep from "./steps/NFC";
-import LoadingStep from "./steps/Loading";
+import WelcomeStep from "./steps/1_Welcome";
+import EmailVerificationStep from "./steps/2_EmailVerification";
+import NFCStep from "./steps/3_NFC";
+import PasswordStep from "./steps/4_Password";
+import LoadingStep from "./steps/5_Create";
 import { InfoBox } from "@/components/InfoBox";
 import { FaExclamationTriangle } from "react-icons/fa";
 
@@ -15,11 +17,20 @@ interface OnboardingFlowProps {
     email?: string;
 }
 
-export type OnboardingStep = "welcome" | "nfc" | "loading" | "complete";
+export type OnboardingStep =
+    | "welcome"
+    | "verification"
+    | "nfc"
+    | "password"
+    | "loading"
+    | "complete";
 
 export default function OnboardingFlow({ name, email }: OnboardingFlowProps) {
     const [currentStep, setCurrentStep] = useState<OnboardingStep>("welcome");
+    const [password, setPassword] = useState("");
     const [nfcId, setNfcId] = useState("");
+    const [verificationCode, setVerificationCode] = useState("");
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
     const router = useRouter();
 
     // Check if required data is missing
@@ -35,9 +46,19 @@ export default function OnboardingFlow({ name, email }: OnboardingFlowProps) {
 
     const nextStep = () => {
         if (currentStep === "welcome") {
-            setCurrentStep("nfc");
+            setCurrentStep("verification");
+        } else if (currentStep === "verification") {
+            // Only proceed if email is verified
+            if (isEmailVerified) {
+                setCurrentStep("nfc");
+            }
         } else if (currentStep === "nfc") {
-            setCurrentStep("loading");
+            setCurrentStep("password");
+        } else if (currentStep === "password") {
+            // Additional check before creating account
+            if (isEmailVerified) {
+                setCurrentStep("loading");
+            }
         }
     };
 
@@ -80,19 +101,45 @@ export default function OnboardingFlow({ name, email }: OnboardingFlowProps) {
                                     }
                                 />
                             )}
+                            {currentStep === "verification" && (
+                                <EmailVerificationStep
+                                    name={name}
+                                    email={email}
+                                    verificationCode={verificationCode}
+                                    setVerificationCode={setVerificationCode}
+                                    isEmailVerified={isEmailVerified}
+                                    setIsEmailVerified={setIsEmailVerified}
+                                    onNext={nextStep}
+                                    onBack={() => {
+                                        setCurrentStep("welcome");
+                                        setIsEmailVerified(false);
+                                        setVerificationCode("");
+                                    }}
+                                />
+                            )}
                             {currentStep === "nfc" && (
                                 <NFCStep
                                     nfcId={nfcId}
                                     setNfcId={setNfcId}
                                     onNext={nextStep}
-                                    onBack={() => setCurrentStep("welcome")}
+                                />
+                            )}
+
+                            {currentStep === "password" && (
+                                <PasswordStep
+                                    password={password}
+                                    setPassword={setPassword}
+                                    onNext={nextStep}
+                                    onBack={() => setCurrentStep("nfc")}
                                 />
                             )}
                             {currentStep === "loading" && (
                                 <LoadingStep
                                     name={name}
                                     email={email}
+                                    password={password}
                                     nfcId={nfcId}
+                                    verificationCode={verificationCode}
                                     onComplete={handleAccountCreated}
                                 />
                             )}

@@ -41,9 +41,9 @@ export const authOptions: NextAuthOptions = {
 
             const email = profile?.email;
             if (
-                email?.endsWith("@jamdon2.dev") ||
                 email?.endsWith("@budapest.school") ||
-                email?.endsWith("@budapestschool.org")
+                email?.endsWith("@budapestschool.org") ||
+                email?.endsWith("@jamdon2.dev")
             ) {
                 // Redirect to onboarding with user info as search params
                 const params = new URLSearchParams({

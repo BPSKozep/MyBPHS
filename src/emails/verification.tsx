@@ -13,16 +13,15 @@ import {
 
 import * as React from "react";
 
-export default function PasswordReset({
-    name,
-    password,
-}: {
+interface VerificationProps {
     name: string;
-    password: string;
-}) {
+    code: string;
+}
+
+export default function Verification({ name, code }: VerificationProps) {
     return (
         <Html>
-            <Preview>Elkészült az ideiglenes jelszavad.</Preview>
+            <Preview>Email verifikációs kódod: {code}</Preview>
             <Tailwind>
                 <Body className="bg-gray-900 font-sans">
                     <Container className="mt-16 bg-slate-800 p-8">
@@ -37,16 +36,25 @@ export default function PasswordReset({
                                 Kedves {name}!
                             </Text>
                             <Text className="text-lg leading-6 text-white">
-                                Ezzel az ideiglenes jelszóval tudsz belépni a
-                                laptopokra:{" "}
-                                <CodeInline className="rounded-md bg-gray-600 p-1">
-                                    {password}
+                                Az email címed megerősítéséhez kérjük, add meg
+                                az alábbi verifikációs kódot:
+                            </Text>
+
+                            <Section className="my-8 text-center">
+                                <CodeInline className="rounded-md bg-blue-600 p-3 text-xl font-bold tracking-widest text-white">
+                                    {code}
                                 </CodeInline>
+                            </Section>
+
+                            <Text className="text-lg leading-6 text-white">
+                                Ez a kód 10 percig érvényes. Ha nem te kérted
+                                ezt a verifikációt, kérjük, hagyd figyelmen
+                                kívül ezt az emailt.
                             </Text>
 
                             <Hr />
                             <Text className="text-lg leading-6 text-white">
-                                — A BPHS Rendszergazda csapata
+                                — A MyBPHS csapata
                             </Text>
                             <Hr />
                             <Text className="text-xs leading-4 text-slate-400">

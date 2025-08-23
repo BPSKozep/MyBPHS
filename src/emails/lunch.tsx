@@ -15,7 +15,7 @@ import * as React from "react";
 
 import { env } from "@/env/client";
 
-function Lunch() {
+export default function Lunch() {
     return (
         <Html>
             <Preview>Az ebédrendelés már elérhető a következő hétre!</Preview>
@@ -61,5 +61,3 @@ function Lunch() {
         </Html>
     );
 }
-
-export default Lunch;

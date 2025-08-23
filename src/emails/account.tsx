@@ -13,7 +13,13 @@ import {
 
 import * as React from "react";
 
-function Account({ name, password }: { name: string; password: string }) {
+export default function Account({
+    name,
+    password,
+}: {
+    name: string;
+    password: string;
+}) {
     return (
         <Html>
             <Preview>Elkészült a laptop fiókod.</Preview>
@@ -27,7 +33,7 @@ function Account({ name, password }: { name: string; password: string }) {
                                 height="42"
                             ></Img>
                             <Hr />
-                            <Text className="text-lg font-bold leading-6 text-white">
+                            <Text className="text-lg leading-6 font-bold text-white">
                                 Kedves {name}!
                             </Text>
                             <Text className="text-lg leading-6 text-white">
@@ -61,5 +67,3 @@ function Account({ name, password }: { name: string; password: string }) {
         </Html>
     );
 }
-
-export default Account;

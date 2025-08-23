@@ -63,6 +63,7 @@ import Card from "@/components/Card";
 import Loading from "@/components/Loading";
 import rolesJson from "@/data/roles.json";
 import { compareHungarianIgnoreCase } from "@/utils/hungarianCollator";
+import { FaCheck, FaX } from "react-icons/fa6";
 
 type SortDirection = "asc" | "desc";
 type SortableColumn =
@@ -70,7 +71,8 @@ type SortableColumn =
     | "email"
     | "nfcId"
     | "blocked"
-    | "laptopPasswordChanged";
+    | "laptopPasswordChanged"
+    | "hasADAccount";
 type UserColumn =
     | "select"
     | "name"
@@ -79,6 +81,7 @@ type UserColumn =
     | "roles"
     | "blocked"
     | "laptopPasswordChanged"
+    | "hasADAccount"
     | "actions";
 type RoleFilter =
     | "all"
@@ -109,6 +112,7 @@ interface UserData {
     laptopPasswordChanged: Date | null;
     roles: string[];
     blocked: boolean;
+    hasADAccount: boolean;
 }
 
 interface EditingUser extends UserData {
@@ -124,10 +128,11 @@ const defaultColumns: ColumnConfig[] = [
     { key: "blocked", label: "Blokkolva", sortable: true, visible: true },
     {
         key: "laptopPasswordChanged",
-        label: "Laptop jelszó módosítva",
+        label: "Iskolai jelszó módosítva",
         sortable: true,
         visible: true,
     },
+    { key: "hasADAccount", label: "AD Fiók", sortable: true, visible: true },
     { key: "actions", label: "Műveletek", sortable: false, visible: true },
 ];
 
@@ -304,6 +309,11 @@ export default function UsersDataManager() {
                         ? new Date(b.laptopPasswordChanged).getTime()
                         : 0;
                     compareResult = aTime - bTime;
+                    break;
+                case "hasADAccount":
+                    const aAD = a.hasADAccount ? 1 : 0;
+                    const bAD = b.hasADAccount ? 1 : 0;
+                    compareResult = aAD - bAD;
                     break;
                 default:
                     return 0;
@@ -1285,6 +1295,25 @@ export default function UsersDataManager() {
                                                                 displayUser.laptopPasswordChanged,
                                                             )}
                                                         </span>
+                                                    )}
+                                                    {column.key ===
+                                                        "hasADAccount" && (
+                                                        <div className="flex justify-center">
+                                                            <Badge
+                                                                variant="default"
+                                                                className={
+                                                                    displayUser.hasADAccount
+                                                                        ? "bg-green-600 text-white hover:bg-green-700"
+                                                                        : "bg-red-600 text-white hover:bg-red-700"
+                                                                }
+                                                            >
+                                                                {displayUser.hasADAccount ? (
+                                                                    <FaCheck />
+                                                                ) : (
+                                                                    <FaX />
+                                                                )}
+                                                            </Badge>
+                                                        </div>
                                                     )}
                                                     {column.key ===
                                                         "actions" && (
