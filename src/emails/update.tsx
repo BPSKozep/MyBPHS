@@ -17,7 +17,7 @@ interface UpdateProps {
     link?: string;
     buttonText?: string;
 }
-function Update({ text, link, buttonText }: UpdateProps) {
+export default function Update({ text, link, buttonText }: UpdateProps) {
     return (
         <Html>
             <Tailwind>
@@ -30,10 +30,10 @@ function Update({ text, link, buttonText }: UpdateProps) {
                                 height="42"
                             ></Img>
                             <Hr />
-                            <Text className="text-center text-lg font-bold leading-6 text-white">
+                            <Text className="text-center text-lg leading-6 font-bold text-white">
                                 Elérhető az új MyBPHS verzió!
                             </Text>
-                            <Text className="text-md whitespace-pre-wrap leading-6 text-white">
+                            <Text className="text-md leading-6 whitespace-pre-wrap text-white">
                                 {text}
                             </Text>
                             <Section className="text-center">
@@ -60,5 +60,3 @@ function Update({ text, link, buttonText }: UpdateProps) {
         </Html>
     );
 }
-
-export default Update;

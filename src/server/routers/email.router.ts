@@ -1,18 +1,30 @@
 import { Resend } from "resend";
-import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from "@/server/trpc";
 import Lunch from "@/emails/lunch";
 import General from "@/emails/general";
 import Update from "@/emails/update";
 import Important from "@/emails/important";
 import GeneralUser from "@/emails/generalUser";
 import ImportantUser from "@/emails/importantUser";
+import Verification from "@/emails/verification";
+import Welcome from "@/emails/welcome";
 import { checkRoles } from "@/utils/authorization";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env as clientEnv } from "@/env/client";
 import { env as serverEnv } from "@/env/server";
+import { getVerificationService } from "@/clients/redis";
 
 const resend = new Resend(serverEnv.RESEND_API_KEY);
+
+// Function to generate a 6-digit verification code
+function generateVerificationCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 export const emailRouter = createTRPCRouter({
     sendLunchEmail: protectedProcedure.mutation(async ({ ctx }) => {
@@ -140,5 +152,144 @@ export const emailRouter = createTRPCRouter({
                                 user: input.user,
                             }),
             });
+        }),
+
+    sendVerificationCode: publicProcedure
+        .input(
+            z.object({
+                email: z.string().email(),
+                name: z.string(),
+            }),
+        )
+        .mutation(async ({ input }) => {
+            // Generate new verification code
+            const code = generateVerificationCode();
+            const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes from now
+
+            // Get verification service
+            const verificationService = await getVerificationService();
+
+            // Store the code in Redis
+            await verificationService.setCode(input.email, {
+                code,
+                expiry,
+                name: input.name,
+            });
+
+            // Send the email
+            await resend.emails.send({
+                from: "MyBPHS <my@bphs.hu>",
+                to: input.email,
+                subject: "MyBPHS Email Verifikáció",
+                react: Verification({
+                    name: input.name,
+                    code: code,
+                }),
+            });
+
+            return { success: true };
+        }),
+
+    verifyAndDeleteCode: publicProcedure
+        .input(
+            z.object({
+                email: z.string().email(),
+                code: z.string().length(6),
+            }),
+        )
+        .mutation(async ({ input }) => {
+            // Get verification service
+            const verificationService = await getVerificationService();
+
+            // Verify and delete the code in one operation
+            const isValid = await verificationService.verifyAndDeleteCode(
+                input.email,
+                input.code,
+            );
+
+            if (!isValid) {
+                // Check if there was a code at all
+                const storedData = await verificationService.getCode(
+                    input.email,
+                );
+
+                if (!storedData) {
+                    throw new TRPCError({
+                        code: "NOT_FOUND",
+                        message:
+                            "No verification code found for this email. Please request a new code.",
+                    });
+                } else {
+                    throw new TRPCError({
+                        code: "BAD_REQUEST",
+                        message: "Invalid verification code.",
+                    });
+                }
+            }
+
+            return { success: true };
+        }),
+
+    verifyCode: publicProcedure
+        .input(
+            z.object({
+                email: z.string().email(),
+                code: z.string().length(6),
+            }),
+        )
+        .mutation(async ({ input }) => {
+            // Get verification service
+            const verificationService = await getVerificationService();
+
+            // Verify the code without deleting it
+            const isValid = await verificationService.verifyCode(
+                input.email,
+                input.code,
+            );
+
+            if (!isValid) {
+                // Check if there was a code at all
+                const storedData = await verificationService.getCode(
+                    input.email,
+                );
+
+                if (!storedData) {
+                    throw new TRPCError({
+                        code: "NOT_FOUND",
+                        message:
+                            "No verification code found for this email. Please request a new code.",
+                    });
+                } else {
+                    throw new TRPCError({
+                        code: "BAD_REQUEST",
+                        message: "Hibás kód.",
+                    });
+                }
+            }
+
+            return { success: true };
+        }),
+
+    sendWelcome: publicProcedure
+        .input(
+            z.object({
+                name: z.string(),
+                email: z.string().email(),
+                isOnboarding: z.boolean().default(false),
+            }),
+        )
+        .mutation(async ({ input }) => {
+            // Send the welcome email
+            await resend.emails.send({
+                from: "MyBPHS <my@bphs.hu>",
+                to: input.email,
+                subject: "Üdvözlünk a MyBPHS rendszerben!",
+                react: Welcome({
+                    name: input.name,
+                    isOnboarding: input.isOnboarding,
+                }),
+            });
+
+            return { success: true };
         }),
 });

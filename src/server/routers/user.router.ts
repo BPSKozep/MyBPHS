@@ -15,6 +15,12 @@ import type { IGroupOverride } from "@/models/GroupOverride.model";
 import { checkRoles } from "@/utils/authorization";
 import type { IUser } from "@/models/User.model";
 import { sortByPropertyHungarian } from "@/utils/hungarianCollator";
+import { getVerificationService } from "@/clients/redis";
+import { env } from "@/env/server";
+import { Resend } from "resend";
+import Welcome from "@/emails/welcome";
+
+const resend = new Resend(env.RESEND_API_KEY);
 
 export const userRouter = createTRPCRouter({
     get: protectedProcedure
@@ -481,7 +487,7 @@ export const userRouter = createTRPCRouter({
         }),
 
     // Create a single user
-    create: publicProcedure
+    create: protectedProcedure
         .input(
             z.object({
                 name: z.string().min(1),
@@ -491,54 +497,67 @@ export const userRouter = createTRPCRouter({
                 blocked: z.boolean().default(false),
             }),
         )
-        .mutation(
-            async ({
-                // ctx,
-                input,
-            }) => {
-                // const authorized = await checkRoles(ctx.session, ["administrator"]);
+        .mutation(async ({ ctx, input }) => {
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
 
-                // if (!authorized) {
-                //     throw new TRPCError({
-                //         code: "FORBIDDEN",
-                //         message: "Access denied to the requested resource",
-                //     });
-                // }
-                await mongooseConnect();
-
-                // Check if user with this email or nfcId already exists
-                const existingUser = await User.findOne({
-                    $or: [{ email: input.email }, { nfcId: input.nfcId }],
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
                 });
+            }
+            await mongooseConnect();
 
-                if (existingUser) {
-                    throw new TRPCError({
-                        code: "CONFLICT",
-                        message:
-                            "User with this email or NFC ID already exists",
-                    });
-                }
+            // Check if user with this email or nfcId already exists
+            const existingUser = await User.findOne({
+                $or: [{ email: input.email }, { nfcId: input.nfcId }],
+            });
 
-                const newUser = await User.create({
-                    name: input.name,
-                    email: input.email,
-                    nfcId: input.nfcId,
-                    roles: input.roles,
-                    blocked: input.blocked,
-                    groups: [],
+            if (existingUser) {
+                throw new TRPCError({
+                    code: "CONFLICT",
+                    message: "User with this email or NFC ID already exists",
                 });
+            }
 
-                return {
-                    _id: newUser._id?.toString() ?? "",
-                    name: newUser.name,
-                    email: newUser.email,
-                    nfcId: newUser.nfcId,
-                    roles: newUser.roles,
-                    blocked: newUser.blocked ?? false,
-                    laptopPasswordChanged: null,
-                };
-            },
-        ),
+            const newUser = await User.create({
+                name: input.name,
+                email: input.email,
+                nfcId: input.nfcId,
+                roles: input.roles,
+                blocked: input.blocked,
+                groups: [],
+            });
+
+            // Send welcome email for manually created users
+            try {
+                await resend.emails.send({
+                    from: "MyBPHS <my@bphs.hu>",
+                    to: newUser.email,
+                    subject: "Üdvözlünk a MyBPHS rendszerben!",
+                    react: Welcome({
+                        name: newUser.name,
+                        isOnboarding: false,
+                    }),
+                });
+            } catch (error) {
+                // Log email error but don't fail the user creation process
+                console.error(
+                    "Failed to send welcome email during manual user creation:",
+                    error,
+                );
+            }
+
+            return {
+                _id: newUser._id?.toString() ?? "",
+                name: newUser.name,
+                email: newUser.email,
+                nfcId: newUser.nfcId,
+                roles: newUser.roles,
+                blocked: newUser.blocked ?? false,
+                laptopPasswordChanged: newUser.laptopPasswordChanged ?? null,
+            };
+        }),
 
     // Delete multiple users
     delete: protectedProcedure
@@ -579,5 +598,147 @@ export const userRouter = createTRPCRouter({
             await mongooseConnect();
             const user = await User.findOne({ email: input.email });
             return !!user;
+        }),
+
+    onboard: publicProcedure
+        .input(
+            z.object({
+                name: z.string(),
+                email: z.string().email(),
+                password: z.string(),
+                nfcId: z.string(),
+                verificationCode: z.string().length(6),
+            }),
+        )
+        .mutation(async ({ input }) => {
+            await mongooseConnect();
+
+            // Verify the email verification code first
+            const verificationService = await getVerificationService();
+
+            // Verify and delete the code in one operation (final verification)
+            const isValid = await verificationService.verifyAndDeleteCode(
+                input.email,
+                input.verificationCode,
+            );
+
+            if (!isValid) {
+                // Check if there was a code at all to provide better error message
+                const storedData = await verificationService.getCode(
+                    input.email,
+                );
+
+                if (!storedData) {
+                    throw new TRPCError({
+                        code: "NOT_FOUND",
+                        message:
+                            "Verification code expired or not found. Please go back and request a new code.",
+                    });
+                } else {
+                    throw new TRPCError({
+                        code: "BAD_REQUEST",
+                        message:
+                            "Invalid verification code. Please check your code and try again.",
+                    });
+                }
+            }
+
+            // Check if email is allowed for onboarding
+            if (
+                !input.email.endsWith("@budapestschool.org") &&
+                !input.email.endsWith("@budapest.school") &&
+                !input.email.endsWith("@jamdon2.dev")
+            ) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "Email is not allowed for onboarding",
+                });
+            }
+
+            // Check if user with this email or nfcId already exists
+            const existingUser = await User.findOne({
+                $or: [{ email: input.email }, { nfcId: input.nfcId }],
+            });
+
+            if (existingUser) {
+                throw new TRPCError({
+                    code: "CONFLICT",
+                    message: "User with this email or NFC ID already exists",
+                });
+            }
+
+            const role = input.email.endsWith("@budapestschool.org")
+                ? "staff"
+                : "student";
+
+            const newUser = await User.create({
+                name: input.name,
+                email: input.email,
+                nfcId: input.nfcId,
+                roles: [role],
+                blocked: false,
+                groups: [],
+            });
+
+            try {
+                const puToken = env.PU_TOKEN;
+                const request = await fetch(
+                    `${env.PU_URL}/ad/create-user/${input.email}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${puToken}`,
+                        },
+                        body: JSON.stringify({
+                            password: input.password,
+                            name: input.name,
+                        }),
+                    },
+                );
+
+                if (request.status !== 200) {
+                    throw new TRPCError({
+                        code: "INTERNAL_SERVER_ERROR",
+                        message:
+                            "Failed to create AD user: " + request.statusText,
+                    });
+                }
+
+                newUser.laptopPasswordChanged = new Date();
+                await newUser.save();
+            } catch (error) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message:
+                        "Failed to create AD user: " + (error as Error).message,
+                });
+            }
+
+            // Send welcome email for onboarding
+            try {
+                await resend.emails.send({
+                    from: "MyBPHS <my@bphs.hu>",
+                    to: newUser.email,
+                    subject: "Üdvözlünk a MyBPHS rendszerben!",
+                    react: Welcome({
+                        name: newUser.name,
+                        isOnboarding: true,
+                    }),
+                });
+            } catch (error) {
+                // Log email error but don't fail the onboarding process
+                console.error(
+                    "Failed to send welcome email during onboarding:",
+                    error,
+                );
+            }
+
+            return {
+                _id: newUser._id?.toString() ?? "",
+                name: newUser.name,
+                email: newUser.email,
+                nfcId: newUser.nfcId,
+            };
         }),
 });

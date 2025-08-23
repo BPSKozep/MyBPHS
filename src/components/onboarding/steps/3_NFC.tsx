@@ -3,22 +3,16 @@
 import React, { useState } from "react";
 import Button from "@/components/Button";
 import { Input } from "@/components/ui/input";
-import { FaIdCard, FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { FaIdCard, FaArrowRight } from "react-icons/fa";
 import { InfoBox } from "@/components/InfoBox";
 
 interface NFCStepProps {
     nfcId: string;
     setNfcId: (nfcId: string) => void;
     onNext: () => void;
-    onBack: () => void;
 }
 
-export default function NFCStep({
-    nfcId,
-    setNfcId,
-    onNext,
-    onBack,
-}: NFCStepProps) {
+export default function NFCStep({ nfcId, setNfcId, onNext }: NFCStepProps) {
     const [error, setError] = useState("");
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,14 +76,6 @@ export default function NFCStep({
             </div>
 
             <div className="flex w-full gap-3">
-                <Button
-                    onClick={onBack}
-                    className="flex flex-1 items-center justify-center gap-2 bg-gray-600 hover:bg-gray-700"
-                >
-                    <FaArrowLeft className="h-4 w-4" />
-                    Vissza
-                </Button>
-
                 <Button
                     onClick={handleNext}
                     disabled={!isValid}

@@ -9,14 +9,18 @@ import { InfoBox } from "@/components/InfoBox";
 interface LoadingStepProps {
     name: string;
     email: string;
+    password: string;
     nfcId: string;
+    verificationCode: string;
     onComplete: () => void;
 }
 
 export default function LoadingStep({
     name,
     email,
+    password,
     nfcId,
+    verificationCode,
     onComplete,
 }: LoadingStepProps) {
     const [step, setStep] = useState<"creating" | "success" | "error">(
@@ -25,13 +29,13 @@ export default function LoadingStep({
     const [errorMessage, setErrorMessage] = useState("");
     const hasStarted = useRef(false);
 
-    const createUser = api.user.create.useMutation({
+    const createUser = api.user.onboard.useMutation({
         onSuccess: () => {
             setTimeout(() => {
                 setStep("success");
                 setTimeout(() => {
                     onComplete();
-                }, 1500);
+                }, 3000);
             }, 2000); // Artificial delay for better UX
         },
         onError: (error) => {
@@ -45,21 +49,18 @@ export default function LoadingStep({
     useEffect(() => {
         if (!hasStarted.current) {
             hasStarted.current = true;
-            const roles = email.endsWith("@budapestschool.org")
-                ? ["staff"]
-                : ["student"];
             setTimeout(() => {
                 createUser.mutate({
                     name,
                     email,
+                    password,
                     nfcId,
-                    roles,
-                    blocked: false,
+                    verificationCode,
                 });
             }, 500);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [name, email, nfcId]);
+    }, [name, email, password, nfcId, verificationCode]);
 
     if (step === "creating") {
         return (
@@ -87,8 +88,7 @@ export default function LoadingStep({
                     Sikeres regisztráció!
                 </h1>
                 <p className="text-gray-300">
-                    A fiókod sikeresen létrejött. Átirányítás a bejelentkezési
-                    oldalra...
+                    Átirányítás a bejelentkezési oldalra...
                 </p>
             </div>
         );
