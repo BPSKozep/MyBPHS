@@ -32,6 +32,7 @@ import {
     SaveIcon,
     XIcon,
     TrashIcon,
+    PlusIcon,
 } from "lucide-react";
 import { FaColumns } from "react-icons/fa";
 import { UserPlusIcon } from "lucide-react";
@@ -179,6 +180,7 @@ export default function UsersDataManager() {
         nfcId: "",
         roles: [] as string[],
         blocked: false,
+        sendWelcomeEmail: true,
     });
     const [isRefreshLoading, setIsRefreshLoading] = useState(false);
 
@@ -235,6 +237,7 @@ export default function UsersDataManager() {
                 nfcId: "",
                 roles: [],
                 blocked: false,
+                sendWelcomeEmail: true,
             });
         },
         onError: (error) => {
@@ -244,6 +247,21 @@ export default function UsersDataManager() {
                 description:
                     "Hiba történt a felhasználó létrehozásakor: " +
                     error.message,
+                type: "error",
+            });
+        },
+    });
+
+    const createADUserMutation = api.ad.createUser.useMutation({
+        onSuccess: () => {
+            void refetchUsers();
+        },
+        onError: (error) => {
+            setAlertDialog({
+                open: true,
+                title: "AD fiók létrehozási hiba",
+                description:
+                    "Hiba történt az AD fiók létrehozásakor: " + error.message,
                 type: "error",
             });
         },
@@ -526,6 +544,13 @@ export default function UsersDataManager() {
         }
     };
 
+    const handleCreateADUser = (user: UserData) => {
+        createADUserMutation.mutate({
+            email: user.email,
+            name: user.name,
+        });
+    };
+
     const roles: Record<string, string> = rolesJson;
     const roleKeys = Object.keys(roles);
 
@@ -546,7 +571,7 @@ export default function UsersDataManager() {
         <Card>
             <div className="space-y-6">
                 {/* Controls Section */}
-                <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+                <div className="sticky top-0 z-20 flex flex-col items-start justify-between gap-4 bg-[#242424] py-3 lg:flex-row lg:items-center">
                     <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
                         {/* Search */}
                         <Input
@@ -832,6 +857,30 @@ export default function UsersDataManager() {
                                                 className="text-white"
                                             >
                                                 Blokkolva
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch
+                                                id="sendWelcomeEmail"
+                                                checked={
+                                                    newUser.sendWelcomeEmail
+                                                }
+                                                onCheckedChange={(
+                                                    checked: boolean,
+                                                ) =>
+                                                    setNewUser((prev) => ({
+                                                        ...prev,
+                                                        sendWelcomeEmail:
+                                                            checked,
+                                                    }))
+                                                }
+                                                className="data-[state=checked]:bg-blue-600"
+                                            />
+                                            <Label
+                                                htmlFor="sendWelcomeEmail"
+                                                className="text-white"
+                                            >
+                                                Üdvözlő email küldése
                                             </Label>
                                         </div>
                                     </div>
@@ -1298,7 +1347,7 @@ export default function UsersDataManager() {
                                                     )}
                                                     {column.key ===
                                                         "hasADAccount" && (
-                                                        <div className="flex justify-center">
+                                                        <div className="flex items-center justify-center gap-2">
                                                             <Badge
                                                                 variant="default"
                                                                 className={
@@ -1313,6 +1362,24 @@ export default function UsersDataManager() {
                                                                     <FaX />
                                                                 )}
                                                             </Badge>
+                                                            {!displayUser.hasADAccount && (
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="icon"
+                                                                    onClick={() =>
+                                                                        handleCreateADUser(
+                                                                            user,
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        createADUserMutation.isPending
+                                                                    }
+                                                                    className="h-6 w-6 cursor-pointer border-blue-600 bg-blue-600 text-white hover:bg-blue-700 hover:text-white disabled:opacity-50"
+                                                                    title="AD fiók létrehozása"
+                                                                >
+                                                                    <PlusIcon className="size-3" />
+                                                                </Button>
+                                                            )}
                                                         </div>
                                                     )}
                                                     {column.key ===

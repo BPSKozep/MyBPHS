@@ -42,6 +42,58 @@ export const adRouter = createTRPCRouter({
                     message: "User not found",
                 });
             }
+
+            const users = await fetch(`${env.PU_URL}/ad/list-users`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${puToken}`,
+                },
+            });
+
+            if (!users.ok) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Failed to fetch AD users list",
+                });
+            }
+
+            // Check if user exists in AD
+            const adUsers = (await users.json()) as {
+                UserPrincipalName: string;
+                Name: string;
+                SamAccountName: string;
+                Enabled: boolean;
+            }[];
+
+            const userExistsInAD = adUsers.some(
+                (adUser) => adUser.UserPrincipalName === user.email,
+            );
+
+            // If user doesn't exist in AD, create them first
+            if (!userExistsInAD) {
+                const createUserResponse = await fetch(
+                    `${env.PU_URL}/ad/create-user/${user.email}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${puToken}`,
+                        },
+                        body: JSON.stringify({
+                            password: "xr6CjrFz@mMD",
+                            name: user.name,
+                        }),
+                    },
+                );
+
+                if (!createUserResponse.ok) {
+                    throw new TRPCError({
+                        code: "INTERNAL_SERVER_ERROR",
+                        message: "Failed to create AD user",
+                    });
+                }
+            }
+
             await fetch(`${env.PU_URL}/ad/password-reset/${user.email}`, {
                 method: "POST",
                 headers: {
@@ -87,4 +139,35 @@ export const adRouter = createTRPCRouter({
             });
         }
     }),
+
+    createUser: protectedProcedure
+        .input(
+            z.object({
+                email: z.string(),
+                name: z.string(),
+            }),
+        )
+        .mutation(async ({ input }) => {
+            const response = await fetch(
+                `${env.PU_URL}/ad/create-user/${input.email}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${puToken}`,
+                    },
+                    body: JSON.stringify({
+                        password: "xr6CjrFz@mMD",
+                        name: input.name,
+                    }),
+                },
+            );
+
+            if (!response.ok) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Failed to create AD user",
+                });
+            }
+        }),
 });
