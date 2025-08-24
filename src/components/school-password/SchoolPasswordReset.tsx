@@ -14,7 +14,7 @@ export default function SchoolPasswordReset() {
     const lastChanged = api.ad.getPasswordLastChanged.useQuery();
     const setNewPassword = api.ad.setNewPassword.useMutation();
 
-    const inputValid = input.length >= 6;
+    const inputValid = input.length >= 8;
 
     const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
 
@@ -67,7 +67,7 @@ export default function SchoolPasswordReset() {
                 <Card>
                     <div className="flex flex-col items-center text-center">
                         <h1 className="mb-5 font-bold text-white">
-                            Bejelentkezési jelszó be- vagy visszaállítása
+                            Iskolai jelszó be- vagy visszaállítása
                         </h1>
                         <input
                             type="password"
@@ -97,6 +97,7 @@ export default function SchoolPasswordReset() {
                         <div className="mt-3">
                             <IconSubmitButton
                                 icon={<FaFloppyDisk />}
+                                disabled={!inputValid}
                                 onClick={async () => {
                                     try {
                                         await sleep(500);

@@ -36,10 +36,12 @@ export default function IconSubmitButton({
     onClick,
     icon,
     className,
+    disabled,
 }: {
     onClick: () => Promise<boolean> | boolean;
     icon: ReactNode;
     className?: string;
+    disabled?: boolean;
 }) {
     const [isPressed, setIsPressed] = useState(false);
     const [buttonRotation, setButtonRotation] = useState(0);
@@ -51,7 +53,7 @@ export default function IconSubmitButton({
     return (
         <motion.button
             className={twMerge(
-                "h-12 w-12 cursor-pointer rounded-2xl p-3 text-white",
+                "h-12 w-12 cursor-pointer rounded-2xl p-3 text-white disabled:opacity-50",
                 className,
             )}
             initial={{
@@ -80,7 +82,7 @@ export default function IconSubmitButton({
                 backgroundColor: isPressed ? buttonColor : "#3a445d",
             }}
             onClick={async () => {
-                if (isPressed) return;
+                if (isPressed || disabled) return;
 
                 setIsPressed(true);
 
@@ -110,6 +112,7 @@ export default function IconSubmitButton({
                 setButtonRotation((rotation) => rotation + rotateBack);
                 setIsPressed(false);
             }}
+            disabled={disabled}
         >
             <div
                 className="relative flex items-center justify-center"
