@@ -10,13 +10,13 @@ export default function Home() {
                     <BigLinkButton
                         title="Iskolai jelszó"
                         url="/school-password"
-                        statuswebsites={["/api/laptop/ping"]}
+                        // statuswebsites={["/api/laptop/ping"]}
                     />
                     <BigLinkButton title="Órarend" url="/timetable" disabled />
                     <BigLinkButton
                         title="Chat ✨"
                         url="/chat"
-                        statuswebsites={["/api/chat/ping"]}
+                        // statuswebsites={["/api/chat/ping"]}
                     />
                     <OnlyRolesComponent roles={["administrator"]}>
                         <BigLinkButton title="Admin" url="/admin" />
