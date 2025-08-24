@@ -535,6 +535,7 @@ export const userRouter = createTRPCRouter({
                 nfcId: z.string().min(1),
                 roles: z.array(z.string()).min(1),
                 blocked: z.boolean().default(false),
+                sendWelcomeEmail: z.boolean().default(true),
             }),
         )
         .mutation(async ({ ctx, input }) => {
@@ -570,22 +571,24 @@ export const userRouter = createTRPCRouter({
             });
 
             // Send welcome email for manually created users
-            try {
-                await resend.emails.send({
-                    from: "MyBPHS <my@bphs.hu>",
-                    to: newUser.email,
-                    subject: "Üdvözlünk a MyBPHS rendszerben!",
-                    react: Welcome({
-                        name: newUser.name,
-                        isOnboarding: false,
-                    }),
-                });
-            } catch (error) {
-                // Log email error but don't fail the user creation process
-                console.error(
-                    "Failed to send welcome email during manual user creation:",
-                    error,
-                );
+            if (input.sendWelcomeEmail) {
+                try {
+                    await resend.emails.send({
+                        from: "MyBPHS <my@bphs.hu>",
+                        to: newUser.email,
+                        subject: "Üdvözlünk a MyBPHS rendszerben!",
+                        react: Welcome({
+                            name: newUser.name,
+                            isOnboarding: false,
+                        }),
+                    });
+                } catch (error) {
+                    // Log email error but don't fail the user creation process
+                    console.error(
+                        "Failed to send welcome email during manual user creation:",
+                        error,
+                    );
+                }
             }
 
             return {

@@ -179,6 +179,7 @@ export default function UsersDataManager() {
         nfcId: "",
         roles: [] as string[],
         blocked: false,
+        sendWelcomeEmail: true,
     });
     const [isRefreshLoading, setIsRefreshLoading] = useState(false);
 
@@ -235,6 +236,7 @@ export default function UsersDataManager() {
                 nfcId: "",
                 roles: [],
                 blocked: false,
+                sendWelcomeEmail: true,
             });
         },
         onError: (error) => {
@@ -832,6 +834,30 @@ export default function UsersDataManager() {
                                                 className="text-white"
                                             >
                                                 Blokkolva
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch
+                                                id="sendWelcomeEmail"
+                                                checked={
+                                                    newUser.sendWelcomeEmail
+                                                }
+                                                onCheckedChange={(
+                                                    checked: boolean,
+                                                ) =>
+                                                    setNewUser((prev) => ({
+                                                        ...prev,
+                                                        sendWelcomeEmail:
+                                                            checked,
+                                                    }))
+                                                }
+                                                className="data-[state=checked]:bg-blue-600"
+                                            />
+                                            <Label
+                                                htmlFor="sendWelcomeEmail"
+                                                className="text-white"
+                                            >
+                                                Üdvözlő email küldése
                                             </Label>
                                         </div>
                                     </div>
