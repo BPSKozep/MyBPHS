@@ -548,7 +548,7 @@ export default function UsersDataManager() {
         <Card>
             <div className="space-y-6">
                 {/* Controls Section */}
-                <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+                <div className="sticky top-0 z-20 flex flex-col items-start justify-between gap-4 bg-[#242424] py-3 lg:flex-row lg:items-center">
                     <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
                         {/* Search */}
                         <Input
