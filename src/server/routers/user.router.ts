@@ -82,62 +82,6 @@ export const userRouter = createTRPCRouter({
                 "-_id -__v",
             );
         }),
-    createMany: protectedProcedure
-        .input(
-            z.strictObject({
-                names: z.string().array(),
-                emails: z.string().email().array(),
-                roles: z.string().array().array(),
-                nfcIds: z.string().array(),
-            }),
-        )
-        .mutation(async ({ ctx, input }) => {
-            const authorized = await checkRoles(ctx.session, ["administrator"]);
-
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
-            }
-
-            // Ensure all arrays have the same length
-            const length = input.names.length;
-            if (
-                input.emails.length !== length ||
-                input.roles.length !== length ||
-                input.nfcIds.length !== length
-            ) {
-                throw new TRPCError({
-                    code: "BAD_REQUEST",
-                    message: "All input arrays must have the same length",
-                });
-            }
-
-            const users: IUser[] = input.names.map((name, index) => {
-                const email = input.emails[index];
-                const roles = input.roles[index];
-                const nfcId = input.nfcIds[index];
-
-                // TypeScript now knows these are defined due to length check above
-                if (!email || !roles || !nfcId) {
-                    throw new TRPCError({
-                        code: "BAD_REQUEST",
-                        message: "Missing required fields",
-                    });
-                }
-
-                return {
-                    name,
-                    email,
-                    roles,
-                    nfcId,
-                    groups: [],
-                };
-            });
-
-            await User.insertMany<IUser>(users);
-        }),
     getTimetable: protectedProcedure
         .input(z.string().email())
         .output(z.string().nullable().array().array())

@@ -32,6 +32,7 @@ import {
     SaveIcon,
     XIcon,
     TrashIcon,
+    PlusIcon,
 } from "lucide-react";
 import { FaColumns } from "react-icons/fa";
 import { UserPlusIcon } from "lucide-react";
@@ -246,6 +247,21 @@ export default function UsersDataManager() {
                 description:
                     "Hiba történt a felhasználó létrehozásakor: " +
                     error.message,
+                type: "error",
+            });
+        },
+    });
+
+    const createADUserMutation = api.ad.createUser.useMutation({
+        onSuccess: () => {
+            void refetchUsers();
+        },
+        onError: (error) => {
+            setAlertDialog({
+                open: true,
+                title: "AD fiók létrehozási hiba",
+                description:
+                    "Hiba történt az AD fiók létrehozásakor: " + error.message,
                 type: "error",
             });
         },
@@ -526,6 +542,13 @@ export default function UsersDataManager() {
         } finally {
             setIsRefreshLoading(false);
         }
+    };
+
+    const handleCreateADUser = (user: UserData) => {
+        createADUserMutation.mutate({
+            email: user.email,
+            name: user.name,
+        });
     };
 
     const roles: Record<string, string> = rolesJson;
@@ -1324,7 +1347,7 @@ export default function UsersDataManager() {
                                                     )}
                                                     {column.key ===
                                                         "hasADAccount" && (
-                                                        <div className="flex justify-center">
+                                                        <div className="flex items-center justify-center gap-2">
                                                             <Badge
                                                                 variant="default"
                                                                 className={
@@ -1339,6 +1362,24 @@ export default function UsersDataManager() {
                                                                     <FaX />
                                                                 )}
                                                             </Badge>
+                                                            {!displayUser.hasADAccount && (
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="icon"
+                                                                    onClick={() =>
+                                                                        handleCreateADUser(
+                                                                            user,
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        createADUserMutation.isPending
+                                                                    }
+                                                                    className="h-6 w-6 cursor-pointer border-blue-600 bg-blue-600 text-white hover:bg-blue-700 hover:text-white disabled:opacity-50"
+                                                                    title="AD fiók létrehozása"
+                                                                >
+                                                                    <PlusIcon className="size-3" />
+                                                                </Button>
+                                                            )}
                                                         </div>
                                                     )}
                                                     {column.key ===
