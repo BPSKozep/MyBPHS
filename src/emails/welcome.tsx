@@ -50,11 +50,12 @@ export default function Welcome({ name, isOnboarding = false }: WelcomeProps) {
                                     • Ebédet rendelhetsz
                                 </Text>
                                 <Text className="text-base leading-6 text-white">
-                                    • Iskolai elszavadat módosíthatod (Laptop és
-                                    WiFi bejelentkezés)
+                                    • Iskolai jelszavadat módosíthatod (Laptop
+                                    és WiFi bejelentkezés)
                                 </Text>
                                 <Text className="text-base leading-6 text-white">
-                                    • Chatelhetsz a MyBPHS Intelligence ✨ AI-al
+                                    • Chatelhetsz a MyBPHS Intelligence ✨
+                                    AI-jal
                                 </Text>
                             </Section>
 

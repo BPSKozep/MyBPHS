@@ -65,6 +65,7 @@ import Loading from "@/components/Loading";
 import rolesJson from "@/data/roles.json";
 import { compareHungarianIgnoreCase } from "@/utils/hungarianCollator";
 import { FaCheck, FaX } from "react-icons/fa6";
+import { TriangleAlertIcon } from "lucide-react";
 
 type SortDirection = "asc" | "desc";
 type SortableColumn =
@@ -183,6 +184,7 @@ export default function UsersDataManager() {
         sendWelcomeEmail: true,
     });
     const [isRefreshLoading, setIsRefreshLoading] = useState(false);
+    const [orphanedADDialog, setOrphanedADDialog] = useState(false);
 
     const visibleColumns = useMemo(
         () => columns.filter((col) => col.visible),
@@ -195,6 +197,9 @@ export default function UsersDataManager() {
         error,
         refetch: refetchUsers,
     } = api.user.getAll.useQuery();
+
+    const { data: adUsers, refetch: refetchAdUsers } =
+        api.ad.listUsers.useQuery();
 
     const updateUserMutation = api.user.update.useMutation({
         onSuccess: () => {
@@ -262,6 +267,24 @@ export default function UsersDataManager() {
                 title: "AD fiók létrehozási hiba",
                 description:
                     "Hiba történt az AD fiók létrehozásakor: " + error.message,
+                type: "error",
+            });
+        },
+    });
+
+    const deleteADUsersMutation = api.ad.deleteUsers.useMutation({
+        onSuccess: (result) => {
+            console.log("AD deletion result:", result);
+            void refetchAdUsers();
+        },
+        onError: (error) => {
+            console.error("AD deletion error:", error);
+            setAlertDialog({
+                open: true,
+                title: "AD törlési hiba",
+                description:
+                    "Hiba történt az AD felhasználók törlésekor: " +
+                    error.message,
                 type: "error",
             });
         },
@@ -352,6 +375,16 @@ export default function UsersDataManager() {
     }, [filteredAndSortedUsers, page, pageSize]);
 
     const totalPages = Math.ceil(filteredAndSortedUsers.length / pageSize);
+
+    // Calculate orphaned AD users (AD users that don't exist in app)
+    const orphanedADUsers = useMemo(() => {
+        if (!adUsers || !allUsers) return [];
+
+        const appUserEmails = new Set(allUsers.map((user) => user.email));
+        return adUsers.filter(
+            (adUser) => !appUserEmails.has(adUser.UserPrincipalName),
+        );
+    }, [adUsers, allUsers]);
 
     // Reset to first page when search, filter, or sorting changes
     React.useEffect(() => {
@@ -479,18 +512,33 @@ export default function UsersDataManager() {
     const handleDeleteSelected = () => {
         if (selectedRows.size === 0) return;
 
-        const userNames = paginatedUsers
-            .filter((user) => selectedRows.has(user._id))
-            .map((user) => user.name)
-            .join(", ");
+        const selectedUsers = paginatedUsers.filter((user) =>
+            selectedRows.has(user._id),
+        );
+        const userNames = selectedUsers.map((user) => user.name).join(", ");
 
         setAlertDialog({
             open: true,
             title: "Felhasználók törlése",
-            description: `Biztosan törölni szeretnéd a következő ${selectedRows.size} felhasználót?\n\n${userNames}`,
+            description: `Biztosan törölni szeretnéd a következő ${selectedRows.size} felhasználót? Ez a MyBPHS-ből és az AD-ból is törölni fogja őket.\n\n${userNames}`,
             type: "confirm",
             onConfirm: () => {
-                deleteUsersMutation.mutate(Array.from(selectedRows));
+                // First delete from app
+                deleteUsersMutation.mutate(Array.from(selectedRows), {
+                    onSuccess: () => {
+                        // Then delete from AD if they have AD accounts
+                        const usersWithAD = selectedUsers.filter(
+                            (user) => user.hasADAccount,
+                        );
+                        if (usersWithAD.length > 0) {
+                            const emailsToDelete = usersWithAD.map(
+                                (user) => user.email,
+                            );
+                            deleteADUsersMutation.mutate(emailsToDelete);
+                        }
+                    },
+                });
+
                 setAlertDialog({
                     open: false,
                     title: "",
@@ -538,7 +586,7 @@ export default function UsersDataManager() {
     const handleRefreshWithLoading = async () => {
         setIsRefreshLoading(true);
         try {
-            await refetchUsers();
+            await Promise.all([refetchUsers(), refetchAdUsers()]);
         } finally {
             setIsRefreshLoading(false);
         }
@@ -659,6 +707,24 @@ export default function UsersDataManager() {
                             >
                                 <TrashIcon className="size-4" />
                             </Button>
+
+                            {/* AD Warning Button */}
+                            {orphanedADUsers.length > 0 && (
+                                <Dialog
+                                    open={orphanedADDialog}
+                                    onOpenChange={setOrphanedADDialog}
+                                >
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            className="flex flex-1 items-center justify-center border-yellow-600 bg-yellow-700 text-white hover:bg-yellow-600 hover:text-white"
+                                            title={`${orphanedADUsers.length} AD felhasználó nincs az alkalmazásban`}
+                                        >
+                                            <TriangleAlertIcon className="size-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                </Dialog>
+                            )}
 
                             {/* Column Visibility Button */}
                             <DropdownMenu>
@@ -909,6 +975,95 @@ export default function UsersDataManager() {
                                 </DialogContent>
                             </Dialog>
 
+                            {/* Orphaned AD Users Dialog */}
+                            <Dialog
+                                open={orphanedADDialog}
+                                onOpenChange={setOrphanedADDialog}
+                            >
+                                <DialogContent className="max-w-2xl border-gray-600 bg-[#2e2e2e]">
+                                    <DialogHeader>
+                                        <DialogTitle className="text-white">
+                                            AD felhasználók az alkalmazáson
+                                            kívül
+                                        </DialogTitle>
+                                        <DialogDescription className="text-gray-300">
+                                            Ezek a felhasználók léteznek az
+                                            Active Directory-ban, de nem
+                                            szerepelnek a MyBPHS-ben.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="max-h-96 overflow-y-auto">
+                                        {orphanedADUsers.length > 0 ? (
+                                            <div className="space-y-2">
+                                                {orphanedADUsers.map(
+                                                    (adUser, index) => (
+                                                        <div
+                                                            key={
+                                                                adUser.UserPrincipalName ||
+                                                                `ad-user-${index}`
+                                                            }
+                                                            className="rounded border border-gray-600 bg-[#242424] p-3"
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <p className="font-medium text-white">
+                                                                        {
+                                                                            adUser.Name
+                                                                        }
+                                                                    </p>
+                                                                    <p className="text-sm text-gray-300">
+                                                                        {
+                                                                            adUser.UserPrincipalName
+                                                                        }
+                                                                    </p>
+                                                                    <p className="text-sm text-gray-400">
+                                                                        Bejelentkezési
+                                                                        név:{" "}
+                                                                        {
+                                                                            adUser.SamAccountName
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Badge
+                                                                        variant="default"
+                                                                        className={
+                                                                            adUser.Enabled
+                                                                                ? "bg-green-600 text-white"
+                                                                                : "bg-red-600 text-white"
+                                                                        }
+                                                                    >
+                                                                        {adUser.Enabled
+                                                                            ? "Aktív"
+                                                                            : "Letiltva"}
+                                                                    </Badge>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <p className="text-center text-gray-300">
+                                                Nincsenek orphaned AD
+                                                felhasználók.
+                                            </p>
+                                        )}
+                                    </div>
+                                    <DialogFooter>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() =>
+                                                setOrphanedADDialog(false)
+                                            }
+                                            className="border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+                                        >
+                                            Bezárás
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+
                             {/* Delete Button */}
                             <Button
                                 variant="outline"
@@ -929,6 +1084,26 @@ export default function UsersDataManager() {
                                 {selectedRows.size > 0 &&
                                     `(${selectedRows.size})`}
                             </Button>
+
+                            {/* AD Warning Button */}
+                            {orphanedADUsers.length > 0 && (
+                                <Dialog
+                                    open={orphanedADDialog}
+                                    onOpenChange={setOrphanedADDialog}
+                                >
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            className="flex items-center gap-2 border-yellow-600 bg-yellow-700 text-white hover:bg-yellow-600 hover:text-white"
+                                            title={`${orphanedADUsers.length} AD felhasználó nincs az alkalmazásban`}
+                                        >
+                                            <TriangleAlertIcon className="size-4" />
+                                            AD figyelmeztetés (
+                                            {orphanedADUsers.length})
+                                        </Button>
+                                    </DialogTrigger>
+                                </Dialog>
+                            )}
 
                             {/* Column Visibility Button */}
                             <DropdownMenu>

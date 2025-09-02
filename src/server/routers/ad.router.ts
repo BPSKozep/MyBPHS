@@ -170,4 +170,29 @@ export const adRouter = createTRPCRouter({
                 });
             }
         }),
+
+    deleteUsers: protectedProcedure
+        .input(z.array(z.string().email()))
+        .mutation(async ({ input }) => {
+            const response = await fetch(`${env.PU_URL}/ad/delete-users`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${puToken}`,
+                },
+                body: JSON.stringify({
+                    emails: input,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: `Failed to delete AD users: ${response.status} ${response.statusText} - ${errorText}`,
+                });
+            }
+
+            await response.json();
+        }),
 });
