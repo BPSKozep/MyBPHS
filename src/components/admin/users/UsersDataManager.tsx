@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { api } from "@/trpc/react";
 import {
     Table,
@@ -35,7 +35,6 @@ import {
     PlusIcon,
 } from "lucide-react";
 import { FaColumns } from "react-icons/fa";
-import { UserPlusIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
     Dialog,
@@ -48,7 +47,6 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -66,6 +64,7 @@ import rolesJson from "@/data/roles.json";
 import { compareHungarianIgnoreCase } from "@/utils/hungarianCollator";
 import { FaCheck, FaX } from "react-icons/fa6";
 import { TriangleAlertIcon } from "lucide-react";
+import AddUserDialog from "./AddUserDialog";
 
 type SortDirection = "asc" | "desc";
 type SortableColumn =
@@ -174,15 +173,6 @@ export default function UsersDataManager() {
         type: "error" | "confirm";
         onConfirm?: () => void;
     }>({ open: false, title: "", description: "", type: "error" });
-    const [addUserDialog, setAddUserDialog] = useState(false);
-    const [newUser, setNewUser] = useState({
-        name: "",
-        email: "",
-        nfcId: "",
-        roles: [] as string[],
-        blocked: false,
-        sendWelcomeEmail: true,
-    });
     const [isRefreshLoading, setIsRefreshLoading] = useState(false);
     const [orphanedADDialog, setOrphanedADDialog] = useState(false);
 
@@ -227,31 +217,6 @@ export default function UsersDataManager() {
                 open: true,
                 title: "Törlési hiba",
                 description: "Hiba történt a törlés során: " + error.message,
-                type: "error",
-            });
-        },
-    });
-
-    const createUserMutation = api.user.create.useMutation({
-        onSuccess: () => {
-            void refetchUsers();
-            setAddUserDialog(false);
-            setNewUser({
-                name: "",
-                email: "",
-                nfcId: "",
-                roles: [],
-                blocked: false,
-                sendWelcomeEmail: true,
-            });
-        },
-        onError: (error) => {
-            setAlertDialog({
-                open: true,
-                title: "Létrehozási hiba",
-                description:
-                    "Hiba történt a felhasználó létrehozásakor: " +
-                    error.message,
                 type: "error",
             });
         },
@@ -553,51 +518,41 @@ export default function UsersDataManager() {
         paginatedUsers.length > 0 &&
         selectedRows.size === paginatedUsers.length;
 
-    // New user creation handlers
-    const handleCreateUser = () => {
-        if (
-            !newUser.name ||
-            !newUser.email ||
-            !newUser.nfcId ||
-            newUser.roles.length === 0
-        ) {
+    // Helper functions for dialog
+    const handleUserCreated = useCallback(() => {
+        void refetchUsers();
+    }, [refetchUsers]);
+
+    const handleUserCreationError = useCallback(
+        (title: string, description: string) => {
             setAlertDialog({
                 open: true,
-                title: "Hiányzó adatok",
-                description:
-                    "Kérlek tölts ki minden kötelező mezőt és válassz legalább egy szerepet.",
+                title,
+                description,
                 type: "error",
             });
-            return;
-        }
+        },
+        [],
+    );
 
-        createUserMutation.mutate(newUser);
-    };
-
-    const toggleNewUserRole = (role: string) => {
-        setNewUser((prev) => ({
-            ...prev,
-            roles: prev.roles.includes(role)
-                ? prev.roles.filter((r) => r !== role)
-                : [...prev.roles, role],
-        }));
-    };
-
-    const handleRefreshWithLoading = async () => {
+    const handleRefreshWithLoading = useCallback(async () => {
         setIsRefreshLoading(true);
         try {
             await Promise.all([refetchUsers(), refetchAdUsers()]);
         } finally {
             setIsRefreshLoading(false);
         }
-    };
+    }, [refetchUsers, refetchAdUsers]);
 
-    const handleCreateADUser = (user: UserData) => {
-        createADUserMutation.mutate({
-            email: user.email,
-            name: user.name,
-        });
-    };
+    const handleCreateADUser = useCallback(
+        (user: UserData) => {
+            createADUserMutation.mutate({
+                email: user.email,
+                name: user.name,
+            });
+        },
+        [createADUserMutation],
+    );
 
     const roles: Record<string, string> = rolesJson;
     const roleKeys = Object.keys(roles);
@@ -675,20 +630,12 @@ export default function UsersDataManager() {
                         {/* Mobile: Full-width button row */}
                         <div className="flex w-full gap-2 sm:hidden">
                             {/* Add User Button */}
-                            <Dialog
-                                open={addUserDialog}
-                                onOpenChange={setAddUserDialog}
-                            >
-                                <DialogTrigger asChild>
-                                    <Button
-                                        variant="default"
-                                        className="flex flex-1 items-center justify-center bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
-                                        title="Új felhasználó"
-                                    >
-                                        <UserPlusIcon className="size-4" />
-                                    </Button>
-                                </DialogTrigger>
-                            </Dialog>
+                            <div className="flex-1">
+                                <AddUserDialog
+                                    onSuccess={handleUserCreated}
+                                    onError={handleUserCreationError}
+                                />
+                            </div>
 
                             {/* Delete Button */}
                             <Button
@@ -776,204 +723,10 @@ export default function UsersDataManager() {
                         {/* Desktop: Original layout with text */}
                         <div className="hidden items-center gap-2 sm:flex">
                             {/* Add User Button */}
-                            <Dialog
-                                open={addUserDialog}
-                                onOpenChange={setAddUserDialog}
-                            >
-                                <DialogTrigger asChild>
-                                    <Button
-                                        variant="default"
-                                        className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
-                                    >
-                                        <UserPlusIcon className="size-4" />
-                                        Új felhasználó
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-md border-gray-600 bg-[#2e2e2e]">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-white">
-                                            Új felhasználó hozzáadása
-                                        </DialogTitle>
-                                        <DialogDescription />
-                                    </DialogHeader>
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label
-                                                htmlFor="name"
-                                                className="text-white"
-                                            >
-                                                Név*
-                                            </Label>
-                                            <Input
-                                                id="name"
-                                                value={newUser.name}
-                                                onChange={(e) =>
-                                                    setNewUser((prev) => ({
-                                                        ...prev,
-                                                        name: e.target.value,
-                                                    }))
-                                                }
-                                                className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
-                                                placeholder="Teljes név"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label
-                                                htmlFor="email"
-                                                className="text-white"
-                                            >
-                                                Email*
-                                            </Label>
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                value={newUser.email}
-                                                onChange={(e) =>
-                                                    setNewUser((prev) => ({
-                                                        ...prev,
-                                                        email: e.target.value,
-                                                    }))
-                                                }
-                                                className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
-                                                placeholder="pelda@example.com"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label
-                                                htmlFor="nfcId"
-                                                className="text-white"
-                                            >
-                                                NFC ID*
-                                            </Label>
-                                            <Input
-                                                id="nfcId"
-                                                value={newUser.nfcId}
-                                                maxLength={8}
-                                                onChange={(e) =>
-                                                    setNewUser((prev) => ({
-                                                        ...prev,
-                                                        nfcId: e.target.value,
-                                                    }))
-                                                }
-                                                className="border-gray-600 bg-[#565656] font-mono text-white placeholder:text-gray-300"
-                                                placeholder="12345678"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-white">
-                                                Szerepek*
-                                            </Label>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full justify-between border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
-                                                    >
-                                                        {newUser.roles
-                                                            .length === 0
-                                                            ? "Válassz szerepeket"
-                                                            : newUser.roles
-                                                                  .map(
-                                                                      (role) =>
-                                                                          roles[
-                                                                              role
-                                                                          ] ??
-                                                                          role,
-                                                                  )
-                                                                  .join(", ")}
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent className="border-gray-600 bg-[#242424]">
-                                                    {roleKeys.map((role) => (
-                                                        <DropdownMenuCheckboxItem
-                                                            key={role}
-                                                            checked={newUser.roles.includes(
-                                                                role,
-                                                            )}
-                                                            onCheckedChange={() =>
-                                                                toggleNewUserRole(
-                                                                    role,
-                                                                )
-                                                            }
-                                                            className="font-medium text-white hover:bg-[#2e2e2e] hover:text-white focus:bg-[#2e2e2e] focus:text-white"
-                                                        >
-                                                            {roles[role] ??
-                                                                role}
-                                                        </DropdownMenuCheckboxItem>
-                                                    ))}
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch
-                                                id="blocked"
-                                                checked={newUser.blocked}
-                                                onCheckedChange={(
-                                                    checked: boolean,
-                                                ) =>
-                                                    setNewUser((prev) => ({
-                                                        ...prev,
-                                                        blocked: checked,
-                                                    }))
-                                                }
-                                                className="data-[state=checked]:bg-red-600"
-                                            />
-                                            <Label
-                                                htmlFor="blocked"
-                                                className="text-white"
-                                            >
-                                                Blokkolva
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch
-                                                id="sendWelcomeEmail"
-                                                checked={
-                                                    newUser.sendWelcomeEmail
-                                                }
-                                                onCheckedChange={(
-                                                    checked: boolean,
-                                                ) =>
-                                                    setNewUser((prev) => ({
-                                                        ...prev,
-                                                        sendWelcomeEmail:
-                                                            checked,
-                                                    }))
-                                                }
-                                                className="data-[state=checked]:bg-blue-600"
-                                            />
-                                            <Label
-                                                htmlFor="sendWelcomeEmail"
-                                                className="text-white"
-                                            >
-                                                Üdvözlő email küldése
-                                            </Label>
-                                        </div>
-                                    </div>
-                                    <DialogFooter>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() =>
-                                                setAddUserDialog(false)
-                                            }
-                                            className="border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
-                                        >
-                                            Mégse
-                                        </Button>
-                                        <Button
-                                            onClick={handleCreateUser}
-                                            disabled={
-                                                createUserMutation.isPending
-                                            }
-                                            className="border-blue-600 bg-blue-700 text-white hover:bg-blue-600 hover:text-white"
-                                        >
-                                            {createUserMutation.isPending
-                                                ? "Létrehozás..."
-                                                : "Létrehozás"}
-                                        </Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
+                            <AddUserDialog
+                                onSuccess={handleUserCreated}
+                                onError={handleUserCreationError}
+                            />
 
                             {/* Orphaned AD Users Dialog */}
                             <Dialog
