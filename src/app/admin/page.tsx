@@ -22,7 +22,11 @@ export default function Users() {
                             url="/admin/users"
                         />
                         <BigLinkButton title="Órarend" url="/admin/timetable" />
-                        <BigLinkButton title="Csoportok" url="/admin/groups" />
+                        {/* <BigLinkButton title="Csoportok" url="/admin/groups" /> */}
+                        <BigLinkButton
+                            title="Onboarding"
+                            url="/admin/onboarding"
+                        />
                         <BigLinkButton title="Email" url="/admin/email" />
                         <BigLinkButton title="Laptopok" url="/admin/laptops" />
                     </div>

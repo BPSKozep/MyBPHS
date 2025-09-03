@@ -255,6 +255,7 @@ export const userRouter = createTRPCRouter({
         .output(
             z.array(
                 z.object({
+                    _id: z.string(),
                     email: z.string(),
                     name: z.string(),
                     blocked: z.boolean(),
@@ -280,10 +281,12 @@ export const userRouter = createTRPCRouter({
                 roleFilter = { roles: "administrator" };
             }
 
-            const users =
-                await User.find(roleFilter).select("email name blocked");
+            const users = await User.find(roleFilter).select(
+                "_id email name blocked",
+            );
 
             return users.map((user) => ({
+                _id: user._id?.toString(),
                 email: user.email,
                 name: user.name,
                 blocked: user.blocked ?? false,
@@ -372,7 +375,7 @@ export const userRouter = createTRPCRouter({
             };
         }),
 
-    // Get all users for client-side management
+    // Get all users
     getAll: protectedProcedure
         .output(
             z.array(
