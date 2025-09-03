@@ -292,20 +292,7 @@ export const userRouter = createTRPCRouter({
     getNfcId: protectedProcedure
         .input(z.string().email())
         .output(z.string())
-        .query(async ({ ctx, input }) => {
-            const authorized = await checkRoles(ctx.session, [
-                "student",
-                "staff",
-                "lunch-system",
-            ]);
-
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
-            }
-
+        .query(async ({ input }) => {
             const user = await User.findOne({ email: input });
 
             return user?.nfcId ?? "";
