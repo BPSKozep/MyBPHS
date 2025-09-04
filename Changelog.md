@@ -1,3 +1,7 @@
+# 2.9.0 2025-09-04
+
+- Admin onboarding
+
 # 2.8.0 2025-08-21
 
 - Onboarding
