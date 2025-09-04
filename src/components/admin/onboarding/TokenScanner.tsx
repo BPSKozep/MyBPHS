@@ -81,6 +81,8 @@ export default function TokenScanner() {
     // Generate HTML content for tokens
     const generateTokensHtml = () => {
         const tokensHtml = unassociatedTokens
+            .slice()
+            .reverse()
             .map((token) => `<div class="token-item">${token.id}</div>`)
             .join("");
 
