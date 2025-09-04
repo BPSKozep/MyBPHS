@@ -131,19 +131,9 @@ export default function TokenScanner() {
                         align-items: center;
                         justify-content: center;
                     }
-                    .mobile-instructions {
-                        text-align: center;
-                        margin: 20px;
-                        padding: 15px;
-                        background: #e8f4fd;
-                        border: 1px solid #bee5eb;
-                        border-radius: 5px;
-                        font-size: 14px;
-                    }
                     @media print {
                         body { -webkit-print-color-adjust: exact; }
                         .tokens-grid { page-break-inside: avoid; }
-                        .mobile-instructions { display: none; }
                     }
                     @media screen and (max-width: 768px) {
                         .tokens-grid {
@@ -162,7 +152,6 @@ export default function TokenScanner() {
                     <h1>Onboarding Tokenek</h1>
                     <p>Összesen: ${unassociatedTokens.length} token</p>
                 </div>
-                ${isMobile() ? '<div class="mobile-instructions">Mobil eszközön: Használd a böngésző "Nyomtatás" vagy "Megosztás" funkcióját a menüből</div>' : ""}
                 <div class="tokens-grid">
                     ${tokensHtml}
                 </div>
