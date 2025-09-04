@@ -69,22 +69,27 @@ export default function TokenScanner() {
         setScannedTokens([]);
     };
 
-    // Print tokens in grid format
-    const printTokens = () => {
-        if (unassociatedTokens.length === 0) return;
+    // Detect if user is on mobile device
+    const isMobile = () => {
+        return (
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                navigator.userAgent,
+            ) || window.innerWidth <= 768
+        );
+    };
 
-        const printWindow = window.open("", "_blank");
-        if (!printWindow) return;
-
+    // Generate HTML content for tokens
+    const generateTokensHtml = () => {
         const tokensHtml = unassociatedTokens
             .map((token) => `<div class="token-item">${token.id}</div>`)
             .join("");
 
-        const htmlContent = `
+        return `
             <!DOCTYPE html>
             <html>
-            <title>Onboarding Tokenek</title>
             <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
                     @page {
                         margin: 0.5in;
@@ -97,6 +102,12 @@ export default function TokenScanner() {
                         padding: 0;
                         font-size: 12px;
                         line-height: 1.2;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        padding: 10px;
+                        border-bottom: 2px solid #333;
                     }
                     .tokens-grid {
                         display: grid;
@@ -118,28 +129,120 @@ export default function TokenScanner() {
                         align-items: center;
                         justify-content: center;
                     }
+                    .mobile-instructions {
+                        text-align: center;
+                        margin: 20px;
+                        padding: 15px;
+                        background: #e8f4fd;
+                        border: 1px solid #bee5eb;
+                        border-radius: 5px;
+                        font-size: 14px;
+                    }
                     @media print {
                         body { -webkit-print-color-adjust: exact; }
                         .tokens-grid { page-break-inside: avoid; }
+                        .mobile-instructions { display: none; }
+                    }
+                    @media screen and (max-width: 768px) {
+                        .tokens-grid {
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 6px;
+                        }
+                        .token-item {
+                            font-size: 16px;
+                            padding: 6px;
+                        }
                     }
                 </style>
             </head>
             <body>
+                <div class="header">
+                    <h1>Onboarding Tokenek</h1>
+                    <p>Összesen: ${unassociatedTokens.length} token</p>
+                </div>
+                ${isMobile() ? '<div class="mobile-instructions">Mobil eszközön: Használd a böngésző "Nyomtatás" vagy "Megosztás" funkcióját a menüből</div>' : ""}
                 <div class="tokens-grid">
                     ${tokensHtml}
                 </div>
             </body>
             </html>
         `;
+    };
 
-        printWindow.document.write(htmlContent);
-        printWindow.document.close();
+    // Print tokens in grid format
+    const printTokens = () => {
+        if (unassociatedTokens.length === 0) return;
 
-        // Wait for content to load then print
-        printWindow.onload = () => {
-            printWindow.print();
-            printWindow.close();
-        };
+        const htmlContent = generateTokensHtml();
+
+        if (isMobile()) {
+            // For mobile devices, create a blob and open it in a new tab
+            // This works better with mobile browsers
+            const blob = new Blob([htmlContent], { type: "text/html" });
+            const url = URL.createObjectURL(blob);
+
+            // Try to open in new tab/window
+            const printWindow = window.open(url, "_blank");
+
+            if (!printWindow) {
+                // If popup blocked, try alternative approach
+                // Create a temporary link and click it
+                const link = document.createElement("a");
+                link.href = url;
+                link.target = "_blank";
+                link.download = `tokens-${new Date().getTime()}.html`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Clean up URL after a delay
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+                // Show helpful message
+                alert(
+                    "A token lista új lapon nyílik meg. Használd a böngésző nyomtatás funkcióját (⋮ menü → Nyomtatás)",
+                );
+            } else {
+                // Clean up URL when window is closed
+                const cleanup = () => {
+                    URL.revokeObjectURL(url);
+                };
+
+                // Try to detect when window is closed (not reliable on all mobile browsers)
+                const checkClosed = setInterval(() => {
+                    if (printWindow.closed) {
+                        cleanup();
+                        clearInterval(checkClosed);
+                    }
+                }, 1000);
+
+                // Cleanup after 30 seconds regardless
+                setTimeout(() => {
+                    cleanup();
+                    clearInterval(checkClosed);
+                }, 30000);
+            }
+        } else {
+            // Desktop approach - works reliably on desktop browsers
+            const printWindow = window.open("", "_blank");
+            if (!printWindow) {
+                alert(
+                    "Popup blokkolva! Engedélyezd a popup ablakokat ehhez az oldalhoz.",
+                );
+                return;
+            }
+
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+
+            // Wait for content to load then print
+            printWindow.onload = () => {
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 500); // Small delay to ensure content is fully loaded
+            };
+        }
     };
 
     return (
@@ -179,7 +282,8 @@ export default function TokenScanner() {
                         >
                             <PrinterIcon className="size-4" />
                             <span className="hidden sm:block">
-                                Nyomtatás ({unassociatedTokens.length})
+                                {isMobile() ? "Megnyitás" : "Nyomtatás"} (
+                                {unassociatedTokens.length})
                             </span>
                         </Button>
                         <Button
