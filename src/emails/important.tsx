@@ -12,11 +12,11 @@ import {
 import * as React from "react";
 
 interface ImportantProps {
-    text: string;
+    html: string;
     recipients: string;
 }
 
-export default function Important({ text, recipients }: ImportantProps) {
+export default function Important({ html, recipients }: ImportantProps) {
     return (
         <Html>
             <Tailwind>
@@ -29,12 +29,13 @@ export default function Important({ text, recipients }: ImportantProps) {
                                 height="42"
                             ></Img>
                             <Hr />
-                            <Text className="text-lg font-bold leading-6 text-white">
+                            <Text className="text-lg leading-6 font-bold text-white">
                                 {recipients}
                             </Text>
-                            <Text className="whitespace-pre-wrap text-lg leading-6 text-white">
-                                {text}
-                            </Text>
+                            <div
+                                className="text-lg leading-6 text-white"
+                                dangerouslySetInnerHTML={{ __html: html }}
+                            />
 
                             <Hr />
                             <Text className="text-xs leading-4 text-slate-400">
