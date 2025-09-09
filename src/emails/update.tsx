@@ -13,11 +13,11 @@ import {
 import * as React from "react";
 
 interface UpdateProps {
-    text: string;
+    html: string;
     link?: string;
     buttonText?: string;
 }
-export default function Update({ text, link, buttonText }: UpdateProps) {
+export default function Update({ html, link, buttonText }: UpdateProps) {
     return (
         <Html>
             <Tailwind>
@@ -33,9 +33,10 @@ export default function Update({ text, link, buttonText }: UpdateProps) {
                             <Text className="text-center text-lg leading-6 font-bold text-white">
                                 Elérhető az új MyBPHS verzió!
                             </Text>
-                            <Text className="text-md leading-6 whitespace-pre-wrap text-white">
-                                {text}
-                            </Text>
+                            <div
+                                className="text-md leading-6 text-white"
+                                dangerouslySetInnerHTML={{ __html: html }}
+                            />
                             <Section className="text-center">
                                 <Button
                                     className="w-96 cursor-pointer justify-center rounded-lg bg-slate-700 p-5 text-xl font-bold text-white"

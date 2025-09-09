@@ -44,21 +44,26 @@ export const emailRouter = createTRPCRouter({
             react: Lunch(),
         });
     }),
-    sendAdminGroupEmail: protectedProcedure
+    sendAdminEmail: protectedProcedure
         .input(
             z.object({
                 emailFormat: z.enum(["general", "update", "important"]),
-                emailTo: z.enum([
-                    "bphs-sysadmins@budapest.school",
-                    "jpp-students@budapestschool.org",
-                    "jpp-students-only@budapestschool.org",
-                    "jpp-teachers@budapestschool.org",
+                emailTo: z.union([
+                    z.string().email(), // Single email for user emails
+                    z.enum([
+                        // Group emails
+                        "bphs-sysadmins@budapest.school",
+                        "jpp-students@budapestschool.org",
+                        "jpp-students-only@budapestschool.org",
+                        "jpp-teachers@budapestschool.org",
+                    ]),
                 ]),
-
                 emailSubject: z.string(),
-                emailText: z.string(),
+                emailHtml: z.string(),
                 buttonLink: z.string().optional(),
                 buttonText: z.string().optional(),
+                user: z.string().optional(), // User name for individual emails
+                isGroupEmail: z.boolean(),
             }),
         )
         .mutation(async ({ ctx, input }) => {
@@ -73,84 +78,58 @@ export const emailRouter = createTRPCRouter({
 
             const subject =
                 input.emailFormat !== "important"
-                    ? input.emailSubject + " | MyBPHS hírlevél"
+                    ? input.emailSubject +
+                      (input.isGroupEmail
+                          ? " | MyBPHS hírlevél"
+                          : " | MyBPHS üzenet")
                     : "FONTOS MyBPHS üzenet | " + input.emailSubject;
 
-            const recipients =
-                input.emailTo === "bphs-sysadmins@budapest.school"
-                    ? "Kedves Rendszergazdák!"
-                    : input.emailTo === "jpp-students@budapestschool.org"
-                      ? "Kedves diákok és tanárok!"
-                      : input.emailTo === "jpp-students-only@budapestschool.org"
-                        ? "Kedves diákok!"
-                        : "Kedves tanárok!";
+            let emailComponent;
 
-            await resend.emails.send({
-                from: "MyBPHS <my@bphs.hu>",
-                to: input.emailTo,
-                subject,
-                react:
+            if (input.isGroupEmail) {
+                // Group email logic
+                const recipients =
+                    typeof input.emailTo === "string" &&
+                    input.emailTo.includes("@")
+                        ? input.emailTo === "bphs-sysadmins@budapest.school"
+                            ? "Kedves Rendszergazdák!"
+                            : input.emailTo ===
+                                "jpp-students@budapestschool.org"
+                              ? "Kedves diákok és tanárok!"
+                              : input.emailTo ===
+                                  "jpp-students-only@budapestschool.org"
+                                ? "Kedves diákok!"
+                                : "Kedves tanárok!"
+                        : ""; // fallback
+
+                emailComponent =
                     input.emailFormat === "general"
-                        ? General({ text: input.emailText, recipients })
+                        ? General({ html: input.emailHtml, recipients })
                         : input.emailFormat === "update"
                           ? Update({
-                                text: input.emailText,
+                                html: input.emailHtml,
                                 link: input.buttonLink,
                                 buttonText: input.buttonText,
                             })
-                          : Important({
-                                text: input.emailText,
-                                recipients,
-                            }),
-            });
-        }),
-    sendAdminUserEmail: protectedProcedure
-        .input(
-            z.object({
-                emailFormat: z.enum(["general", "update", "important"]),
-                emailTo: z.string(),
-                emailSubject: z.string(),
-                emailText: z.string(),
-                buttonLink: z.string().optional(),
-                buttonText: z.string().optional(),
-                user: z.string(),
-            }),
-        )
-        .mutation(async ({ ctx, input }) => {
-            const authorized = await checkRoles(ctx.session, ["administrator"]);
+                          : Important({ html: input.emailHtml, recipients });
+            } else {
+                // User email logic
+                const userName = input.user ?? "Felhasználó";
 
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
+                emailComponent =
+                    input.emailFormat === "general"
+                        ? GeneralUser({ html: input.emailHtml, user: userName })
+                        : ImportantUser({
+                              html: input.emailHtml,
+                              user: userName,
+                          });
             }
 
-            const subject =
-                input.emailFormat !== "important"
-                    ? input.emailSubject + " | MyBPHS üzenet"
-                    : "FONTOS MyBPHS üzenet | " + input.emailSubject;
-
             await resend.emails.send({
                 from: "MyBPHS <my@bphs.hu>",
                 to: input.emailTo,
                 subject,
-                react:
-                    input.emailFormat === "general"
-                        ? GeneralUser({
-                              text: input.emailText,
-                              user: input.user,
-                          })
-                        : input.emailFormat === "update"
-                          ? Update({
-                                text: input.emailText,
-                                link: input.buttonLink,
-                                buttonText: input.buttonText,
-                            })
-                          : ImportantUser({
-                                text: input.emailText,
-                                user: input.user,
-                            }),
+                react: emailComponent,
             });
         }),
 
