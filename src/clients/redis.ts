@@ -37,13 +37,6 @@ export async function getRedisClient(): Promise<RedisClient> {
     return redisClient;
 }
 
-export async function disconnectRedis(): Promise<void> {
-    if (redisClient) {
-        await redisClient.disconnect();
-        redisClient = null;
-    }
-}
-
 // Verification code operations
 export interface VerificationData {
     code: string;
