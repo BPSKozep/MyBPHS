@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/redis/keepalive",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
