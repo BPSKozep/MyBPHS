@@ -498,7 +498,7 @@ export const userRouter = createTRPCRouter({
             const newUser = await User.create({
                 name: input.name,
                 email: input.email,
-                nfcId: input.nfcId,
+                nfcId: input.nfcId.toLowerCase().trim(),
                 roles: input.roles,
                 blocked: input.blocked,
                 groups: [],
@@ -651,7 +651,7 @@ export const userRouter = createTRPCRouter({
             const newUser = await User.create({
                 name: input.name,
                 email: input.email,
-                nfcId: input.nfcId,
+                nfcId: input.nfcId.toLowerCase().trim(),
                 roles: [role],
                 blocked: false,
                 groups: [],
