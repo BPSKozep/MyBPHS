@@ -56,6 +56,13 @@ export default function RootLayout({
                         </div>
                     </IdentifyUser>
                 </Providers>
+                <script
+                    data-jsd-embedded
+                    data-key="ade8f754-42e4-4153-bad2-bd4b153ff206"
+                    data-base-url="https://jsd-widget.atlassian.com"
+                    src="https://jsd-widget.atlassian.com/assets/embed.js"
+                    async
+                ></script>
             </body>
         </html>
     );
