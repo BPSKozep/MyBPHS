@@ -27,7 +27,7 @@ export default function Welcome({ name, isOnboarding = false }: WelcomeProps) {
                     <Container className="mt-16 bg-slate-800 p-8">
                         <Section className="">
                             <Img
-                                src="https://cdn.bpskozep.hu/mybphs-logo.png"
+                                src="https://cdn.bphs.hu/mybphs-logo.png"
                                 width="156"
                                 height="42"
                             ></Img>

@@ -11,7 +11,7 @@ const nextConfig = {
     images: {
         remotePatterns: [
             {
-                hostname: "cdn.bpskozep.hu",
+                hostname: "cdn.bphs.hu",
             },
         ],
     },
