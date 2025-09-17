@@ -6,9 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "prepare": "husky",
-    "check": "next lint && tsc --noEmit"
+    "check": "eslint . && tsc --noEmit"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.63",
