@@ -48,6 +48,14 @@ export default function RootLayout({
     return (
         <html lang="hu">
             <body>
+                {/* Jira Widget */}
+                <script
+                    data-jsd-embedded
+                    data-key="ade8f754-42e4-4153-bad2-bd4b153ff206"
+                    data-base-url="https://jsd-widget.atlassian.com"
+                    src="https://jsd-widget.atlassian.com/assets/embed.js"
+                    defer
+                ></script>
                 <Providers>
                     <IdentifyUser>
                         <div className="box-border flex h-screen w-full flex-col">

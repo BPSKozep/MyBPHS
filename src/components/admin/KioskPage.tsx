@@ -15,7 +15,7 @@ export default function KioskPage() {
     const [primarySocketFailed, setPrimarySocketFailed] = useState(false);
     const devTags = ["8b2a1345", "4bf41145", "00000000"];
     const [profileImageURL, setProfileImageURL] = useState(
-        "https://cdn.bpskozep.hu/no_picture.png",
+        "https://cdn.bphs.hu/no_picture.png",
     );
 
     const {
@@ -79,7 +79,7 @@ export default function KioskPage() {
 
     useEffect(() => {
         if (user?.email)
-            setProfileImageURL(`https://cdn.bpskozep.hu/${user?.email}`);
+            setProfileImageURL(`https://cdn.bphs.hu/${user?.email}`);
     }, [user]);
 
     const orderCounts = useMemo(() => {
@@ -171,7 +171,7 @@ export default function KioskPage() {
                                 width={200}
                                 onError={() =>
                                     setProfileImageURL(
-                                        "https://cdn.bpskozep.hu/no_picture.png",
+                                        "https://cdn.bphs.hu/no_picture.png",
                                     )
                                 }
                             />

@@ -22,7 +22,7 @@ export default function GoogleSignIn() {
                 {!clicked ? (
                     <div className="flex items-center space-x-4">
                         <Image
-                            src="https://cdn.bpskozep.hu/google.svg"
+                            src="https://cdn.bphs.hu/google.svg"
                             alt="google logo"
                             width={24}
                             height={24}
