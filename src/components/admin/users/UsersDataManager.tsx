@@ -803,17 +803,6 @@ export default function UsersDataManager() {
                                             </p>
                                         )}
                                     </div>
-                                    <DialogFooter>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() =>
-                                                setOrphanedADDialog(false)
-                                            }
-                                            className="border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
-                                        >
-                                            Bezárás
-                                        </Button>
-                                    </DialogFooter>
                                 </DialogContent>
                             </Dialog>
 
