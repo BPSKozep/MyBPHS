@@ -31,23 +31,7 @@ export const env = createEnv({
             process.env.NODE_ENV === "production"
                 ? z.string()
                 : z.string().optional(),
-        INFO_WEBHOOK:
-            process.env.NODE_ENV === "production"
-                ? z.string()
-                : z.string().optional(),
-        ERROR_WEBHOOK:
-            process.env.NODE_ENV === "production"
-                ? z.string()
-                : z.string().optional(),
-        LUNCH_WEBHOOK:
-            process.env.NODE_ENV === "production"
-                ? z.string()
-                : z.string().optional(),
-        TICKET_WEBHOOK:
-            process.env.NODE_ENV === "production"
-                ? z.string()
-                : z.string().optional(),
-        PAYMENT_WEBHOOK:
+        DISCORD_WEBHOOK:
             process.env.NODE_ENV === "production"
                 ? z.string()
                 : z.string().optional(),

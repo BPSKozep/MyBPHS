@@ -7,6 +7,7 @@ import { FaEnvelope } from "react-icons/fa6";
 import sleep from "@/utils/sleep";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
 import SetMenuForm from "@/components/admin/lunch/SetMenuForm";
+import { env } from "@/env/client";
 
 export default function SetMenuAndSendEmail() {
     const [menuOptions, setMenuOptions] = useState(
@@ -49,16 +50,20 @@ export default function SetMenuAndSendEmail() {
                             await sendEmail.mutateAsync();
 
                             await sendDiscordWebhook.mutateAsync({
-                                type: "Lunch",
-                                message:
-                                    "Új menü feltöltve, email kiküldve. 📩",
+                                title: "Új menü feltöltve, email kiküldve. 📩",
+                                body:
+                                    "Címzettek: " +
+                                    env.NEXT_PUBLIC_TO_EMAILS?.split(",").join(
+                                        ", ",
+                                    ),
                             });
 
                             return true;
                         } catch (err) {
                             await sendDiscordWebhook.mutateAsync({
-                                type: "Error",
-                                message: String(err),
+                                title: "SetMenuAndSendEmail Hiba",
+                                body: String(err),
+                                error: true,
                             });
                             return false;
                         }

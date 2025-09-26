@@ -172,7 +172,7 @@ export async function POST(req: Request) {
                 async execute(body) {
                     console.log("ticket", body);
                     try {
-                        await fetch(env.TICKET_WEBHOOK!, {
+                        await fetch(env.DISCORD_WEBHOOK!, {
                             method: "post",
                             headers: {
                                 "Content-Type": "application/json",

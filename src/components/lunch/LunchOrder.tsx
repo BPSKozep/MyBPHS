@@ -19,7 +19,6 @@ import menuCombine from "@/utils/menuCombine";
 import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
 import IconButton from "@/components/IconButton";
-import { useSession } from "next-auth/react";
 import PageWithHeader from "@/components/PageWithHeader";
 import Paywall from "@/components/Paywall";
 
@@ -81,8 +80,6 @@ function LunchOrder() {
         !menu.data?.isOpenForOrders;
 
     const showText = menu.isLoading || order.isLoading || noMenu || menuClosed;
-
-    const userEmail = useSession().data?.user?.email;
 
     const [closedMenuShown, setClosedMenuShown] = useState(false);
 
@@ -377,15 +374,6 @@ function LunchOrder() {
                                                                     },
                                                                 );
 
-                                                                await sendDiscordWebhook.mutateAsync(
-                                                                    {
-                                                                        type: "Lunch",
-                                                                        message:
-                                                                            userEmail +
-                                                                            " beküldte a rendelést. 📨",
-                                                                    },
-                                                                );
-
                                                                 await sleep(
                                                                     1700,
                                                                 )
@@ -418,11 +406,11 @@ function LunchOrder() {
                                                             } catch (err) {
                                                                 await sendDiscordWebhook.mutateAsync(
                                                                     {
-                                                                        type: "Error",
-                                                                        message:
-                                                                            String(
-                                                                                err,
-                                                                            ),
+                                                                        title: "LunchOrder Hiba",
+                                                                        body: String(
+                                                                            err,
+                                                                        ),
+                                                                        error: true,
                                                                     },
                                                                 );
                                                                 return false;
@@ -467,24 +455,15 @@ function LunchOrder() {
                                                                     false,
                                                                 );
 
-                                                                await sendDiscordWebhook.mutateAsync(
-                                                                    {
-                                                                        type: "Lunch",
-                                                                        message:
-                                                                            userEmail +
-                                                                            " szerkesztette a rendelését. ✍️",
-                                                                    },
-                                                                );
-
                                                                 return true;
                                                             } catch (err) {
                                                                 await sendDiscordWebhook.mutateAsync(
                                                                     {
-                                                                        type: "Error",
-                                                                        message:
-                                                                            String(
-                                                                                err,
-                                                                            ),
+                                                                        title: "LunchOrder-Edit Hiba",
+                                                                        body: String(
+                                                                            err,
+                                                                        ),
+                                                                        error: true,
                                                                     },
                                                                 );
                                                                 return false;

@@ -108,8 +108,9 @@ export default function SchoolPasswordReset() {
                                         return true;
                                     } catch (error) {
                                         await sendDiscordWebhook.mutateAsync({
-                                            type: "Error",
-                                            message: String(error),
+                                            title: "SchoolPasswordReset Hiba",
+                                            body: String(error),
+                                            error: true,
                                         });
                                         return false;
                                     }

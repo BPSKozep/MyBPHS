@@ -426,10 +426,7 @@ export const orderRouter = createTRPCRouter({
         .input(z.strictObject({ year: z.number(), week: z.number() }))
         .output(z.record(z.string(), z.number()).array())
         .query(async ({ ctx, input }) => {
-            const authorized = await checkRoles(ctx.session, [
-                "administrator",
-                "lunch-system",
-            ]);
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
 
             if (!authorized) {
                 throw new TRPCError({
@@ -494,6 +491,34 @@ export const orderRouter = createTRPCRouter({
             }
 
             return result;
+        }),
+    getOrderDocumentCount: protectedProcedure
+        .input(z.strictObject({ year: z.number(), week: z.number() }))
+        .output(z.number())
+        .query(async ({ ctx, input }) => {
+            const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+            if (!authorized) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Access denied to the requested resource",
+                });
+            }
+
+            const menu = await Menu.findOne({
+                year: input.year,
+                week: input.week,
+            });
+
+            if (!menu) {
+                return 0;
+            }
+
+            const count = await Order.countDocuments({
+                menu: menu._id,
+            });
+
+            return count;
         }),
     edit: protectedProcedure
         .input(
