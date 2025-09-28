@@ -16,6 +16,7 @@ export default function Home() {
                     <BigLinkButton
                         title="Chat ✨"
                         url="/chat"
+                        disabled
                         // statuswebsites={["/api/chat/ping"]}
                     />
                     <OnlyRolesComponent roles={["administrator"]}>
