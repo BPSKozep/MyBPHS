@@ -52,10 +52,11 @@ export default function SetMenuAndSendEmail() {
                             await sendDiscordWebhook.mutateAsync({
                                 title: "Új menü feltöltve, email kiküldve. 📩",
                                 body:
-                                    "Címzettek: " +
-                                    env.NEXT_PUBLIC_TO_EMAILS?.split(",").join(
-                                        ", ",
-                                    ),
+                                    "Címzettek:\n" +
+                                    env.NEXT_PUBLIC_TO_EMAILS?.split(",")
+                                        .map((email) => email.trim())
+                                        .filter(Boolean)
+                                        .join("\n"),
                             });
 
                             return true;
