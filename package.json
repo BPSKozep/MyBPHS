@@ -55,7 +55,7 @@
     "react-responsive": "^10.0.1",
     "redis": "^5.8.2",
     "remark-gfm": "^4.0.1",
-    "resend": "^4.8.0",
+    "resend": "^6.1.0",
     "socket.io-client": "^4.8.1",
     "stripe": "^18.5.0",
     "superjson": "^2.2.2",
