@@ -10,7 +10,17 @@ import { getWeek, getWeekYear } from "@/utils/isoweek";
 export default function CloseMenuOrders() {
     const setIsOpen = api.menu.setIsopen.useMutation();
 
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
+
+    const week = getWeek(date);
+    const year = getWeekYear(date);
+
     const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
+    const orderDocCount = api.order.getOrderDocumentCount.useQuery({
+        year,
+        week,
+    });
 
     return (
         <>
@@ -24,25 +34,28 @@ export default function CloseMenuOrders() {
                         try {
                             await sleep(500);
 
-                            const date = new Date();
-                            date.setDate(date.getDate() + 7);
-
                             await setIsOpen.mutateAsync({
-                                week: getWeek(date),
-                                year: getWeekYear(date),
+                                week,
+                                year,
                                 isOpen: false,
                             });
 
+                            const totalOrders = orderDocCount.data ?? 0;
+
                             await sendDiscordWebhook.mutateAsync({
-                                type: "Lunch",
-                                message: "Beküldések lezárva. ❌",
+                                title:
+                                    "Beküldések lezárva a(z) " +
+                                    week +
+                                    ". hétre ❌",
+                                body: `Összes leadott rendelés: ${String(totalOrders)}`,
                             });
 
                             return true;
                         } catch (err) {
                             await sendDiscordWebhook.mutateAsync({
-                                type: "Error",
-                                message: String(err),
+                                title: "CloseMenuOrders Hiba",
+                                body: String(err),
+                                error: true,
                             });
                             return false;
                         }

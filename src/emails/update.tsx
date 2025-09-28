@@ -46,10 +46,7 @@ export default function Update({ html, link, buttonText }: UpdateProps) {
                                 </Button>
                             </Section>
                             <Hr />
-                            <Text className="text-lg leading-6 text-white">
-                                — A BPHS Rendszergazda csapata
-                            </Text>
-                            <Hr />
+
                             <Text className="text-xs leading-4 text-slate-400">
                                 Budapest School Általános Iskola és Gimnázium,
                                 Budapest, II. János Pál pápa tér 25.

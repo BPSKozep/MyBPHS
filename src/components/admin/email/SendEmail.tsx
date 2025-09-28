@@ -201,16 +201,12 @@ export default function SendEmail() {
                 isGroupEmail: isGroupMode,
             });
 
-            await sendDiscordWebhook.mutateAsync({
-                type: "Info",
-                message: `Email elküldve: ${recipient} - ${subject}`,
-            });
-
             return true;
         } catch (err) {
             await sendDiscordWebhook.mutateAsync({
-                type: "Error",
-                message: String(err),
+                title: "SendEmail Hiba",
+                body: String(err),
+                error: true,
             });
             return false;
         }

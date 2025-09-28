@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 import { User } from "@/models";
+import { env } from "@/env/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
 
     await user.save();
 
-    await fetch(process.env.PAYMENT_WEBHOOK!, {
+    await fetch(env.DISCORD_WEBHOOK!, {
         method: "post",
         headers: {
             "Content-Type": "application/json",

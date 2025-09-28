@@ -8,6 +8,7 @@ import { FaFloppyDisk } from "react-icons/fa6";
 import { api } from "@/trpc/react";
 import Card from "../Card";
 import Loading from "../Loading";
+import { useSession } from "next-auth/react";
 
 export default function SchoolPasswordReset() {
     const [input, setInput] = useState("");
@@ -21,6 +22,8 @@ export default function SchoolPasswordReset() {
     const [laptopPassResetAvailable, setlaptopAvailable] = useState(true);
 
     const [laptopPassResetShown, setLaptopPassResetShown] = useState(false);
+
+    const session = useSession();
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -108,18 +111,23 @@ export default function SchoolPasswordReset() {
                                         return true;
                                     } catch (error) {
                                         await sendDiscordWebhook.mutateAsync({
-                                            type: "Error",
-                                            message: String(error),
+                                            title: "SchoolPasswordReset Hiba",
+                                            body:
+                                                session.data?.user?.email +
+                                                "\n\n" +
+                                                String(error),
+                                            error: true,
                                         });
                                         return false;
                                     }
                                 }}
                             />
                         </div>
-                        <h1 className="mt-5 text-white">
-                            Legutoljára módosítva:{" "}
-                            {lastChanged.data ?? "Még nem volt"}
-                        </h1>
+                        {lastChanged.data && (
+                            <h1 className="mt-5 text-white">
+                                Legutoljára módosítva: {lastChanged.data}
+                            </h1>
+                        )}
                     </div>
                 </Card>
             )}

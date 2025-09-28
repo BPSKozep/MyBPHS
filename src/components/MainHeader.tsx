@@ -160,7 +160,7 @@ export default function MainHeader() {
                                             <p className="text-sm font-medium text-gray-400">
                                                 Email cím
                                             </p>
-                                            <p className="text-lg font-semibold text-white">
+                                            <p className="text-sm font-semibold break-all text-white">
                                                 {data?.user?.email ??
                                                     "Nincs adat"}
                                             </p>
@@ -178,7 +178,7 @@ export default function MainHeader() {
                                             <p className="text-sm font-medium text-gray-400">
                                                 Token azonosító
                                             </p>
-                                            <p className="text-lg font-semibold text-white">
+                                            <p className="font-semibold text-white">
                                                 {NfcId.data ?? "Nincs adat"}
                                             </p>
                                         </div>
