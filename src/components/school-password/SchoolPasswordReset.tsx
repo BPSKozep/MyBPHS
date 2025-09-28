@@ -8,6 +8,7 @@ import { FaFloppyDisk } from "react-icons/fa6";
 import { api } from "@/trpc/react";
 import Card from "../Card";
 import Loading from "../Loading";
+import { useSession } from "next-auth/react";
 
 export default function SchoolPasswordReset() {
     const [input, setInput] = useState("");
@@ -21,6 +22,8 @@ export default function SchoolPasswordReset() {
     const [laptopPassResetAvailable, setlaptopAvailable] = useState(true);
 
     const [laptopPassResetShown, setLaptopPassResetShown] = useState(false);
+
+    const session = useSession();
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -109,7 +112,10 @@ export default function SchoolPasswordReset() {
                                     } catch (error) {
                                         await sendDiscordWebhook.mutateAsync({
                                             title: "SchoolPasswordReset Hiba",
-                                            body: String(error),
+                                            body:
+                                                session.data?.user?.email +
+                                                "\n\n" +
+                                                String(error),
                                             error: true,
                                         });
                                         return false;
