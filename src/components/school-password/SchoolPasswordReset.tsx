@@ -117,10 +117,11 @@ export default function SchoolPasswordReset() {
                                 }}
                             />
                         </div>
-                        <h1 className="mt-5 text-white">
-                            Legutoljára módosítva:{" "}
-                            {lastChanged.data ?? "Még nem volt"}
-                        </h1>
+                        {lastChanged.data && (
+                            <h1 className="mt-5 text-white">
+                                Legutoljára módosítva: {lastChanged.data}
+                            </h1>
+                        )}
                     </div>
                 </Card>
             )}
