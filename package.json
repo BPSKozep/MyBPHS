@@ -41,7 +41,7 @@
     "clsx": "^2.1.1",
     "generate-password": "^1.7.1",
     "input-otp": "^1.4.2",
-    "lucide-react": "^0.540.0",
+    "lucide-react": "^0.544.0",
     "mongoose": "^8.18.1",
     "motion": "^12.23.13",
     "nanoid": "^5.1.5",
