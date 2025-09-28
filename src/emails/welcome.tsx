@@ -51,7 +51,7 @@ export default function Welcome({ name, isOnboarding = false }: WelcomeProps) {
                                 </Text>
                                 <Text className="text-base leading-6 text-white">
                                     • Iskolai jelszavadat módosíthatod (Laptop
-                                    és WiFi bejelentkezés)
+                                    és WiFi bejelentkezéshez)
                                 </Text>
                                 <Text className="text-base leading-6 text-white">
                                     • Chatelhetsz a MyBPHS Intelligence ✨
