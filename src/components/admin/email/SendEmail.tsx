@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Card from "@/components/Card";
-import IconSubmitButton from "@/components/IconSubmitButton";
 import { FaEnvelope } from "react-icons/fa6";
 import { api } from "@/trpc/react";
 import UserInput from "../lunch/UserInput";
@@ -14,6 +13,14 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -79,6 +86,7 @@ export default function SendEmail() {
     const [subject, setSubject] = useState("");
     const [buttonLink, setButtonLink] = useState("");
     const [buttonText, setButtonText] = useState("");
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
     // Filter templates based on mode
     const filteredPresets = Object.entries(TEXT_PRESETS).filter(
@@ -176,7 +184,13 @@ export default function SendEmail() {
         }
     }, [isGroupMode, preset, filteredPresets]);
 
-    const handleSend = async () => {
+    const handleSend = () => {
+        // Show confirmation dialog instead of sending directly
+        setShowConfirmDialog(true);
+        return false; // Return false to indicate not to proceed with default behavior
+    };
+
+    const confirmAndSend = async () => {
         if (!editor) return false;
 
         try {
@@ -201,6 +215,8 @@ export default function SendEmail() {
                 isGroupEmail: isGroupMode,
             });
 
+            // Close the dialog after successful send
+            setShowConfirmDialog(false);
             return true;
         } catch (err) {
             await sendDiscordWebhook.mutateAsync({
@@ -208,6 +224,7 @@ export default function SendEmail() {
                 body: String(err),
                 error: true,
             });
+            // Don't close dialog on error so user can try again
             return false;
         }
     };
@@ -600,11 +617,118 @@ export default function SendEmail() {
 
                 {/* Send Button */}
                 <div className="flex justify-center pt-6">
-                    <IconSubmitButton
-                        icon={<FaEnvelope />}
+                    <Button
                         onClick={handleSend}
-                    />
+                        disabled={sendEmail.isPending}
+                        className="bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                        {sendEmail.isPending ? (
+                            <div className="flex items-center gap-2">
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                Küldés...
+                            </div>
+                        ) : (
+                            <>
+                                <FaEnvelope className="mr-2 h-4 w-4" />
+                                Email küldése
+                            </>
+                        )}
+                    </Button>
                 </div>
+
+                {/* Confirmation Dialog */}
+                <Dialog
+                    open={showConfirmDialog}
+                    onOpenChange={setShowConfirmDialog}
+                >
+                    <DialogContent className="border-gray-600 bg-[#242424] text-white">
+                        <DialogHeader>
+                            <DialogTitle className="text-xl font-semibold text-white">
+                                Email küldés megerősítése
+                            </DialogTitle>
+                            <DialogDescription className="text-gray-300">
+                                Kérjük, ellenőrizd az alábbi adatokat a küldés
+                                előtt:
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-4 py-4">
+                            {/* Recipient Information */}
+                            <div className="space-y-2">
+                                <h4 className="font-semibold text-white">
+                                    Címzett:
+                                </h4>
+                                <div className="rounded-lg bg-[#2e2e2e] p-3">
+                                    {isGroupMode ? (
+                                        <div>
+                                            <p className="font-medium">
+                                                {GROUP_EMAILS[groupEmail]}
+                                            </p>
+                                            <p className="text-sm text-gray-400">
+                                                {groupEmail}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <p className="font-medium">
+                                                {selectedUserName ||
+                                                    "Névtelen felhasználó"}
+                                            </p>
+                                            <p className="text-sm text-gray-400">
+                                                {selectedUserEmail}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Subject Information */}
+                            <div className="space-y-2">
+                                <h4 className="font-semibold text-white">
+                                    Email tárgy:
+                                </h4>
+                                <div className="rounded-lg bg-[#2e2e2e] p-3">
+                                    <p>
+                                        {preset.startsWith("important")
+                                            ? `FONTOS MyBPHS üzenet | ${subject}`
+                                            : `${subject}${
+                                                  isGroupMode
+                                                      ? " | MyBPHS hírlevél"
+                                                      : " | MyBPHS üzenet"
+                                              }`}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <DialogFooter className="gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowConfirmDialog(false)}
+                                className="border-gray-600 bg-[#2e2e2e] text-white hover:bg-[#404040] hover:text-white"
+                            >
+                                Mégse
+                            </Button>
+                            <Button
+                                onClick={confirmAndSend}
+                                disabled={sendEmail.isPending}
+                                className="bg-blue-600 text-white hover:bg-blue-700"
+                            >
+                                {sendEmail.isPending ? (
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                        Küldés...
+                                    </div>
+                                ) : (
+                                    <>
+                                        <FaEnvelope className="mr-2 h-4 w-4" />
+                                        Email küldése
+                                    </>
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </Card>
     );

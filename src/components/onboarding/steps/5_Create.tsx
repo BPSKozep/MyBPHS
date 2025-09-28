@@ -112,7 +112,7 @@ export default function LoadingStep({
                 </InfoBox>
 
                 <p className="text-sm text-gray-400">
-                    Kérjük, fordulj a rendszergazdákhoz segítségért.
+                    Kérjük, írj nekünk egy emailt a support@bphs.hu címre.
                 </p>
             </div>
         );
