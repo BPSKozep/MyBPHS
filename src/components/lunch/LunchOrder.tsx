@@ -21,6 +21,7 @@ import { motion } from "motion/react";
 import IconButton from "@/components/IconButton";
 import PageWithHeader from "@/components/PageWithHeader";
 import Paywall from "@/components/Paywall";
+import { useSession } from "next-auth/react";
 
 function LunchOrder() {
     const [weekOffset, setWeekOffset] = useState(1);
@@ -82,6 +83,8 @@ function LunchOrder() {
     const showText = menu.isLoading || order.isLoading || noMenu || menuClosed;
 
     const [closedMenuShown, setClosedMenuShown] = useState(false);
+
+    const session = useSession();
 
     return (
         <PageWithHeader title="Ebédrendelés">
@@ -407,9 +410,15 @@ function LunchOrder() {
                                                                 await sendDiscordWebhook.mutateAsync(
                                                                     {
                                                                         title: "LunchOrder Hiba",
-                                                                        body: String(
-                                                                            err,
-                                                                        ),
+                                                                        body:
+                                                                            session
+                                                                                .data
+                                                                                ?.user
+                                                                                ?.email +
+                                                                            "\n\n" +
+                                                                            String(
+                                                                                err,
+                                                                            ),
                                                                         error: true,
                                                                     },
                                                                 );

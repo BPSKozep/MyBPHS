@@ -366,34 +366,10 @@ export default function KioskPage() {
                                         !profileImageURL.includes(
                                             "no_picture.png",
                                         )
-                                    ) {
-                                        logErrorOnce(
-                                            {
-                                                error: `Failed to load profile image: ${profileImageURL}`,
-                                                errorType:
-                                                    "profile_image_error",
-                                                context: {
-                                                    nfcId,
-                                                    user,
-                                                    order,
-                                                    socketStatus: {
-                                                        socketFailure,
-                                                        socketConnected,
-                                                    },
-                                                    componentState: {
-                                                        isValidNfc,
-                                                        loading,
-                                                        profileImageURL,
-                                                    },
-                                                },
-                                            },
-                                            `profile_image_error_${profileImageURL}`,
-                                        ).catch(console.error);
-                                    }
-
-                                    setProfileImageURL(
-                                        "https://cdn.bphs.hu/no_picture.png",
-                                    );
+                                    )
+                                        setProfileImageURL(
+                                            "https://cdn.bphs.hu/no_picture.png",
+                                        );
                                 }}
                             />
 
