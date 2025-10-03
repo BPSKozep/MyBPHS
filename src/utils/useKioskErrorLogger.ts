@@ -43,7 +43,6 @@ export interface KioskErrorDetails {
         | "order_lookup_error"
         | "order_completion_error"
         | "kiosk_save_error"
-        | "profile_image_error"
         | "unknown_error";
 }
 
