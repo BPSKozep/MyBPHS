@@ -1,8 +1,14 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from "@/server/trpc";
 import { TRPCError } from "@trpc/server";
 import { env } from "@/env/server";
 import { z } from "zod";
 import { checkRoles } from "@/utils/authorization";
+import LaptopLogin from "@/models/LaptopLogin.model";
+import mongooseConnect from "@/clients/mongoose";
 
 const deploymentDataSchema = z.object({
     Name: z.string(),
@@ -98,5 +104,56 @@ export const laptopRouter = createTRPCRouter({
                 success: true,
                 message: "Deployment deleted successfully",
             };
+        }),
+    getLogins: publicProcedure
+        .input(
+            z.object({
+                range: z.number(),
+                number: z.number().optional(),
+                user: z.string().optional(),
+            }),
+        )
+        .output(
+            z.array(
+                z.object({
+                    date: z.date(),
+                    user: z.string(),
+                    number: z.number(),
+                }),
+            ),
+        )
+        .query(async ({ input }) => {
+            await mongooseConnect();
+
+            try {
+                const query: { number?: number; user?: string } = {};
+
+                if (input.number) {
+                    query.number = input.number;
+                }
+
+                if (input.user) {
+                    query.user = input.user;
+                }
+
+                const logins = await LaptopLogin.find(query)
+                    .sort({ date: -1 })
+                    .limit(input.range);
+
+                return z
+                    .array(
+                        z.object({
+                            date: z.date(),
+                            user: z.string(),
+                            number: z.number(),
+                        }),
+                    )
+                    .parse(logins);
+            } catch (error) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: `Failed to get logins: ${error as string}`,
+                });
+            }
         }),
 });

@@ -55,6 +55,10 @@ export const env = createEnv({
             process.env.NODE_ENV === "production"
                 ? z.string()
                 : z.string().optional(),
+        LAPTOP_SECRET:
+            process.env.NODE_ENV === "production"
+                ? z.string()
+                : z.string().optional(),
         MONGODB_URI: z.string(),
         MONGODB_DATABASE: z.string(),
         NEXTAUTH_SECRET: z.string(),

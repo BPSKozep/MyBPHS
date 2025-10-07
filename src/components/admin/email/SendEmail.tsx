@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Card from "@/components/Card";
 import { FaEnvelope } from "react-icons/fa6";
 import { api } from "@/trpc/react";
-import UserInput from "../lunch/UserInput";
+import UserInput from "@/components/ui/UserInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

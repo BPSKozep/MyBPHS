@@ -13,12 +13,18 @@ interface User {
 
 interface UserInputProps {
     onSelect?: (user: User) => void;
+    showAllOption?: boolean;
 }
 
-export default function UserInput({ onSelect }: UserInputProps) {
+export default function UserInput({
+    onSelect,
+    showAllOption = false,
+}: UserInputProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedUser, setSelectedUser] = useState<User | null>(
+        showAllOption ? { email: "all", name: "Összes felhasználó" } : null,
+    );
     const userInputRef = useRef<HTMLDivElement>(null);
 
     const usersData = api.user.list.useQuery("all");
@@ -114,6 +120,29 @@ export default function UserInput({ onSelect }: UserInputProps) {
                             transition={{ delay: 0.1 }}
                             className="max-h-[300px] overflow-auto px-3"
                         >
+                            {showAllOption && (
+                                <motion.li
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <button
+                                        onClick={() =>
+                                            handleSelectUser({
+                                                email: "all",
+                                                name: "Összes felhasználó",
+                                            })
+                                        }
+                                        className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-black hover:bg-neutral-100"
+                                    >
+                                        <div className="flex flex-col items-start">
+                                            <span className="text-left font-extrabold">
+                                                Összes felhasználó
+                                            </span>
+                                        </div>
+                                    </button>
+                                </motion.li>
+                            )}
                             {filteredUsers.map((user) => (
                                 <motion.li
                                     key={user.email}
