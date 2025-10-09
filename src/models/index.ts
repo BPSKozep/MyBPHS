@@ -4,5 +4,6 @@ import GroupOverride from "./GroupOverride.model";
 import Menu from "./Menu.model";
 import Order from "./Order.model";
 import Kiosk from "./Kiosk.model";
+import LaptopLogin from "./LaptopLogin.model";
 
-export { User, Group, GroupOverride, Menu, Order, Kiosk };
+export { User, Group, GroupOverride, Menu, Order, Kiosk, LaptopLogin };

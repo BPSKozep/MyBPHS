@@ -371,14 +371,13 @@ function DeploymentCard({
 }
 
 export default function LaptopDeploymentsClient() {
-    const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+    const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false);
     const previousDeploymentsRef = useRef<DeploymentData[]>([]);
 
     const {
         data: deployments,
         isLoading,
         error,
-        dataUpdatedAt,
     } = api.laptop.getDeployments.useQuery(undefined, {
         refetchInterval: autoRefreshEnabled ? 3000 : false,
         refetchIntervalInBackground: false,
@@ -456,29 +455,28 @@ export default function LaptopDeploymentsClient() {
 
     if (isLoading) {
         return (
-            <div className="flex h-full w-full items-center justify-center">
+            <div className="flex flex-col items-center justify-center py-12">
                 <Loading />
+                <p className="mt-4 text-sm text-gray-300">
+                    Telepítések betöltése...
+                </p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="p-6">
-                <Card>
-                    <div className="text-center">
-                        <div className="mb-4 text-red-400">
-                            <h3 className="mb-2 text-lg font-semibold">
-                                Hiba a telepítések betöltésekor
-                            </h3>
-                            <p className="text-sm text-gray-300">
-                                {error instanceof Error
-                                    ? error.message
-                                    : "Ismeretlen hiba történt"}
-                            </p>
-                        </div>
-                    </div>
-                </Card>
+            <div className="py-6 text-center">
+                <div className="mb-4 text-red-400">
+                    <h3 className="mb-2 text-lg font-semibold">
+                        Hiba a telepítések betöltésekor
+                    </h3>
+                    <p className="text-sm text-gray-300">
+                        {error instanceof Error
+                            ? error.message
+                            : "Ismeretlen hiba történt"}
+                    </p>
+                </div>
             </div>
         );
     }
@@ -491,48 +489,57 @@ export default function LaptopDeploymentsClient() {
         deployments?.filter((d) => d.DeploymentStatus === 3) ?? [];
 
     return (
-        <div className="space-y-6 p-4">
-            {/* Refresh Indicator Header */}
-            <div className="flex items-center justify-between">
+        <div className="space-y-6">
+            {/* Header with Auto-refresh Toggle */}
+            <div className="flex items-center justify-between border-b border-gray-600 pb-3">
+                <div className="flex items-center gap-2">
+                    <svg
+                        className="size-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                        />
+                    </svg>
+                    <h2 className="text-lg font-semibold text-white">
+                        Laptop Telepítések
+                    </h2>
+                </div>
                 <div className="flex items-center gap-3 text-sm text-gray-300">
-                    <div className="flex items-center gap-3">
-                        {/* Auto-refresh Toggle Switch */}
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() =>
-                                    setAutoRefreshEnabled(!autoRefreshEnabled)
-                                }
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none ${
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() =>
+                                setAutoRefreshEnabled(!autoRefreshEnabled)
+                            }
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none ${
+                                autoRefreshEnabled
+                                    ? "bg-green-600"
+                                    : "bg-gray-600"
+                            }`}
+                        >
+                            <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                     autoRefreshEnabled
-                                        ? "bg-green-600"
-                                        : "bg-gray-600"
+                                        ? "translate-x-6"
+                                        : "translate-x-1"
                                 }`}
-                            >
-                                <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                        autoRefreshEnabled
-                                            ? "translate-x-6"
-                                            : "translate-x-1"
-                                    }`}
-                                />
-                            </button>
-                        </div>
-                        <span>Automatikus frissítés</span>
-                    </div>
-                    {dataUpdatedAt && (
-                        <span className="text-xs">
-                            Frissítve:{" "}
-                            {new Date(dataUpdatedAt).toLocaleTimeString(
-                                "hu-HU",
-                            )}
+                            />
+                        </button>
+                        <span className="hidden sm:inline">
+                            Automatikus frissítés
                         </span>
-                    )}
+                    </div>
                 </div>
             </div>
 
             {/* Stats Header */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                <Card padding="3">
+                <Card padding="3" color="#101828">
                     <div className="text-center">
                         <div className="text-2xl font-bold text-white">
                             {deployments?.length ?? 0}
@@ -540,7 +547,7 @@ export default function LaptopDeploymentsClient() {
                         <div className="text-sm text-gray-400">Összesen</div>
                     </div>
                 </Card>
-                <Card padding="3">
+                <Card padding="3" color="#101828">
                     <div className="text-center">
                         <div className="text-2xl font-bold text-yellow-400">
                             {activeDeployments.length}
@@ -548,7 +555,7 @@ export default function LaptopDeploymentsClient() {
                         <div className="text-sm text-gray-400">Aktív</div>
                     </div>
                 </Card>
-                <Card padding="3">
+                <Card padding="3" color="#101828">
                     <div className="text-center">
                         <div
                             className="text-2xl font-bold text-red-400"
@@ -559,9 +566,12 @@ export default function LaptopDeploymentsClient() {
                         <div className="text-sm text-gray-400">Hibás</div>
                     </div>
                 </Card>
-                <Card padding="3">
+                <Card padding="3" color="#101828">
                     <div className="text-center">
-                        <div className="text-2xl font-bold text-green-400">
+                        <div
+                            className="text-2xl font-bold text-green-400"
+                            onClick={playSuccessSound}
+                        >
                             {completedDeployments.length}
                         </div>
                         <div className="text-sm text-gray-400">Befejezett</div>
@@ -635,7 +645,7 @@ export default function LaptopDeploymentsClient() {
             {/* Empty State */}
             {(!deployments || deployments.length === 0) && (
                 <div className="py-12 text-center">
-                    <Card>
+                    <Card color="#101828" padding="12">
                         <div className="text-center">
                             <motion.div
                                 animate={{

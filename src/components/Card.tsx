@@ -3,12 +3,19 @@ import React from "react";
 
 interface CardProps extends PropsWithChildren {
     padding?: string;
+    margin?: string;
+    color?: string;
 }
 
-export default function Card({ children, padding = "5" }: CardProps) {
+export default function Card({
+    children,
+    padding = "5",
+    margin = "5",
+    color = "#242424",
+}: CardProps) {
     return (
         <div
-            className={`relative m-5 rounded-xl bg-[#242424] shadow-xl p-${padding}`}
+            className={`relative m-${margin} rounded-xl bg-[${color}] shadow-xl p-${padding}`}
         >
             {children}
         </div>

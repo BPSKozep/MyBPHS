@@ -7,7 +7,7 @@ import { getWeek, getWeekYear } from "@/utils/isoweek";
 import Loading from "@/components/Loading";
 import IconButton from "@/components/IconButton";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
-import UserInput from "./UserInput";
+import UserInput from "@/components/ui/UserInput";
 
 export default function TokenCheck() {
     const [nfcId, setNfcId] = useState<string>("");
