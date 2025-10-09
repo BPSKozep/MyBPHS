@@ -24,7 +24,7 @@ export default function LaptopLogins() {
     }, [laptopInput]);
 
     // Fetch users for dropdown
-    const { data: users } = api.user.getAll.useQuery();
+    const { data: users } = api.user.list.useQuery("all");
 
     const selectedUsername = useMemo(() => {
         if (!selectedUserEmail) return undefined;
@@ -50,10 +50,15 @@ export default function LaptopLogins() {
         },
     );
 
-    // Create a map of email to user for quick lookups
-    const userMap = useMemo(() => {
+    // Create a map of username (email part before @) to user for quick lookups
+    const usernameToUserMap = useMemo(() => {
         if (!users) return new Map();
-        return new Map(users.map((u) => [u.email, u]));
+        return new Map(
+            users.map((u) => {
+                const username = u.email.split("@")[0];
+                return [username, u];
+            }),
+        );
     }, [users]);
 
     const getUserInitials = (name: string): string => {
@@ -64,9 +69,9 @@ export default function LaptopLogins() {
             .slice(0, 2);
     };
 
-    const getUserNameFromEmail = (email: string): string => {
-        const user = userMap.get(email) as IUser;
-        return user?.name ?? email;
+    const getUserNameFromUsername = (username: string): string => {
+        const user = usernameToUserMap.get(username) as IUser;
+        return user?.name ?? username;
     };
 
     const formatDate = (date: Date) => {
@@ -182,7 +187,7 @@ export default function LaptopLogins() {
                     ) : (
                         <div className="space-y-2">
                             {logins.map((login, index) => {
-                                const userName = getUserNameFromEmail(
+                                const userName = getUserNameFromUsername(
                                     login.user,
                                 );
                                 return (
