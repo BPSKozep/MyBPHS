@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import sleep from "@/utils/sleep";
 import IconSubmitButton from "@/components/IconSubmitButton";
-import { FaFloppyDisk } from "react-icons/fa6";
+import { FaFloppyDisk, FaEye, FaEyeSlash } from "react-icons/fa6";
 import { api } from "@/trpc/react";
 import Card from "../Card";
 import Loading from "../Loading";
@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 
 export default function SchoolPasswordReset() {
     const [input, setInput] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const lastChanged = api.ad.getPasswordLastChanged.useQuery();
     const setNewPassword = api.ad.setNewPassword.useMutation();
 
@@ -72,13 +73,31 @@ export default function SchoolPasswordReset() {
                         <h1 className="mb-5 font-bold text-white">
                             Iskolai jelszó be- vagy visszaállítása
                         </h1>
-                        <input
-                            type="password"
-                            placeholder="Jelszó"
-                            className="mb-3 rounded-md bg-white p-1 text-center text-black transition-all"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                        />
+                        <div className="mb-3 flex items-center gap-2">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Jelszó"
+                                className="rounded-md bg-white p-1 text-center text-black transition-all"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="text-white transition-opacity hover:opacity-80"
+                                aria-label={
+                                    showPassword
+                                        ? "Jelszó elrejtése"
+                                        : "Jelszó mutatása"
+                                }
+                            >
+                                {showPassword ? (
+                                    <FaEyeSlash size={20} />
+                                ) : (
+                                    <FaEye size={20} />
+                                )}
+                            </button>
+                        </div>
 
                         <motion.span
                             className="text-white"
