@@ -10,6 +10,8 @@ import {
     FaEyeSlash,
     FaKey,
     FaCircleExclamation,
+    FaChevronDown,
+    FaCircleQuestion,
 } from "react-icons/fa6";
 import { api } from "@/trpc/react";
 import Card from "../Card";
@@ -21,6 +23,10 @@ import { InfoBox } from "@/components/InfoBox";
 export default function SchoolPasswordReset() {
     const [input, setInput] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [showFaq, setShowFaq] = useState(false);
+    const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(
+        null,
+    );
     const lastChanged = api.ad.getPasswordLastChanged.useQuery();
     const setNewPassword = api.ad.setNewPassword.useMutation();
 
@@ -33,6 +39,21 @@ export default function SchoolPasswordReset() {
     const [laptopPassResetShown, setLaptopPassResetShown] = useState(false);
 
     const session = useSession();
+
+    const faqItems = [
+        {
+            question: "Mire való ez a jelszó?",
+            answer: "Ez a jelszó az iskolai számítógépekre és az ENT WiFi-re való bejelentkezéshez szükséges.",
+        },
+        {
+            question: "Ki látja a jelszavamat?",
+            answer: "Senki. A jelszavad, titkosított formátumban, az iskolai szerverén van tárolva, így senki sem tud hozzáférni.",
+        },
+        {
+            question: "Mit tegyek, ha elfelejtett a jelszavam?",
+            answer: "Ezen az oldalon bármikor visszaállíthatod. Csak add meg az új jelszót és mentsd el.",
+        },
+    ];
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -210,7 +231,7 @@ export default function SchoolPasswordReset() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.3 }}
-                                    className="w-full rounded-lg border border-gray-600 bg-gray-700/50 p-3"
+                                    className="mb-4 w-full rounded-lg border border-gray-600 bg-gray-700/50 p-3"
                                 >
                                     <p className="text-sm text-gray-300">
                                         Legutoljára módosítva:{" "}
@@ -220,6 +241,101 @@ export default function SchoolPasswordReset() {
                                     </p>
                                 </motion.div>
                             )}
+
+                            {/* FAQ Section */}
+                            <div className="w-full">
+                                <button
+                                    onClick={() => setShowFaq(!showFaq)}
+                                    className="flex w-full items-center justify-between rounded-lg border border-gray-600 bg-gray-700/30 p-3 transition-colors hover:bg-gray-700/50"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <FaCircleQuestion className="h-4 w-4 text-blue-400" />
+                                        <span className="font-semibold text-white">
+                                            Hogyan használd?
+                                        </span>
+                                    </div>
+                                    <motion.div
+                                        animate={{ rotate: showFaq ? 180 : 0 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <FaChevronDown className="h-4 w-4 text-gray-400" />
+                                    </motion.div>
+                                </button>
+
+                                <motion.div
+                                    initial={false}
+                                    animate={{
+                                        height: showFaq ? "auto" : 0,
+                                        opacity: showFaq ? 1 : 0,
+                                    }}
+                                    transition={{ duration: 0.3 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="mt-2 space-y-2">
+                                        {faqItems.map((item, index) => (
+                                            <div
+                                                key={index}
+                                                className="rounded-lg border border-gray-600 bg-gray-700/20"
+                                            >
+                                                <button
+                                                    onClick={() =>
+                                                        setExpandedFaqIndex(
+                                                            expandedFaqIndex ===
+                                                                index
+                                                                ? null
+                                                                : index,
+                                                        )
+                                                    }
+                                                    className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-gray-700/30"
+                                                >
+                                                    <span className="text-sm font-medium text-white">
+                                                        {item.question}
+                                                    </span>
+                                                    <motion.div
+                                                        animate={{
+                                                            rotate:
+                                                                expandedFaqIndex ===
+                                                                index
+                                                                    ? 180
+                                                                    : 0,
+                                                        }}
+                                                        transition={{
+                                                            duration: 0.2,
+                                                        }}
+                                                    >
+                                                        <FaChevronDown className="h-3 w-3 flex-shrink-0 text-gray-400" />
+                                                    </motion.div>
+                                                </button>
+                                                <motion.div
+                                                    initial={false}
+                                                    animate={{
+                                                        height:
+                                                            expandedFaqIndex ===
+                                                            index
+                                                                ? "auto"
+                                                                : 0,
+                                                        opacity:
+                                                            expandedFaqIndex ===
+                                                            index
+                                                                ? 1
+                                                                : 0,
+                                                    }}
+                                                    transition={{
+                                                        duration: 0.2,
+                                                    }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="border-t border-gray-600 p-3 pt-2">
+                                                        <p className="text-sm text-gray-300">
+                                                            {item.answer}
+                                                        </p>
+                                                    </div>
+                                                </motion.div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            </div>
                         </div>
                     </Card>
                 </motion.div>
