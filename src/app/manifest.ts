@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
     return {
         name: "MyBPHS",
+        description: "MyBPHS: A Budapest School JPP Alkalmazása.",
         short_name: "MyBPHS",
         id: "mybphs",
         lang: "hu",
