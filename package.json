@@ -37,7 +37,7 @@
     "@trpc/react-query": "^11.5.1",
     "@trpc/server": "^11.5.1",
     "@trpc/tanstack-react-query": "^11.5.1",
-    "ai": "^3.4.33",
+    "ai": "^5.0.52",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "generate-password": "^1.7.1",
