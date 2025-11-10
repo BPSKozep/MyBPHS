@@ -611,8 +611,7 @@ export const userRouter = createTRPCRouter({
       // Check if email is allowed for onboarding
       if (
         !input.email.endsWith("@budapestschool.org") &&
-        !input.email.endsWith("@budapest.school") &&
-        !input.email.endsWith("@jamdon2.dev")
+        !input.email.endsWith("@budapest.school")
       ) {
         throw new TRPCError({
           code: "BAD_REQUEST",
