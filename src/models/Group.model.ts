@@ -1,40 +1,40 @@
-import mongoose, { model, Schema } from "mongoose";
 import type { Model, Types } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 
 export interface IGroup {
-    _id?: Types.ObjectId;
-    name: string;
-    timetable: (string | null)[][];
-    priority: number;
-    override: boolean;
+  _id?: Types.ObjectId;
+  name: string;
+  timetable: (string | null)[][];
+  priority: number;
+  override: boolean;
 }
 
 const groupSchema = new Schema<IGroup>({
-    name: {
-        type: String,
-        required: true,
-    },
-    timetable: {
-        type: [[String]],
-        required: true,
-    },
-    priority: {
-        type: Number,
-        required: true,
-    },
-    override: {
-        type: Boolean,
-        required: true,
-    },
+  name: {
+    type: String,
+    required: true,
+  },
+  timetable: {
+    type: [[String]],
+    required: true,
+  },
+  priority: {
+    type: Number,
+    required: true,
+  },
+  override: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 groupSchema.virtual("overrides", {
-    ref: "GroupOverride",
-    localField: "_id",
-    foreignField: "group",
+  ref: "GroupOverride",
+  localField: "_id",
+  foreignField: "group",
 });
 
 const Group: Model<IGroup> =
-    mongoose.models.Group ?? model("Group", groupSchema);
+  mongoose.models.Group ?? model("Group", groupSchema);
 
 export default Group;

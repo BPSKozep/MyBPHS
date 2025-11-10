@@ -1,10 +1,9 @@
-import React from "react";
 import PageWithHeader from "@/components/PageWithHeader";
 
 export const metadata = {
-    title: "Kreditek",
+  title: "Kreditek",
 };
 
 export default function Credits() {
-    return <PageWithHeader title="Kreditek" />;
+  return <PageWithHeader title="Kreditek" />;
 }

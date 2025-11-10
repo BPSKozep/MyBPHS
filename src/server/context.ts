@@ -10,19 +10,20 @@
  *
  * @see https://trpc.io/docs/server/context
  */
-import mongooseConnect from "@/clients/mongoose";
+
 import { getServerSession } from "next-auth";
+import mongooseConnect from "@/clients/mongoose";
 import { authOptions } from "@/server/auth";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-    const mongooseClient = await mongooseConnect();
-    const session = await getServerSession(authOptions);
+  const mongooseClient = await mongooseConnect();
+  const session = await getServerSession(authOptions);
 
-    return {
-        mongooseClient,
-        session,
-        ...opts,
-    };
+  return {
+    mongooseClient,
+    session,
+    ...opts,
+  };
 };
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
