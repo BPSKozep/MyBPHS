@@ -10,7 +10,7 @@
     "check": "biome check && tsc --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.63",
+    "@ai-sdk/openai": "^2.0.64",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource-variable/montserrat": "^5.2.8",
