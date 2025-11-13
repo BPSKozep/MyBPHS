@@ -1,9 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { motion } from "motion/react";
+import { useEffect, useMemo, useState } from "react";
+import { FaEdit, FaSave } from "react-icons/fa";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import NFCInput from "@/components/admin/lunch/NFCInput";
 import IconButton from "@/components/IconButton";
+import IconSubmitButton from "@/components/IconSubmitButton";
 import Loading from "@/components/Loading";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -11,6 +14,7 @@ import UserInput from "@/components/ui/UserInput";
 import { api } from "@/trpc/react";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
 import menuCombine from "@/utils/menuCombine";
+import sleep from "@/utils/sleep";
 
 const days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
@@ -18,11 +22,13 @@ export default function TokenCheck() {
   const [nfcId, setNfcId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [checkMode, setCheckMode] = useState<"user" | "token">("user");
+  const [isEditing, setIsEditing] = useState(false);
 
   const [weekOffset, setWeekOffset] = useState(1);
   const [year, week] = useMemo(() => {
     const date = new Date();
     date.setDate(date.getDate() + weekOffset * 7);
+    setIsEditing(false);
 
     return [getWeekYear(date), getWeek(date)];
   }, [weekOffset]);
@@ -49,7 +55,7 @@ export default function TokenCheck() {
   const isUserFetched =
     checkMode === "user" ? isEmailUserFetched : isNFCUserFetched;
 
-  const { data: order, isLoading: orderLoading } = api.order.get.useQuery(
+  const orderQuery = api.order.get.useQuery(
     {
       email: user?.email,
       year,
@@ -60,6 +66,9 @@ export default function TokenCheck() {
       retry: false,
     },
   );
+
+  const order = orderQuery.data;
+  const orderLoading = orderQuery.isLoading;
 
   const { data: menu, isLoading: menuLoading } = api.menu.get.useQuery(
     {
@@ -74,7 +83,19 @@ export default function TokenCheck() {
 
   const orderExists = order && order.length > 0;
 
+  const [editedOrder, setEditedOrder] = useState<
+    { chosen: string; completed: boolean }[]
+  >([]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: sync edited order with fetched order
+  useEffect(() => {
+    if (order && order.length > 0) {
+      setEditedOrder(order);
+    }
+  }, [order, weekOffset]);
+
   const toggleBlocked = api.user.toggleBlocked.useMutation();
+  const adminEditOrder = api.order.adminEdit.useMutation();
 
   return (
     <>
@@ -151,7 +172,34 @@ export default function TokenCheck() {
       {nfcId && isUserLoading && <Loading />}
 
       {user && orderExists && menu && !menuLoading && (
-        <div>
+        <div className="relative">
+          {checkMode === "user" && (
+            <div className="mb-5">
+              <div className="absolute -top-[0.9rem] -right-[0.9rem]">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileFocus={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 500,
+                    damping: 20,
+                  }}
+                  onClick={() => {
+                    setIsEditing(!isEditing);
+                    if (!isEditing) {
+                      setEditedOrder(order);
+                    }
+                  }}
+                >
+                  <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-slate-600 drop-shadow-2xl text-white">
+                    <FaEdit />
+                  </div>
+                </motion.button>
+              </div>
+            </div>
+          )}
+
           {checkMode === "token" && (
             <h2 className="mb-4 text-white font-semibold text-lg">
               {user.name}
@@ -173,26 +221,71 @@ export default function TokenCheck() {
                 </tr>
               </thead>
               <tbody>
-                {order.map((dayOrder, index) => {
-                  const menuOption = menuCombine(menu.options[index] ?? {})[
-                    dayOrder.chosen
-                  ];
+                {(isEditing ? editedOrder : order).map((dayOrder, index) => {
+                  const combinedOptions = menuCombine(
+                    menu.options[index] ?? {},
+                  );
+                  const menuOption = combinedOptions[dayOrder.chosen];
                   return (
                     <tr key={days[index]} className="border-b border-gray-800">
                       <td className="bg-gray-900 px-6 py-3 text-left text-sm font-medium text-gray-100">
                         {days[index]}
                       </td>
-                      <td className="bg-gray-900 px-6 py-3 text-left text-sm font-medium wrap-break-word whitespace-normal text-gray-100">
-                        {menuOption ?? dayOrder.chosen}
+                      <td className="bg-gray-900 px-6 py-3 text-left text-sm font-medium text-gray-100">
+                        {isEditing ? (
+                          <select
+                            value={dayOrder.chosen}
+                            onChange={(e) => {
+                              const newOrder = [...editedOrder];
+                              if (newOrder[index]) {
+                                newOrder[index] = {
+                                  chosen: e.target.value,
+                                  completed: newOrder[index].completed,
+                                };
+                              }
+                              setEditedOrder(newOrder);
+                            }}
+                            className="w-full rounded-md bg-gray-800 px-3 py-2 text-sm text-white border border-gray-700 focus:border-blue-500 focus:outline-none"
+                          >
+                            {Object.entries(combinedOptions).map(
+                              ([key, value]) => (
+                                <option key={key} value={key}>
+                                  {value}
+                                </option>
+                              ),
+                            )}
+                          </select>
+                        ) : (
+                          <span className="wrap-break-word whitespace-normal">
+                            {menuOption ?? dayOrder.chosen}
+                          </span>
+                        )}
                       </td>
                       <td className="bg-gray-900 px-6 py-3 text-center text-sm font-medium text-gray-100">
                         <div className="flex justify-center">
-                          {dayOrder.completed && (
+                          {isEditing ? (
                             <Checkbox
-                              checked={true}
-                              disabled
+                              checked={dayOrder.completed}
+                              onCheckedChange={(checked) => {
+                                const newOrder = [...editedOrder];
+                                if (newOrder[index]) {
+                                  newOrder[index] = {
+                                    chosen: newOrder[index].chosen,
+                                    completed: checked as boolean,
+                                  };
+                                }
+                                setEditedOrder(newOrder);
+                              }}
                               className="scale-150"
                             />
+                          ) : (
+                            dayOrder.completed && (
+                              <Checkbox
+                                checked={true}
+                                disabled
+                                className="scale-150"
+                              />
+                            )
                           )}
                         </div>
                       </td>
@@ -202,6 +295,36 @@ export default function TokenCheck() {
               </tbody>
             </table>
           </div>
+
+          {isEditing && (
+            <div className="mt-6 flex justify-center">
+              <IconSubmitButton
+                icon={<FaSave />}
+                onClick={async () => {
+                  try {
+                    await sleep(500);
+
+                    await adminEditOrder.mutateAsync({
+                      email: user.email,
+                      year,
+                      week,
+                      order: editedOrder,
+                    });
+
+                    await sleep(500);
+                    await orderQuery.refetch();
+
+                    setIsEditing(false);
+
+                    return true;
+                  } catch (err) {
+                    console.error("Error saving order:", err);
+                    return false;
+                  }
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 

@@ -26,7 +26,7 @@ export const orderRouter = createTRPCRouter({
         "lunch-system",
       ]);
 
-      const email = ctx.session.user?.email ?? input.email;
+      const email = input.email ?? ctx.session.user?.email;
 
       const requester = await User.findOne({
         email: ctx.session.user?.email,
@@ -573,6 +573,69 @@ export const orderRouter = createTRPCRouter({
           completed: false,
         };
       });
+
+      await order.save();
+    }),
+  adminEdit: protectedProcedure
+    .input(
+      z.strictObject({
+        email: z.string().email(),
+        week: z.number(),
+        year: z.number(),
+        order: z
+          .strictObject({
+            chosen: z.string(),
+            completed: z.boolean(),
+          })
+          .array(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
+
+      const menu = await Menu.findOne({
+        week: input.week,
+        year: input.year,
+      });
+
+      if (!menu) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Menu not found",
+        });
+      }
+
+      const user = await User.findOne({
+        email: input.email,
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      const order = await Order.findOne({
+        menu: menu._id,
+        user: user._id,
+      });
+
+      if (!order) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Order not found",
+        });
+      }
+
+      order.order = input.order;
 
       await order.save();
     }),
