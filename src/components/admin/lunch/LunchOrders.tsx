@@ -27,23 +27,40 @@ export default function Orders() {
 
   const [year, setYear] = useState<number>(getWeekYear(nextWeek));
   const [week, setWeek] = useState<number>(getWeek(nextWeek));
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const {
     data: orderCounts,
     isLoading: isOrderCountsLoading,
     error: isOrderCountsError,
-  } = api.order.getOrderCounts.useQuery({
-    year,
-    week,
-  });
+  } = api.order.getOrderCounts.useQuery(
+    {
+      year,
+      week,
+    },
+    {
+      refetchInterval: autoRefreshEnabled ? 3000 : false,
+      refetchIntervalInBackground: false,
+      refetchOnWindowFocus: autoRefreshEnabled,
+      staleTime: 0,
+    },
+  );
 
   const {
     data: menu,
     isLoading: isMenuLoading,
     isError: isMenuError,
-  } = api.menu.get.useQuery({
-    year,
-    week,
-  });
+  } = api.menu.get.useQuery(
+    {
+      year,
+      week,
+    },
+    {
+      refetchInterval: autoRefreshEnabled ? 3000 : false,
+      refetchIntervalInBackground: false,
+      refetchOnWindowFocus: autoRefreshEnabled,
+      staleTime: 0,
+    },
+  );
 
   const isLoading = isOrderCountsLoading || isMenuLoading;
   const isError = isOrderCountsError ?? isMenuError;
@@ -52,15 +69,13 @@ export default function Orders() {
 
   return (
     <>
-      <div className="mb-5 flex flex-row items-center justify-center">
-        <h1 className="mr-5 text-center font-bold text-white">
-          Leadott rendelések
-        </h1>
-        <div className="flex flex-col items-center">
+      <div className="mb-5 flex flex-col items-center justify-center gap-4 md:flex-row">
+        <h1 className="text-center font-bold text-white">Leadott rendelések</h1>
+        <div className="flex flex-col items-center gap-2">
           <input
             type="number"
             value={year}
-            className="m-2 w-44 rounded-md border-none bg-white p-2 text-center font-bold text-black"
+            className="w-44 rounded-md border-none bg-white p-2 text-center font-bold text-black"
             min={2020}
             onChange={(e) => {
               setYear(Number(e.target.value));
@@ -70,13 +85,29 @@ export default function Orders() {
           <input
             type="number"
             value={week}
-            className="m-2 w-44 rounded-md border-none bg-white p-2 text-center font-bold text-black"
+            className="w-44 rounded-md border-none bg-white p-2 text-center font-bold text-black"
             min={1}
             max={56}
             onChange={(e) => {
               setWeek(Number(e.target.value));
             }}
           />
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setAutoRefreshEnabled(!autoRefreshEnabled)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none ${
+              autoRefreshEnabled ? "bg-green-600" : "bg-gray-600"
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                autoRefreshEnabled ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+          <span className="text-sm text-gray-300">Automatikus frissítés</span>
         </div>
       </div>
       <div className="">
@@ -134,7 +165,7 @@ export default function Orders() {
                         ([option, count], optionIndex) => (
                           // biome-ignore lint/suspicious/noArrayIndexKey: no index
                           <tr className="mt-2" key={optionIndex}>
-                            <td className="bg-gray-900 px-6 py-3 text-left text-sm font-medium break-words whitespace-normal text-gray-100">
+                            <td className="bg-gray-900 px-6 py-3 text-left text-sm font-medium wrap-break-word whitespace-normal text-gray-100">
                               {
                                 menuCombine(menu.options[dayIndex] ?? {})[
                                   option
