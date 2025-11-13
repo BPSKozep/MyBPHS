@@ -1,60 +1,59 @@
 import {
-    Body,
-    Button,
-    Container,
-    Hr,
-    Html,
-    Img,
-    Section,
-    Text,
-    Tailwind,
+  Body,
+  Button,
+  Container,
+  Hr,
+  Html,
+  Img,
+  Section,
+  Tailwind,
+  Text,
 } from "@react-email/components";
 
-import * as React from "react";
-
 interface UpdateProps {
-    html: string;
-    link?: string;
-    buttonText?: string;
+  html: string;
+  link?: string;
+  buttonText?: string;
 }
 export default function Update({ html, link, buttonText }: UpdateProps) {
-    return (
-        <Html>
-            <Tailwind>
-                <Body className="bg-gray-900 font-sans">
-                    <Container className="mt-16 bg-slate-800 p-8">
-                        <Section>
-                            <Img
-                                src="https://cdn.bphs.hu/mybphs-logo.png"
-                                width="156"
-                                height="42"
-                            ></Img>
-                            <Hr />
-                            <Text className="text-center text-lg leading-6 font-bold text-white">
-                                Elérhető az új MyBPHS verzió!
-                            </Text>
-                            <div
-                                className="text-md leading-6 text-white"
-                                dangerouslySetInnerHTML={{ __html: html }}
-                            />
-                            <Section className="text-center">
-                                <Button
-                                    className="w-96 cursor-pointer justify-center rounded-lg bg-slate-700 p-5 text-xl font-bold text-white"
-                                    href={link}
-                                >
-                                    {buttonText}
-                                </Button>
-                            </Section>
-                            <Hr />
+  return (
+    <Html>
+      <Tailwind>
+        <Body className="bg-gray-900 font-sans">
+          <Container className="mt-16 bg-slate-800 p-8">
+            <Section>
+              <Img
+                src="https://cdn.bphs.hu/mybphs-logo.png"
+                width="156"
+                height="42"
+              ></Img>
+              <Hr />
+              <Text className="text-center text-lg leading-6 font-bold text-white">
+                Elérhető az új MyBPHS verzió!
+              </Text>
+              <div
+                className="text-md leading-6 text-white"
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: todo review
+                dangerouslySetInnerHTML={{ __html: html }}
+              />
+              <Section className="text-center">
+                <Button
+                  className="w-96 cursor-pointer justify-center rounded-lg bg-slate-700 p-5 text-xl font-bold text-white"
+                  href={link}
+                >
+                  {buttonText}
+                </Button>
+              </Section>
+              <Hr />
 
-                            <Text className="text-xs leading-4 text-slate-400">
-                                Budapest School Általános Iskola és Gimnázium,
-                                Budapest, II. János Pál pápa tér 25.
-                            </Text>
-                        </Section>
-                    </Container>
-                </Body>
-            </Tailwind>
-        </Html>
-    );
+              <Text className="text-xs leading-4 text-slate-400">
+                Budapest School Általános Iskola és Gimnázium, Budapest, II.
+                János Pál pápa tér 25.
+              </Text>
+            </Section>
+          </Container>
+        </Body>
+      </Tailwind>
+    </Html>
+  );
 }

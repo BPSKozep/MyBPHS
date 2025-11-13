@@ -1,10 +1,9 @@
-import React from "react";
 import KioskPage from "@/components/admin/KioskPage";
 
 export const metadata = {
-    title: "Kiosk",
+  title: "Kiosk",
 };
 
 export default function Kiosk() {
-    return <KioskPage />;
+  return <KioskPage />;
 }

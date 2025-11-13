@@ -1,9 +1,9 @@
 export default function wrapConditional<ArgumentType>(
-    fn: (arg: ArgumentType) => ArgumentType,
-    arg: ArgumentType,
-    enabled: boolean
+  fn: (arg: ArgumentType) => ArgumentType,
+  arg: ArgumentType,
+  enabled: boolean,
 ) {
-    if (!enabled) return arg;
+  if (!enabled) return arg;
 
-    return fn(arg);
+  return fn(arg);
 }

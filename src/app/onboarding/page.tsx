@@ -1,19 +1,18 @@
 import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
-import React from "react";
 
 export const metadata = {
-    title: "Fiók létrehozás",
+  title: "Fiók létrehozás",
 };
 
 export default async function Onboarding({
-    searchParams,
+  searchParams,
 }: {
-    searchParams: Promise<{
-        name?: string;
-        email?: string;
-    }>;
+  searchParams: Promise<{
+    name?: string;
+    email?: string;
+  }>;
 }) {
-    const { name, email } = await searchParams;
+  const { name, email } = await searchParams;
 
-    return <OnboardingFlow name={name} email={email} />;
+  return <OnboardingFlow name={name} email={email} />;
 }

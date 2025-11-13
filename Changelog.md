@@ -1,3 +1,9 @@
+# 2.10.0 2025-11-13
+
+- Cleanup
+- Biome
+- Lunch admin improvements
+
 # 2.9.0 2025-09-04
 
 - Admin onboarding

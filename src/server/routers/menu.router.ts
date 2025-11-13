@@ -1,112 +1,112 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 import { Menu } from "@/models";
 import type { IMenu } from "@/models/Menu.model";
-import { TRPCError } from "@trpc/server";
-import { getWeek, getWeekYear } from "@/utils/isoweek";
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 import { checkRoles } from "@/utils/authorization";
+import { getWeek, getWeekYear } from "@/utils/isoweek";
 
 export const menuRouter = createTRPCRouter({
-    get: protectedProcedure
-        .input(z.strictObject({ week: z.number(), year: z.number() }))
-        .output(
-            z.strictObject({
-                options: z.record(z.string()).array(),
-                isOpenForOrders: z.boolean(),
-            }),
-        )
-        .query(async ({ input }) => {
-            const menu = await Menu.findOne({
-                week: input.week,
-                year: input.year,
-            });
+  get: protectedProcedure
+    .input(z.strictObject({ week: z.number(), year: z.number() }))
+    .output(
+      z.strictObject({
+        options: z.record(z.string()).array(),
+        isOpenForOrders: z.boolean(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const menu = await Menu.findOne({
+        week: input.week,
+        year: input.year,
+      });
 
-            if (!menu) return { options: [], isOpenForOrders: true };
+      if (!menu) return { options: [], isOpenForOrders: true };
 
-            return {
-                options: menu.options,
-                isOpenForOrders: menu.isOpenForOrders,
-            };
-        }),
-    create: protectedProcedure
-        .input(
-            z.strictObject({
-                week: z.number().optional(),
-                year: z.number().optional(),
-                options: z.record(z.string()).array(),
-            }),
-        )
-        .mutation(async ({ ctx, input }) => {
-            const authorized = await checkRoles(ctx.session, ["administrator"]);
+      return {
+        options: menu.options,
+        isOpenForOrders: menu.isOpenForOrders,
+      };
+    }),
+  create: protectedProcedure
+    .input(
+      z.strictObject({
+        week: z.number().optional(),
+        year: z.number().optional(),
+        options: z.record(z.string()).array(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authorized = await checkRoles(ctx.session, ["administrator"]);
 
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
-            }
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
 
-            const date = new Date();
+      const date = new Date();
 
-            const week = input.week ?? getWeek(date);
-            const year = input.year ?? getWeekYear(date);
+      const week = input.week ?? getWeek(date);
+      const year = input.year ?? getWeekYear(date);
 
-            const menu = await Menu.exists({
-                week,
-                year,
-            });
+      const menu = await Menu.exists({
+        week,
+        year,
+      });
 
-            if (menu) {
-                throw new TRPCError({
-                    code: "BAD_REQUEST",
-                    message: "Menu already exists for specified week.",
-                });
-            }
+      if (menu) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Menu already exists for specified week.",
+        });
+      }
 
-            await new Menu<IMenu>({
-                week,
-                year,
-                options: input.options,
-                isOpenForOrders: true,
-            }).save();
-        }),
-    setIsopen: protectedProcedure
-        .input(
-            z.strictObject({
-                week: z.number(),
-                year: z.number(),
-                isOpen: z.boolean(),
-            }),
-        )
-        .mutation(async ({ ctx, input }) => {
-            const authorized = await checkRoles(ctx.session, ["administrator"]);
+      await new Menu<IMenu>({
+        week,
+        year,
+        options: input.options,
+        isOpenForOrders: true,
+      }).save();
+    }),
+  setIsopen: protectedProcedure
+    .input(
+      z.strictObject({
+        week: z.number(),
+        year: z.number(),
+        isOpen: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authorized = await checkRoles(ctx.session, ["administrator"]);
 
-            if (!authorized) {
-                throw new TRPCError({
-                    code: "FORBIDDEN",
-                    message: "Access denied to the requested resource",
-                });
-            }
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
 
-            const date = new Date();
+      const date = new Date();
 
-            const week = input.week || getWeek(date);
-            const year = input.year || getWeekYear(date);
+      const week = input.week || getWeek(date);
+      const year = input.year || getWeekYear(date);
 
-            const menu = await Menu.findOne({
-                week,
-                year,
-            });
+      const menu = await Menu.findOne({
+        week,
+        year,
+      });
 
-            if (!menu) {
-                throw new TRPCError({
-                    code: "NOT_FOUND",
-                    message: "Menu not found for specified week.",
-                });
-            }
+      if (!menu) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Menu not found for specified week.",
+        });
+      }
 
-            menu.isOpenForOrders = input.isOpen;
+      menu.isOpenForOrders = input.isOpen;
 
-            await menu.save();
-        }),
+      await menu.save();
+    }),
 });

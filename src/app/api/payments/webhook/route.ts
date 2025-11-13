@@ -1,51 +1,63 @@
-import { NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { User } from "@/models";
 import { env } from "@/env/server";
+import { User } from "@/models";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+if (!env.STRIPE_SECRET_KEY) {
+  throw new Error("STRIPE_SECRET_KEY is not set");
+}
+
+const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 export async function POST(req: Request) {
-    const signature = (await headers()).get("stripe-signature")!;
+  if (!env.STRIPE_WEBHOOK_KEY) {
+    throw new Error("STRIPE_WEBHOOK_KEY is not set");
+  }
 
-    const event = stripe.webhooks.constructEvent(
-        await req.text(),
-        signature,
-        process.env.STRIPE_WEBHOOK_KEY!,
-    );
+  if (!env.DISCORD_WEBHOOK) {
+    throw new Error("DISCORD_WEBHOOK is not set");
+  }
 
-    if (event.type !== "checkout.session.completed")
-        return NextResponse.json("OK");
+  const signature = (await headers()).get("stripe-signature");
 
-    const user_email = event.data.object.client_reference_id;
+  const event = stripe.webhooks.constructEvent(
+    await req.text(),
+    signature ?? "",
+    env.STRIPE_WEBHOOK_KEY,
+  );
 
-    const user = await User.findOne({
-        email: user_email,
-    });
+  if (event.type !== "checkout.session.completed")
+    return NextResponse.json("OK");
 
-    if (!user || !user.blocked) {
-        if (event.data.object.payment_intent)
-            await stripe.refunds.create({
-                payment_intent: event.data.object.payment_intent as string,
-            });
+  const user_email = event.data.object.client_reference_id;
 
-        return NextResponse.json("OK");
-    }
+  const user = await User.findOne({
+    email: user_email,
+  });
 
-    user.blocked = false;
-
-    await user.save();
-
-    await fetch(env.DISCORD_WEBHOOK!, {
-        method: "post",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            content: `${user.name} (${user.email}) has purchased a replacement token.`,
-        }),
-    });
+  if (!user || !user.blocked) {
+    if (event.data.object.payment_intent)
+      await stripe.refunds.create({
+        payment_intent: event.data.object.payment_intent as string,
+      });
 
     return NextResponse.json("OK");
+  }
+
+  user.blocked = false;
+
+  await user.save();
+
+  await fetch(env.DISCORD_WEBHOOK, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      content: `${user.name} (${user.email}) has purchased a replacement token.`,
+    }),
+  });
+
+  return NextResponse.json("OK");
 }
