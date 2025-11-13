@@ -14,7 +14,7 @@ export default function LunchAdmin() {
   return (
     <OnlyRoles roles={["administrator"]}>
       <PageWithHeader title="Admin / Ebédrendelés" homeLocation="/admin">
-        <div className="flex flex-col justify-center xl:flex-row">
+        <div className="flex flex-col justify-center md:flex-row space-x-10">
           <Card>
             <SetMenuAndSendEmail />
           </Card>

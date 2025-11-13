@@ -5,9 +5,14 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import NFCInput from "@/components/admin/lunch/NFCInput";
 import IconButton from "@/components/IconButton";
 import Loading from "@/components/Loading";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import UserInput from "@/components/ui/UserInput";
 import { api } from "@/trpc/react";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
+import menuCombine from "@/utils/menuCombine";
+
+const days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
 export default function TokenCheck() {
   const [nfcId, setNfcId] = useState<string>("");
@@ -44,18 +49,28 @@ export default function TokenCheck() {
   const isUserFetched =
     checkMode === "user" ? isEmailUserFetched : isNFCUserFetched;
 
-  const { data: order, isLoading: orderLoading } =
-    api.order.getAllWeek.useQuery(
-      {
-        email: user?.email,
-        year,
-        week,
-      },
-      {
-        enabled: !!user,
-        retry: false,
-      },
-    );
+  const { data: order, isLoading: orderLoading } = api.order.get.useQuery(
+    {
+      email: user?.email,
+      year,
+      week,
+    },
+    {
+      enabled: !!user,
+      retry: false,
+    },
+  );
+
+  const { data: menu, isLoading: menuLoading } = api.menu.get.useQuery(
+    {
+      year,
+      week,
+    },
+    {
+      enabled: !!user,
+      retry: false,
+    },
+  );
 
   const orderExists = order && order.length > 0;
 
@@ -97,17 +112,21 @@ export default function TokenCheck() {
       )}
 
       {user && checkMode === "user" && (
-        <button
-          className={`rounded-lg ${user.blocked ? "bg-blue-400" : "bg-red-400"} p-3 font-bold text-white transition-all hover:scale-105`}
-          type="button"
-          onClick={async () => {
-            await toggleBlocked.mutateAsync(user.email);
-            await refetchEmailUser();
-          }}
-        >
-          {user.blocked ? "Tiltás feloldása" : "Fiók letiltása"}
-        </button>
+        <div className="my-3 flex items-center space-x-3">
+          <span className="text-white font-medium">Fiók letiltása</span>
+          <Switch
+            checked={user.blocked}
+            onCheckedChange={async () => {
+              await toggleBlocked.mutateAsync(user.email);
+              await refetchEmailUser();
+            }}
+            className="data-[state=checked]:bg-red-600"
+          />
+        </div>
       )}
+
+      <h3 className="mt-5 mb-2 text-white font-semibold">Rendelések:</h3>
+
       <div className="my-3 flex items-center text-white">
         <IconButton
           icon={<FaArrowLeft />}
@@ -125,49 +144,74 @@ export default function TokenCheck() {
           }}
         />
       </div>
+
       {nfcId && !user && isUserFetched && (
         <h2 className="text-white">Nem érvényes NFC token</h2>
       )}
       {nfcId && isUserLoading && <Loading />}
-      {user && orderExists && (
+
+      {user && orderExists && menu && !menuLoading && (
         <div>
-          {checkMode === "token" && <h2 className="text-white">{user.name}</h2>}
-          <table className="mt-8 text-white">
-            <thead>
-              <tr>
-                <th className="pb-5 pl-5 text-left text-xl">Nap</th>
-                <th className="pr-5 pb-5 text-right text-xl">Rendelt</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="pb-5 text-left">Hétfő</td>
-                <td className="pb-5 text-right">{orderExists && order[0]}</td>
-              </tr>
-              <tr>
-                <td className="pb-5 text-left">Kedd</td>
-                <td className="pb-5 text-right">{orderExists && order[1]}</td>
-              </tr>
-              <tr>
-                <td className="pb-5 text-left">Szerda</td>
-                <td className="pb-5 text-right">{orderExists && order[2]}</td>
-              </tr>
-              <tr>
-                <td className="pb-5 text-left">Csütörtök</td>
-                <td className="pb-5 text-right">{orderExists && order[3]}</td>
-              </tr>
-              <tr>
-                <td className="pb-5 text-left">Péntek</td>
-                <td className="pb-5 text-right">{orderExists && order[4]}</td>
-              </tr>
-            </tbody>
-          </table>
+          {checkMode === "token" && (
+            <h2 className="mb-4 text-white font-semibold text-lg">
+              {user.name}
+            </h2>
+          )}
+          <div className="overflow-auto rounded-lg">
+            <table className="min-w-full">
+              <thead>
+                <tr>
+                  <th className="bg-gray-900 px-6 py-3 text-left text-md font-medium tracking-wider text-white">
+                    Nap
+                  </th>
+                  <th className="bg-gray-900 px-6 py-3 text-left text-md font-medium tracking-wider text-white">
+                    Rendelt
+                  </th>
+                  <th className="bg-gray-900 px-6 py-3 text-center text-md font-medium tracking-wider text-white">
+                    Érintve
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {order.map((dayOrder, index) => {
+                  const menuOption = menuCombine(menu.options[index] ?? {})[
+                    dayOrder.chosen
+                  ];
+                  return (
+                    <tr key={days[index]} className="border-b border-gray-800">
+                      <td className="bg-gray-900 px-6 py-3 text-left text-sm font-medium text-gray-100">
+                        {days[index]}
+                      </td>
+                      <td className="bg-gray-900 px-6 py-3 text-left text-sm font-medium wrap-break-word whitespace-normal text-gray-100">
+                        {menuOption ?? dayOrder.chosen}
+                      </td>
+                      <td className="bg-gray-900 px-6 py-3 text-center text-sm font-medium text-gray-100">
+                        <div className="flex justify-center">
+                          {dayOrder.completed && (
+                            <Checkbox
+                              checked={true}
+                              disabled
+                              className="scale-150"
+                            />
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
-      {user && orderLoading && <Loading />}
+
+      {user && (orderLoading || menuLoading) && <Loading />}
+
       {user && !orderExists && !orderLoading && (
         <>
-          <h1 className="mt-5 text-xl text-white">Nincs rendelés erre hétre</h1>
+          <h1 className="mt-5 text-xl text-white">
+            Nincs rendelés erre a hétre
+          </h1>
           {NFCUser && <h2 className="text-white">{user.name}</h2>}
         </>
       )}
