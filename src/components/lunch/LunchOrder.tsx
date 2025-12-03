@@ -27,12 +27,18 @@ function LunchOrder() {
 
   const [orderEditing, setOrderEditing] = useState(false);
 
-  const [year, week] = useMemo(() => {
+  const [year, week, weekStartTimestamp] = useMemo(() => {
     const date = new Date();
     date.setDate(date.getDate() + weekOffset * 7);
     setOrderEditing(false);
 
-    return [getWeekYear(date), getWeek(date)];
+    // Calculate Monday of this week
+    const dayOfWeek = date.getDay() || 7; // Sunday = 7
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - dayOfWeek + 1);
+    monday.setHours(0, 0, 0, 0);
+
+    return [getWeekYear(date), getWeek(date), monday.getTime()];
   }, [weekOffset]);
 
   const menu = api.menu.get.useQuery({ year, week });
@@ -291,6 +297,7 @@ function LunchOrder() {
                         setSelectedOptions(chosenOptions);
                       }
                     }}
+                    weekStartTimestamp={weekStartTimestamp}
                   />
 
                   <AnimatePresence>

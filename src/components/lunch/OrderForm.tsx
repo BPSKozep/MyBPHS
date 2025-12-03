@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useMediaQuery } from "react-responsive";
 import createBreakpoint from "@/utils/createBreakpoint";
 import transpose2DArray from "@/utils/transpose";
@@ -5,22 +6,42 @@ import wrapConditional from "@/utils/wrapConditional";
 
 const days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
+/**
+ * Format date as MM.DD (Hungarian format)
+ */
+function formatDateHungarian(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}.${day}`;
+}
+
 export default function OrderForm({
   options,
   selectedOptions,
   onChange,
   isEditing,
+  weekStartTimestamp,
 }: {
   options: Record<string, string>[];
   selectedOptions: string[];
   onChange: (selectedOptions: string[]) => void;
   isEditing: boolean;
+  weekStartTimestamp: number;
 }) {
   const isBigScreen = useMediaQuery({ query: createBreakpoint("lg") });
 
+  const weekDates = useMemo(() => {
+    const monday = new Date(weekStartTimestamp);
+    return Array.from({ length: 5 }, (_, i) => {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
+      return formatDateHungarian(date);
+    });
+  }, [weekStartTimestamp]);
+
   return (
     <div
-      className={`grid max-w-240 grid-flow-row break-words ${
+      className={`grid max-w-240 grid-flow-row wrap-break-word ${
         isBigScreen ? "grid-cols-5" : "grid-cols-1"
       } gap-3 rounded-lg bg-zinc-700 p-5 shadow-lg`}
     >
@@ -29,7 +50,7 @@ export default function OrderForm({
         options.map((day, dayIndex) => [
           // biome-ignore lint/suspicious/noArrayIndexKey: no index
           <h1 className="text-center font-bold" key={dayIndex}>
-            {days[dayIndex]}
+            {days[dayIndex]} ({weekDates[dayIndex]})
           </h1>,
           ...Object.entries(day).map(([id, option]) =>
             !option ? (
