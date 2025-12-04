@@ -8,7 +8,7 @@ const AUTH_WHITELIST = [
   "/auth",
   "/robots.txt",
   "/sitemap.xml",
-  "/ingest",
+  "/relay-cgHT",
   "/manifest",
   "/api",
 ];
