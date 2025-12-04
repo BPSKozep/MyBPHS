@@ -39,7 +39,7 @@
     "generate-password": "^1.7.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.544.0",
-    "mongoose": "^8.19.3",
+    "mongoose": "^9.0.0",
     "motion": "^12.23.24",
     "nanoid": "^5.1.6",
     "next": "16.0.7",
