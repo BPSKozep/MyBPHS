@@ -10,7 +10,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 
 if (typeof window !== "undefined") {
   posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: "/ingest",
+    api_host: "/relay-cgHT",
     ui_host: "https://eu.posthog.com",
     capture_pageview: false, // Disable automatic pageview capture, as we capture manually
   });
