@@ -42,7 +42,7 @@
     "mongoose": "^8.19.3",
     "motion": "^12.23.24",
     "nanoid": "^5.1.6",
-    "next": "16.0.7",
+    "next": "16.0.9",
     "next-auth": "^4.24.13",
     "posthog-js": "^1.297.3",
     "prettier": "^3.6.2",
