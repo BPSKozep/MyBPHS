@@ -962,37 +962,43 @@ export default function UsersDataManager() {
                               )}
                             </div>
                           )}
-                          {column.key === "email" &&
-                            isEditing &&
-                            (getFieldConfig("email")?.editable ? (
-                              <Input
-                                type="email"
-                                value={displayUser.email}
-                                onChange={(e) =>
-                                  updateEditingField("email", e.target.value)
-                                }
-                                className="h-8 border-gray-600 bg-[#565656] text-white"
-                              />
-                            ) : (
-                              <span className="text-gray-200">
-                                {displayUser.email}
-                              </span>
-                            ))}
-                          {column.key === "nfcId" &&
-                            isEditing &&
-                            (getFieldConfig("nfcId")?.editable ? (
-                              <Input
-                                value={displayUser.nfcId}
-                                onChange={(e) =>
-                                  updateEditingField("nfcId", e.target.value)
-                                }
-                                className="h-8 border-gray-600 bg-[#565656] font-mono text-white"
-                              />
-                            ) : (
-                              <code className="rounded border border-gray-500 bg-[#565656] px-2 py-1 font-mono text-sm text-white">
-                                {displayUser.nfcId}
-                              </code>
-                            ))}
+                          {column.key === "email" && (
+                            <div>
+                              {isEditing &&
+                              getFieldConfig("email")?.editable ? (
+                                <Input
+                                  type="email"
+                                  value={displayUser.email}
+                                  onChange={(e) =>
+                                    updateEditingField("email", e.target.value)
+                                  }
+                                  className="h-8 border-gray-600 bg-[#565656] text-white"
+                                />
+                              ) : (
+                                <span className="text-gray-200">
+                                  {displayUser.email}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {column.key === "nfcId" && (
+                            <div>
+                              {isEditing &&
+                              getFieldConfig("nfcId")?.editable ? (
+                                <Input
+                                  value={displayUser.nfcId}
+                                  onChange={(e) =>
+                                    updateEditingField("nfcId", e.target.value)
+                                  }
+                                  className="h-8 border-gray-600 bg-[#565656] font-mono text-white"
+                                />
+                              ) : (
+                                <code className="rounded border border-gray-500 bg-[#565656] px-2 py-1 font-mono text-sm text-white">
+                                  {displayUser.nfcId}
+                                </code>
+                              )}
+                            </div>
+                          )}
                           {column.key === "roles" && (
                             <div className="flex flex-wrap gap-1">
                               {isEditing &&
@@ -1258,7 +1264,7 @@ export default function UsersDataManager() {
             </Button>
             <div className="mx-1 flex items-center gap-1 text-xs font-medium text-gray-300 sm:mx-3 sm:gap-2 sm:text-sm">
               <span className="hidden sm:inline">Oldal</span>
-              <span className="min-w-[2rem] rounded border border-gray-600 bg-[#565656] px-1 py-0.5 text-center text-xs text-white sm:min-w-[3rem] sm:px-2 sm:py-1 sm:text-sm">
+              <span className="min-w-8 rounded border border-gray-600 bg-[#565656] px-1 py-0.5 text-center text-xs text-white sm:min-w-12 sm:px-2 sm:py-1 sm:text-sm">
                 {page}
               </span>
               <span>/ {totalPages}</span>
