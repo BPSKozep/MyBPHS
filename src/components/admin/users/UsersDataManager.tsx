@@ -349,6 +349,26 @@ export default function UsersDataManager() {
     setPage(1);
   }, []);
 
+  // Editing functions
+  const cancelEditing = useCallback(() => {
+    setEditingUserId(null);
+    setEditingUserData(null);
+  }, []);
+
+  // Handle Escape key to exit edit mode
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && editingUserId !== null) {
+        cancelEditing();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [editingUserId, cancelEditing]);
+
   const handleSort = (column: UserColumn) => {
     // Only handle sorting for sortable columns
     if (column === "actions" || column === "select" || column === "roles")
@@ -408,11 +428,6 @@ export default function UsersDataManager() {
     };
     setEditingUserId(user._id);
     setEditingUserData(editingUser);
-  };
-
-  const cancelEditing = () => {
-    setEditingUserId(null);
-    setEditingUserData(null);
   };
 
   const saveEditing = () => {
@@ -923,6 +938,11 @@ export default function UsersDataManager() {
                   return (
                     <TableRow
                       key={user._id}
+                      onDoubleClick={() => {
+                        if (!isEditing) {
+                          startEditing(user);
+                        }
+                      }}
                       className={cn(
                         "border-gray-600 text-white transition-colors",
                         index % 2 === 0
