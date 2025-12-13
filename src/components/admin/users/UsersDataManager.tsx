@@ -14,6 +14,7 @@ import {
   SaveIcon,
   TrashIcon,
   TriangleAlertIcon,
+  UserIcon,
   XIcon,
 } from "lucide-react";
 import React, { useCallback, useMemo, useState } from "react";
@@ -50,6 +51,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -174,6 +176,11 @@ export default function UsersDataManager() {
   }>({ open: false, title: "", description: "", type: "error" });
   const [isRefreshLoading, setIsRefreshLoading] = useState(false);
   const [orphanedADDialog, setOrphanedADDialog] = useState(false);
+  const [mobileEditDialog, setMobileEditDialog] = useState<{
+    open: boolean;
+    user: UserData | null;
+    editedUser: UserData | null;
+  }>({ open: false, user: null, editedUser: null });
 
   const visibleColumns = useMemo(
     () => columns.filter((col) => col.visible),
@@ -349,6 +356,26 @@ export default function UsersDataManager() {
     setPage(1);
   }, []);
 
+  // Editing functions
+  const cancelEditing = useCallback(() => {
+    setEditingUserId(null);
+    setEditingUserData(null);
+  }, []);
+
+  // Handle Escape key to exit edit mode
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && editingUserId !== null) {
+        cancelEditing();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [editingUserId, cancelEditing]);
+
   const handleSort = (column: UserColumn) => {
     // Only handle sorting for sortable columns
     if (column === "actions" || column === "select" || column === "roles")
@@ -408,11 +435,6 @@ export default function UsersDataManager() {
     };
     setEditingUserId(user._id);
     setEditingUserData(editingUser);
-  };
-
-  const cancelEditing = () => {
-    setEditingUserId(null);
-    setEditingUserData(null);
   };
 
   const saveEditing = () => {
@@ -543,6 +565,52 @@ export default function UsersDataManager() {
     },
     [createADUserMutation],
   );
+
+  // Mobile edit dialog functions
+  const openMobileEditDialog = useCallback((user: UserData) => {
+    setMobileEditDialog({
+      open: true,
+      user: user,
+      editedUser: { ...user },
+    });
+  }, []);
+
+  const closeMobileEditDialog = useCallback(() => {
+    setMobileEditDialog({ open: false, user: null, editedUser: null });
+  }, []);
+
+  const updateMobileEditField = useCallback(
+    <K extends keyof UserData>(field: K, value: UserData[K]) => {
+      setMobileEditDialog((prev) => {
+        if (!prev.editedUser) return prev;
+        return {
+          ...prev,
+          editedUser: { ...prev.editedUser, [field]: value },
+        };
+      });
+    },
+    [],
+  );
+
+  const saveMobileEdit = useCallback(() => {
+    if (!mobileEditDialog.editedUser) return;
+
+    updateUserMutation.mutate(
+      {
+        _id: mobileEditDialog.editedUser._id,
+        name: mobileEditDialog.editedUser.name,
+        email: mobileEditDialog.editedUser.email,
+        nfcId: mobileEditDialog.editedUser.nfcId,
+        roles: mobileEditDialog.editedUser.roles,
+        blocked: mobileEditDialog.editedUser.blocked,
+      },
+      {
+        onSuccess: () => {
+          closeMobileEditDialog();
+        },
+      },
+    );
+  }, [mobileEditDialog.editedUser, updateUserMutation, closeMobileEditDialog]);
 
   const roles: Record<string, string> = rolesJson;
   const roleKeys = Object.keys(roles);
@@ -852,8 +920,246 @@ export default function UsersDataManager() {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-hidden rounded-lg">
+        {/* Mobile List View */}
+        <div className="block md:hidden">
+          {isLoading ? (
+            <div className="flex flex-col items-center gap-4 py-12">
+              <Loading />
+              <p className="text-white">Felhasználók betöltése...</p>
+            </div>
+          ) : paginatedUsers.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-12">
+              <p className="text-lg font-medium text-white">Nincs találat</p>
+              <p className="text-sm text-gray-300">
+                Próbáld módosítani a keresést vagy szűrőket
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {paginatedUsers.map((user) => (
+                <button
+                  type="button"
+                  key={user._id}
+                  onClick={() => openMobileEditDialog(user)}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-lg border border-gray-600 p-4 text-left transition-colors",
+                    user.blocked
+                      ? "border-l-4 border-l-red-500 bg-[#2a2020]"
+                      : "bg-[#2e2e2e] hover:bg-[#343434]",
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-full",
+                        user.blocked ? "bg-red-900/50" : "bg-[#454545]",
+                      )}
+                    >
+                      <UserIcon
+                        className={cn(
+                          "size-5",
+                          user.blocked ? "text-red-400" : "text-gray-300",
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <p
+                        className={cn(
+                          "font-medium",
+                          user.blocked ? "text-red-400" : "text-white",
+                        )}
+                      >
+                        {user.name}
+                      </p>
+                      <p className="text-sm text-gray-400">{user.email}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Edit Dialog */}
+        <AlertDialog
+          open={mobileEditDialog.open}
+          onOpenChange={(open) => {
+            if (!open) closeMobileEditDialog();
+          }}
+        >
+          <AlertDialogContent className="max-h-[90vh] overflow-y-auto border-gray-600 bg-[#2e2e2e]">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 text-white">
+                <EditIcon className="size-5" />
+                Felhasználó szerkesztése
+              </AlertDialogTitle>
+              <AlertDialogDescription />
+            </AlertDialogHeader>
+
+            {mobileEditDialog.editedUser && (
+              <div className="space-y-4 pb-4">
+                {/* Name Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="mobile-name" className="text-white">
+                    Név
+                  </Label>
+                  <Input
+                    id="mobile-name"
+                    value={mobileEditDialog.editedUser.name}
+                    onChange={(e) =>
+                      updateMobileEditField("name", e.target.value)
+                    }
+                    className="border-gray-600 bg-[#565656] text-white"
+                  />
+                </div>
+
+                {/* Email Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="mobile-email" className="text-white">
+                    Email
+                  </Label>
+                  <Input
+                    id="mobile-email"
+                    type="email"
+                    value={mobileEditDialog.editedUser.email}
+                    onChange={(e) =>
+                      updateMobileEditField("email", e.target.value)
+                    }
+                    className="border-gray-600 bg-[#565656] text-white"
+                  />
+                </div>
+
+                {/* NFC ID Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="mobile-nfcId" className="text-white">
+                    NFC ID
+                  </Label>
+                  <Input
+                    id="mobile-nfcId"
+                    value={mobileEditDialog.editedUser.nfcId}
+                    onChange={(e) =>
+                      updateMobileEditField("nfcId", e.target.value)
+                    }
+                    className="border-gray-600 bg-[#565656] font-mono text-white"
+                  />
+                </div>
+
+                {/* Roles Field */}
+                <div className="space-y-2">
+                  <Label className="text-white">Szerepek</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {roleKeys.map((role) => (
+                      <button
+                        type="button"
+                        key={role}
+                        onClick={() => {
+                          const currentRoles =
+                            mobileEditDialog.editedUser?.roles || [];
+                          const newRoles = currentRoles.includes(role)
+                            ? currentRoles.filter((r) => r !== role)
+                            : [...currentRoles, role];
+                          updateMobileEditField("roles", newRoles);
+                        }}
+                        className={cn(
+                          "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+                          mobileEditDialog.editedUser?.roles.includes(role)
+                            ? "border-blue-500 bg-blue-600 text-white"
+                            : "border-gray-600 bg-[#454545] text-gray-300 hover:bg-[#565656]",
+                        )}
+                      >
+                        {roles[role] ?? role}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Blocked Toggle */}
+                <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#454545] p-4">
+                  <Label htmlFor="mobile-blocked" className="text-white">
+                    Blokkolva
+                  </Label>
+                  <Switch
+                    id="mobile-blocked"
+                    checked={mobileEditDialog.editedUser.blocked}
+                    onCheckedChange={(checked) =>
+                      updateMobileEditField("blocked", checked)
+                    }
+                    className="data-[state=checked]:bg-red-600"
+                  />
+                </div>
+
+                {/* AD Account Status (Read-only) */}
+                <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#454545] p-4">
+                  <Label className="text-white">AD Fiók</Label>
+                  <Badge
+                    variant="default"
+                    className={
+                      mobileEditDialog.editedUser.hasADAccount
+                        ? "bg-green-600 text-white"
+                        : "bg-red-600 text-white"
+                    }
+                  >
+                    {mobileEditDialog.editedUser.hasADAccount ? (
+                      <span className="flex items-center gap-1">
+                        <FaCheck className="size-3" /> Van
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <FaX className="size-3" /> Nincs
+                      </span>
+                    )}
+                  </Badge>
+                </div>
+
+                {/* Create AD Account Button */}
+                {!mobileEditDialog.editedUser.hasADAccount && (
+                  <Button
+                    onClick={() => {
+                      if (mobileEditDialog.user) {
+                        handleCreateADUser(mobileEditDialog.user);
+                      }
+                    }}
+                    disabled={createADUserMutation.isPending}
+                    className="w-full border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    <PlusIcon className="mr-2 size-4" />
+                    AD fiók létrehozása
+                  </Button>
+                )}
+
+                {/* Password Changed (Read-only) */}
+                <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#454545] p-4">
+                  <Label className="text-white">Iskolai jelszó módosítva</Label>
+                  <span className="text-sm text-gray-200">
+                    {formatDate(
+                      mobileEditDialog.editedUser.laptopPasswordChanged,
+                    )}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+              <AlertDialogCancel
+                onClick={closeMobileEditDialog}
+                className="w-full border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white sm:w-auto"
+              >
+                Mégse
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={saveMobileEdit}
+                disabled={updateUserMutation.isPending}
+                className="w-full border-green-600 bg-green-700 text-white hover:bg-green-600 hover:text-white sm:w-auto"
+              >
+                <SaveIcon className="mr-2 size-4" />
+                Mentés
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Desktop Table */}
+        <div className="hidden overflow-hidden rounded-lg md:block">
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-600 bg-gray-900 hover:bg-slate-900">
@@ -923,6 +1229,11 @@ export default function UsersDataManager() {
                   return (
                     <TableRow
                       key={user._id}
+                      onDoubleClick={() => {
+                        if (!isEditing) {
+                          startEditing(user);
+                        }
+                      }}
                       className={cn(
                         "border-gray-600 text-white transition-colors",
                         index % 2 === 0
@@ -962,37 +1273,43 @@ export default function UsersDataManager() {
                               )}
                             </div>
                           )}
-                          {column.key === "email" &&
-                            isEditing &&
-                            (getFieldConfig("email")?.editable ? (
-                              <Input
-                                type="email"
-                                value={displayUser.email}
-                                onChange={(e) =>
-                                  updateEditingField("email", e.target.value)
-                                }
-                                className="h-8 border-gray-600 bg-[#565656] text-white"
-                              />
-                            ) : (
-                              <span className="text-gray-200">
-                                {displayUser.email}
-                              </span>
-                            ))}
-                          {column.key === "nfcId" &&
-                            isEditing &&
-                            (getFieldConfig("nfcId")?.editable ? (
-                              <Input
-                                value={displayUser.nfcId}
-                                onChange={(e) =>
-                                  updateEditingField("nfcId", e.target.value)
-                                }
-                                className="h-8 border-gray-600 bg-[#565656] font-mono text-white"
-                              />
-                            ) : (
-                              <code className="rounded border border-gray-500 bg-[#565656] px-2 py-1 font-mono text-sm text-white">
-                                {displayUser.nfcId}
-                              </code>
-                            ))}
+                          {column.key === "email" && (
+                            <div>
+                              {isEditing &&
+                              getFieldConfig("email")?.editable ? (
+                                <Input
+                                  type="email"
+                                  value={displayUser.email}
+                                  onChange={(e) =>
+                                    updateEditingField("email", e.target.value)
+                                  }
+                                  className="h-8 border-gray-600 bg-[#565656] text-white"
+                                />
+                              ) : (
+                                <span className="text-gray-200">
+                                  {displayUser.email}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {column.key === "nfcId" && (
+                            <div>
+                              {isEditing &&
+                              getFieldConfig("nfcId")?.editable ? (
+                                <Input
+                                  value={displayUser.nfcId}
+                                  onChange={(e) =>
+                                    updateEditingField("nfcId", e.target.value)
+                                  }
+                                  className="h-8 border-gray-600 bg-[#565656] font-mono text-white"
+                                />
+                              ) : (
+                                <code className="rounded border border-gray-500 bg-[#565656] px-2 py-1 font-mono text-sm text-white">
+                                  {displayUser.nfcId}
+                                </code>
+                              )}
+                            </div>
+                          )}
                           {column.key === "roles" && (
                             <div className="flex flex-wrap gap-1">
                               {isEditing &&
@@ -1258,7 +1575,7 @@ export default function UsersDataManager() {
             </Button>
             <div className="mx-1 flex items-center gap-1 text-xs font-medium text-gray-300 sm:mx-3 sm:gap-2 sm:text-sm">
               <span className="hidden sm:inline">Oldal</span>
-              <span className="min-w-[2rem] rounded border border-gray-600 bg-[#565656] px-1 py-0.5 text-center text-xs text-white sm:min-w-[3rem] sm:px-2 sm:py-1 sm:text-sm">
+              <span className="min-w-8 rounded border border-gray-600 bg-[#565656] px-1 py-0.5 text-center text-xs text-white sm:min-w-12 sm:px-2 sm:py-1 sm:text-sm">
                 {page}
               </span>
               <span>/ {totalPages}</span>

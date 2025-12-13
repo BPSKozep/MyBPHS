@@ -639,4 +639,84 @@ export const orderRouter = createTRPCRouter({
 
       await order.save();
     }),
+  adminCreateDefaultOrder: protectedProcedure
+    .input(
+      z.strictObject({
+        email: z.string().email(),
+        week: z.number(),
+        year: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
+
+      const menu = await Menu.findOne({
+        week: input.week,
+        year: input.year,
+      });
+
+      if (!menu) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Menu not found",
+        });
+      }
+
+      const user = await User.findOne({
+        email: input.email,
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      const orderExists = await Order.exists({
+        menu: menu._id,
+        user: user._id,
+      });
+
+      if (orderExists) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Order already exists",
+        });
+      }
+
+      await new Order<IOrder>({
+        menu: menu._id,
+        user: user._id,
+        order: [
+          {
+            chosen: "a-menu",
+            completed: false,
+          },
+          {
+            chosen: "a-menu",
+            completed: false,
+          },
+          {
+            chosen: "a-menu",
+            completed: false,
+          },
+          {
+            chosen: "a-menu",
+            completed: false,
+          },
+          {
+            chosen: "a-menu",
+            completed: false,
+          },
+        ],
+      }).save();
+    }),
 });

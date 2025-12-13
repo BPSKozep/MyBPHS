@@ -75,7 +75,7 @@ export default function MainHeader() {
                   onError={() => setImageError(true)}
                 />
               ) : (
-                <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-lg font-bold text-white">
+                <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-lg font-bold text-white">
                   {userInitial}
                 </div>
               )}
@@ -111,7 +111,7 @@ export default function MainHeader() {
                       onError={() => setImageError(true)}
                     />
                   ) : (
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-2xl font-bold text-white ring-4 ring-blue-500/20">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-2xl font-bold text-white ring-4 ring-blue-500/20">
                       {userInitial}
                     </div>
                   )}
