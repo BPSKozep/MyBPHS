@@ -23,6 +23,7 @@ export default function TokenCheck() {
   const [email, setEmail] = useState<string>("");
   const [checkMode, setCheckMode] = useState<"user" | "token">("user");
   const [isEditing, setIsEditing] = useState(false);
+  const [createOrderError, setCreateOrderError] = useState<string | null>(null);
 
   const [weekOffset, setWeekOffset] = useState(1);
   const [year, week] = useMemo(() => {
@@ -94,8 +95,16 @@ export default function TokenCheck() {
     }
   }, [order, weekOffset]);
 
+  // Clear error when user or week changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: clear error when user or week changes
+  useEffect(() => {
+    setCreateOrderError(null);
+  }, [user, weekOffset]);
+
   const toggleBlocked = api.user.toggleBlocked.useMutation();
   const adminEditOrder = api.order.adminEdit.useMutation();
+  const adminCreateDefaultOrder =
+    api.order.adminCreateDefaultOrder.useMutation();
 
   return (
     <>
@@ -336,6 +345,52 @@ export default function TokenCheck() {
             Nincs rendelés erre a hétre
           </h1>
           {NFCUser && <h2 className="text-white">{user.name}</h2>}
+          <div className="mt-6 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileFocus={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{
+                type: "spring",
+                stiffness: 500,
+                damping: 20,
+              }}
+              className="inline-block cursor-pointer rounded-lg bg-slate-600 p-3 text-white disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-gray-300"
+              disabled={adminCreateDefaultOrder.isPending}
+              onClick={async () => {
+                setCreateOrderError(null);
+                try {
+                  await sleep(500);
+                  await adminCreateDefaultOrder.mutateAsync({
+                    email: user.email,
+                    year,
+                    week,
+                  });
+                  await sleep(500);
+                  await orderQuery.refetch();
+                  setCreateOrderError(null);
+                } catch (err) {
+                  console.error("Error creating order:", err);
+                  const errorMessage =
+                    err && typeof err === "object" && "message" in err
+                      ? String(err.message)
+                      : err instanceof Error
+                        ? err.message
+                        : "Ismeretlen hiba történt";
+                  setCreateOrderError(errorMessage);
+                }
+              }}
+            >
+              {adminCreateDefaultOrder.isPending
+                ? "Létrehozás..."
+                : "Rendelés létrehozása"}
+            </motion.button>
+          </div>
+          {createOrderError && (
+            <div className="mt-3 text-center text-red-400">
+              {createOrderError}
+            </div>
+          )}
         </>
       )}
     </>
