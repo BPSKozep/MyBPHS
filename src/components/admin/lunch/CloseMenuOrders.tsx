@@ -15,7 +15,7 @@ export default function CloseMenuOrders() {
   const week = getWeek(date);
   const year = getWeekYear(date);
 
-  const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
+  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
   const orderDocCount = api.order.getOrderDocumentCount.useQuery({
     year,
     week,
@@ -39,14 +39,14 @@ export default function CloseMenuOrders() {
 
               const totalOrders = orderDocCount.data ?? 0;
 
-              await sendDiscordWebhook.mutateAsync({
+              await sendSlackWebhook.mutateAsync({
                 title: `Beküldések lezárva a(z) ${week}. hétre ❌`,
                 body: `Összes leadott rendelés: ${String(totalOrders)}`,
               });
 
               return true;
             } catch (err) {
-              await sendDiscordWebhook.mutateAsync({
+              await sendSlackWebhook.mutateAsync({
                 title: "CloseMenuOrders Hiba",
                 body: String(err),
                 error: true,

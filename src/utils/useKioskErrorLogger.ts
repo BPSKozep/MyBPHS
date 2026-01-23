@@ -47,7 +47,7 @@ export interface KioskErrorDetails {
 }
 
 export function useKioskErrorLogger() {
-  const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
+  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
   const logError = useCallback(
     async (errorDetails: KioskErrorDetails) => {
@@ -130,7 +130,7 @@ export function useKioskErrorLogger() {
       }
 
       try {
-        await sendDiscordWebhook.mutateAsync({
+        await sendSlackWebhook.mutateAsync({
           title: errorTitle,
           body: errorBody,
           error: true,
@@ -146,7 +146,7 @@ export function useKioskErrorLogger() {
         });
       }
     },
-    [sendDiscordWebhook],
+    [sendSlackWebhook],
   );
 
   return { logError };

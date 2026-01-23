@@ -35,6 +35,10 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
+    SLACK_WEBHOOK:
+      process.env.NODE_ENV === "production"
+        ? z.string()
+        : z.string().optional(),
     RESEND_API_KEY:
       process.env.NODE_ENV === "production"
         ? z.string()

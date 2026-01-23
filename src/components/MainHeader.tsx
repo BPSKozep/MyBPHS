@@ -4,7 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import { FaEnvelope, FaIdCard, FaRightFromBracket } from "react-icons/fa6";
+import {
+  FaBell,
+  FaEnvelope,
+  FaIdCard,
+  FaRightFromBracket,
+} from "react-icons/fa6";
 import PWAInstall from "@/components/PWAInstall";
 import {
   Sheet,
@@ -31,7 +36,10 @@ export default function MainHeader() {
     enabled: !!data?.user?.email,
   });
 
+  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
+
   const [signOutLoading, setSignOutLoading] = useState(false);
+  const [testWebhookLoading, setTestWebhookLoading] = useState(false);
 
   const userInitial = data?.user?.name?.charAt(0)?.toUpperCase() ?? "U";
 
@@ -172,8 +180,50 @@ export default function MainHeader() {
               </div>
             </div>
 
+            {/* Development Test Section */}
+            {process.env.NODE_ENV === "development" && (
+              <div className="mt-auto">
+                <div className="rounded-xl bg-blue-600/20 p-4 backdrop-blur-sm border border-blue-500/30">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/30">
+                      <FaBell className="text-blue-400" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-white">
+                      Dev Tools
+                    </h3>
+                  </div>
+                  <button
+                    className="w-full cursor-pointer rounded-lg bg-blue-600/30 p-3 text-sm text-white transition-all duration-200 hover:bg-blue-600/40 focus:ring-2 focus:ring-blue-500/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    type="button"
+                    onClick={async () => {
+                      setTestWebhookLoading(true);
+                      try {
+                        await sendSlackWebhook.mutateAsync({
+                          title: "Test Webhook",
+                          body: `Teszt üzenet küldve: ${new Date().toLocaleString("hu-HU")}`,
+                        });
+                      } catch (error) {
+                        console.error("Failed to send test webhook:", error);
+                      } finally {
+                        setTestWebhookLoading(false);
+                      }
+                    }}
+                    disabled={testWebhookLoading}
+                  >
+                    {testWebhookLoading ? (
+                      <div className="flex items-center justify-center">
+                        <SmallLoading />
+                      </div>
+                    ) : (
+                      "Teszt Webhook Küldése"
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Sign Out Button - Fixed at bottom */}
-            <div className="mt-auto mb-6">
+            <div className={process.env.NODE_ENV === "development" ? "mt-4 mb-6" : "mt-auto mb-6"}>
               <button
                 className="w-full cursor-pointer rounded-xl bg-red-600/20 p-4 text-white transition-all duration-200 hover:bg-red-600/30 focus:ring-2 focus:ring-red-500/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 type="button"

@@ -74,6 +74,76 @@ export const webhookRouter = createTRPCRouter({
         }),
       });
     }),
+
+  sendSlackWebhook: protectedProcedure
+    .input(
+      z
+        .object({
+          message: z.string().optional(),
+          title: z.string().optional(),
+          body: z.string().optional(),
+          // Slack supports color names or hex codes
+          color: z.enum(["good", "warning", "danger"]).optional(),
+          error: z.boolean().optional(),
+        })
+        .refine((data) => !!data.message || (!!data.title && !!data.body), {
+          message: "Either 'message' or both 'title' and 'body' are required",
+        }),
+    )
+    .mutation(async ({ input }) => {
+      const date = new Date();
+      const localDate = date.toLocaleDateString("hu-HU", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        timeZone: "Europe/Budapest",
+      });
+
+      if (!env.SLACK_WEBHOOK) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Slack webhook URL is not set",
+        });
+      }
+
+      const isDev = process.env.NODE_ENV !== "production";
+
+      // If title and body are provided, send as an attachment
+      if (input.title && input.body) {
+        const attachment = {
+          title: (isDev ? "DEV - " : "") + input.title,
+          text: input.body,
+          color: input.color ?? (input.error ? "danger" : "warning"),
+          footer: localDate,
+          footer_icon: "https://platform.slack-edge.com/img/default_application_icon.png",
+        };
+
+        await fetch(env.SLACK_WEBHOOK, {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            attachments: [attachment],
+          }),
+        });
+        return;
+      }
+
+      // Fallback to simple text message for backward compatibility
+      await fetch(env.SLACK_WEBHOOK, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: `${(isDev ? "DEV - " : "") + localDate} - ${input.message ?? ""}`,
+        }),
+      });
+    }),
 });
 
 export default webhookRouter;

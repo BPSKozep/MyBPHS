@@ -30,7 +30,7 @@ export default function SchoolPasswordReset() {
 
   const inputValid = input.length >= 8;
 
-  const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
+  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
   const [laptopPassResetAvailable, setlaptopAvailable] = useState(true);
 
@@ -196,7 +196,7 @@ export default function SchoolPasswordReset() {
 
                       return true;
                     } catch (error) {
-                      await sendDiscordWebhook.mutateAsync({
+                      await sendSlackWebhook.mutateAsync({
                         title: "SchoolPasswordReset Hiba",
                         body: `${session.data?.user?.email}\n\n${String(error)}`,
                         error: true,
@@ -281,7 +281,7 @@ export default function SchoolPasswordReset() {
                               duration: 0.2,
                             }}
                           >
-                            <FaChevronDown className="h-3 w-3 flex-shrink-0 text-gray-400" />
+                            <FaChevronDown className="h-3 w-3 shrink-0 text-gray-400" />
                           </motion.div>
                         </button>
                         <motion.div
