@@ -94,7 +94,7 @@ export default function SendEmail() {
   );
 
   const sendEmail = api.email.sendAdminEmail.useMutation();
-  const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
+  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
   const user = api.user.get.useQuery(selectedUserEmail, {
     enabled: !!selectedUserEmail,
@@ -220,7 +220,7 @@ export default function SendEmail() {
       setShowConfirmDialog(false);
       return true;
     } catch (err) {
-      await sendDiscordWebhook.mutateAsync({
+      await sendSlackWebhook.mutateAsync({
         title: "SendEmail Hiba",
         body: String(err),
         error: true,

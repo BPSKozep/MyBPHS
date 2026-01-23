@@ -25,7 +25,7 @@ export default function SetMenuAndSendEmail() {
 
   const sendEmail = api.email.sendLunchEmail.useMutation();
 
-  const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
+  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -49,7 +49,7 @@ export default function SetMenuAndSendEmail() {
 
               await sendEmail.mutateAsync();
 
-              await sendDiscordWebhook.mutateAsync({
+              await sendSlackWebhook.mutateAsync({
                 title: "Új menü feltöltve, email kiküldve. 📩",
                 body:
                   "**Címzettek**:\n" +
@@ -61,7 +61,7 @@ export default function SetMenuAndSendEmail() {
 
               return true;
             } catch (err) {
-              await sendDiscordWebhook.mutateAsync({
+              await sendSlackWebhook.mutateAsync({
                 title: "SetMenuAndSendEmail Hiba",
                 body: String(err),
                 error: true,

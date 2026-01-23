@@ -69,7 +69,7 @@ function LunchOrder() {
 
   const editOrder = api.order.edit.useMutation();
 
-  const sendDiscordWebhook = api.webhook.sendDiscordWebhook.useMutation();
+  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
   const showMenu =
     menu.data &&
@@ -339,7 +339,7 @@ function LunchOrder() {
 
                               return true;
                             } catch (err) {
-                              await sendDiscordWebhook.mutateAsync({
+                              await sendSlackWebhook.mutateAsync({
                                 title: "LunchOrder Hiba",
                                 body:
                                   session.data?.user?.email +
@@ -384,7 +384,7 @@ function LunchOrder() {
 
                               return true;
                             } catch (err) {
-                              await sendDiscordWebhook.mutateAsync({
+                              await sendSlackWebhook.mutateAsync({
                                 title: "LunchOrder-Edit Hiba",
                                 body: String(err),
                                 error: true,
