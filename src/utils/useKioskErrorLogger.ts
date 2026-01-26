@@ -72,61 +72,31 @@ export function useKioskErrorLogger() {
         errorMessage = JSON.stringify(error, null, 2);
       }
 
-      // Get browser/environment information
-      const browserInfo = {
-        userAgent:
-          typeof window !== "undefined"
-            ? window.navigator.userAgent
-            : "Server-side",
-        url: typeof window !== "undefined" ? window.location.href : "N/A",
-        timestamp: new Date().toISOString(),
-        isDevelopment: process.env.NODE_ENV === "development",
-        ...context?.browserInfo,
-      };
-
       // Build comprehensive error details
       const errorTitle = `Kiosk Hiba - ${errorType.replace(/_/g, " ")}`;
 
-      let errorBody = `**Hiba Részletei:**\n`;
-      errorBody += `• **Típus:** ${errorType}\n`;
-      errorBody += `• **Üzenet:** ${errorMessage}\n`;
-      errorBody += `• **Környezet:** ${browserInfo.isDevelopment ? "Fejlesztői" : "Éles"}\n`;
-      errorBody += `• **URL:** ${browserInfo.url}\n\n`;
+      let errorBody = `• Üzenet: ${errorMessage}\n\n`;
 
       if (context?.nfcId) {
-        errorBody += `**NFC Token:**\n`;
-        errorBody += `• **ID:** ${context.nfcId}\n\n`;
+        errorBody += `NFC Token: ${context.nfcId}\n\n`;
       }
 
       if (context?.user) {
-        errorBody += `**Felhasználó:**\n`;
-        errorBody += `• **Név:** ${context.user.name ?? "N/A"}\n`;
-        errorBody += `• **Email:** ${context.user.email ?? "N/A"}\n`;
-        errorBody += `• **Szerepkörök:** ${context.user.roles?.join(", ") ?? "N/A"}\n`;
-        errorBody += `• **Tiltva:** ${context.user.blocked ? "❌ Igen" : "✅ Nem"}\n\n`;
+        errorBody += `Felhasználó:\n`;
+        errorBody += `• Név: ${context.user.name ?? "N/A"}\n`;
+        errorBody += `• Email: ${context.user.email ?? "N/A"}\n`;
+        errorBody += `• Szerepkörök: ${context.user.roles?.join(", ") ?? "N/A"}\n`;
+        errorBody += `• Tiltva: ${context.user.blocked ? "❌ Igen" : "✅ Nem"}\n\n`;
       }
 
       if (context?.order) {
-        errorBody += `**Rendelés:**\n`;
-        errorBody += `• **Rendelés:** ${context.order.order ?? "N/A"}\n`;
-        errorBody += `• **Állapot:** ${context.order.orderError ? "❌" : "✅"}\n\n`;
-      }
-
-      if (context?.socketStatus) {
-        errorBody += `**Socket Állapot:**\n`;
-        errorBody += `• **Socket:** ${context.socketStatus.socketFailure ? "❌" : "✅"}\n`;
-        errorBody += `• **Socket Csatlakoztatva:** ${context.socketStatus.socketConnected ? "✅" : "❌"}\n\n`;
-      }
-
-      if (context?.componentState) {
-        errorBody += `**Oldal Állapot:**\n`;
-        errorBody += `• **Valós NFC:** ${context.componentState.isValidNfc ? "✅" : "❌"}\n`;
-        errorBody += `• **Betöltve:** ${context.componentState.loading ? "⏳" : "✅"}\n`;
-        errorBody += `• **Profil Kép:** ${context.componentState.profileImageURL?.includes("no_picture") ? "Alapértelmezett" : "Egyedi"}\n\n`;
+        errorBody += `Rendelés:\n`;
+        errorBody += `• Rendelés: ${context.order.order ?? "N/A"}\n`;
+        errorBody += `• Állapot: ${context.order.orderError ? "❌" : "✅"}\n\n`;
       }
 
       if (errorStack) {
-        errorBody += `\n**Stack Trace:**\n\`\`\`\n${errorStack.substring(0, 1000)}${errorStack.length > 1000 ? "...(truncated)" : ""}\n\`\`\``;
+        errorBody += `\nStack Trace:\n\`\`\`\n${errorStack.substring(0, 1000)}${errorStack.length > 1000 ? "...(truncated)" : ""}\n\`\`\``;
       }
 
       try {
