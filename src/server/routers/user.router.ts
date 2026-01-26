@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import type { Document } from "mongoose";
+import type { HydratedDocument } from "mongoose";
 import { Resend } from "resend";
 import { z } from "zod";
 import mongooseConnect from "@/clients/mongoose";
@@ -48,7 +48,9 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      return await User.findOne({ email: input }).select<IUser>("-_id -__v");
+      return await User.findOne({ email: input })
+        .select("-_id -__v")
+        .lean<IUser>();
     }),
   getUserByNfcId: protectedProcedure
     .input(z.string())
@@ -75,7 +77,9 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      return await User.findOne({ nfcId: input }).select<IUser>("-_id -__v");
+      return await User.findOne({ nfcId: input })
+        .select("-_id -__v")
+        .lean<IUser>();
     }),
   getTimetable: protectedProcedure
     .input(z.string().email())
@@ -95,8 +99,9 @@ export const userRouter = createTRPCRouter({
       }
 
       const user = await User.findOne({ email: input }).populate<{
-        groups: (Document &
-          IGroup & { overrides: (Document & IGroupOverride)[] })[];
+        groups: (HydratedDocument<IGroup> & {
+          overrides: HydratedDocument<IGroupOverride>[];
+        })[];
       }>({ path: "groups", populate: { path: "overrides" } });
 
       const timetables: {
@@ -107,7 +112,7 @@ export const userRouter = createTRPCRouter({
       }[] = [];
 
       for (const group of user?.groups ?? []) {
-        const groupObj = group.toObject() as IGroupOverride;
+        const groupObj = group.toObject() as IGroup;
 
         timetables.push({
           timetable: groupObj.timetable,
