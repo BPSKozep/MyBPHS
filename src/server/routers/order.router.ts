@@ -62,13 +62,15 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
-      const order = await Order.findOne({ menu, user }).select("-order._id");
+      const order = await Order.findOne({ menu: menu._id, user: user._id })
+        .select("-order._id")
+        .lean<IOrder>();
 
       if (!order) {
         return [];
       }
 
-      return order.toObject().order;
+      return order.order;
     }),
   getAllWeek: protectedProcedure
     .input(
@@ -121,7 +123,9 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
-      const order = await Order.findOne({ menu, user }).select("-order._id");
+      const order = await Order.findOne({ menu: menu._id, user: user._id })
+        .select("-order._id")
+        .lean<IOrder>();
 
       if (!order) {
         return [];

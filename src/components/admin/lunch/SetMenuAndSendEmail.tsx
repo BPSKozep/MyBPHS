@@ -173,8 +173,8 @@ export default function SetMenuAndSendEmail() {
               Email újraküldés megerősítése
             </AlertDialogTitle>
             <AlertDialogDescription className="text-gray-300">
-              Biztosan szeretnéd újraküldeni az emailt a menü mentése nélkül?
-              Az email az alábbi címzetteknek lesz elküldve:
+              Biztosan szeretnéd újraküldeni az emailt a menü mentése nélkül? Az
+              email az alábbi címzetteknek lesz elküldve:
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex flex-wrap gap-2 px-6 pb-2">

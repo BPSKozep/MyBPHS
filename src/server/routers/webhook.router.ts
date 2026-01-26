@@ -118,7 +118,8 @@ export const webhookRouter = createTRPCRouter({
           text: input.body,
           color: input.color ?? (input.error ? "danger" : "warning"),
           footer: localDate,
-          footer_icon: "https://platform.slack-edge.com/img/default_application_icon.png",
+          footer_icon:
+            "https://platform.slack-edge.com/img/default_application_icon.png",
         };
 
         await fetch(env.SLACK_WEBHOOK, {

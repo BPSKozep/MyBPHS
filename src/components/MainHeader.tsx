@@ -223,7 +223,13 @@ export default function MainHeader() {
             )}
 
             {/* Sign Out Button - Fixed at bottom */}
-            <div className={process.env.NODE_ENV === "development" ? "mt-4 mb-6" : "mt-auto mb-6"}>
+            <div
+              className={
+                process.env.NODE_ENV === "development"
+                  ? "mt-4 mb-6"
+                  : "mt-auto mb-6"
+              }
+            >
               <button
                 className="w-full cursor-pointer rounded-xl bg-red-600/20 p-4 text-white transition-all duration-200 hover:bg-red-600/30 focus:ring-2 focus:ring-red-500/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 type="button"
