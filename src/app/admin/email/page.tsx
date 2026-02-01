@@ -10,7 +10,9 @@ export default function Email() {
   return (
     <OnlyRoles roles={["administrator"]}>
       <PageWithHeader title="Admin / Email" homeLocation="/admin">
-        <SendEmail />
+        <div className="px-10">
+          <SendEmail />
+        </div>
       </PageWithHeader>
     </OnlyRoles>
   );

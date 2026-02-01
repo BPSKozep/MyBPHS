@@ -59,6 +59,7 @@
     "superjson": "^2.2.6",
     "tailwind-merge": "^3.4.0",
     "use-debounce": "^10.1.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.25.76"
   },
   "devDependencies": {
