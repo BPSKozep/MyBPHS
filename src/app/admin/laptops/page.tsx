@@ -12,7 +12,7 @@ export default function LaptopPage() {
   return (
     <OnlyRoles roles={["administrator"]}>
       <PageWithHeader title="Laptopok" homeLocation="/admin">
-        <div className="flex flex-col gap-4 lg:flex-row">
+        <div className="flex flex-col gap-4 lg:flex-row px-10">
           {/* Left side - Deployments (50%) */}
           <div className="w-full lg:w-1/2">
             <Card>

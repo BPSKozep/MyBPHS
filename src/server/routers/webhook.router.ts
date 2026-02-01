@@ -43,7 +43,7 @@ export const webhookRouter = createTRPCRouter({
       // If title and body are provided, send as an embed
       if (input.title && input.body) {
         const embed = {
-          title: (isDev ? "DEV - " : "") + input.title,
+          title: (isDev ? "TESZT - " : "") + input.title,
           description: input.body,
           color: input.color ?? (input.error ? 16711680 : 16432932), // default yellow - error red
           footer: {
@@ -70,7 +70,7 @@ export const webhookRouter = createTRPCRouter({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          content: `${(isDev ? "DEV - " : "") + localDate} - ${input.message ?? ""}`,
+          content: `${(isDev ? "TESZT - " : "") + localDate} - ${input.message ?? ""}`,
         }),
       });
     }),
@@ -114,7 +114,7 @@ export const webhookRouter = createTRPCRouter({
       // If title and body are provided, send as an attachment
       if (input.title && input.body) {
         const attachment = {
-          title: (isDev ? "DEV - " : "") + input.title,
+          title: (isDev ? "TESZT - " : "") + input.title,
           text: input.body,
           color: input.color ?? (input.error ? "danger" : "warning"),
           footer: localDate,
@@ -141,7 +141,7 @@ export const webhookRouter = createTRPCRouter({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          text: `${(isDev ? "DEV - " : "") + localDate} - ${input.message ?? ""}`,
+          text: `${(isDev ? "TESZT - " : "") + localDate} - ${input.message ?? ""}`,
         }),
       });
     }),

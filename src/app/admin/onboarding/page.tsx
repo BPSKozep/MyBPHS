@@ -11,7 +11,7 @@ export default function Onboarding() {
   return (
     <OnlyRoles roles={["administrator"]}>
       <PageWithHeader title="Admin / Onboarding" homeLocation="/admin">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 px-10">
           <div>
             <TokenScanner />
           </div>

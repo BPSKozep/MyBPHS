@@ -14,7 +14,7 @@ export default function ClosedOrderForm({
 
   return (
     <div
-      className={`grid max-w-240 grid-flow-row break-words ${
+      className={`grid max-w-240 grid-flow-row wrap-break-word ${
         isBigScreen ? "grid-cols-5" : "grid-cols-1"
       } gap-3 rounded-lg bg-zinc-700 p-5 shadow-lg`}
     >

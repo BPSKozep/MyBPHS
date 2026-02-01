@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FaEnvelope, FaPaperPlane } from "react-icons/fa6";
+import ExcelMenuImport from "@/components/admin/lunch/ExcelMenuImport";
 import SetMenuForm from "@/components/admin/lunch/SetMenuForm";
 import IconSubmitButton from "@/components/IconSubmitButton";
 import {
@@ -20,15 +21,15 @@ import { getWeek, getWeekYear } from "@/utils/isoweek";
 import sleep from "@/utils/sleep";
 
 export default function SetMenuAndSendEmail() {
-  const [menuOptions, setMenuOptions] = useState(
+  const [menuOptions, setMenuOptions] = useState<
+    { soup?: string; "a-menu": string; "b-menu": string }[]
+  >(
     Array(5)
       .fill(0)
-      .map(() => {
-        return {
-          "a-menu": "",
-          "b-menu": "",
-        };
-      }),
+      .map(() => ({
+        "a-menu": "",
+        "b-menu": "",
+      })),
   );
   const [showResendConfirmDialog, setShowResendConfirmDialog] = useState(false);
 
@@ -38,40 +39,31 @@ export default function SetMenuAndSendEmail() {
 
   const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
-  const handleSaveAndSendEmail = async () => {
-    try {
-      await sleep(500);
+  const handleSaveAndSendEmail = async (
+    optionsToSave?: { soup?: string; "a-menu": string; "b-menu": string }[],
+  ) => {
+    await sleep(500);
 
-      const date = new Date();
-      date.setDate(date.getDate() + 7);
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
 
-      await createMenu.mutateAsync({
-        options: menuOptions,
-        week: getWeek(date),
-        year: getWeekYear(date),
-      });
+    await createMenu.mutateAsync({
+      options: optionsToSave ?? menuOptions,
+      week: getWeek(date),
+      year: getWeekYear(date),
+    });
 
-      await sendEmail.mutateAsync();
+    await sendEmail.mutateAsync();
 
-      await sendSlackWebhook.mutateAsync({
-        title: "Új menü feltöltve, email kiküldve. 📩",
-        body:
-          "**Címzettek**:\n" +
-          env.NEXT_PUBLIC_TO_EMAILS?.split(",")
-            .map((email) => email.trim())
-            .filter(Boolean)
-            .join("\n"),
-      });
-
-      return true;
-    } catch (err) {
-      await sendSlackWebhook.mutateAsync({
-        title: "SetMenuAndSendEmail Hiba",
-        body: String(err),
-        error: true,
-      });
-      return false;
-    }
+    await sendSlackWebhook.mutateAsync({
+      title: "Új menü feltöltve, email kiküldve. 📩",
+      body:
+        "Címzettek:\n" +
+        env.NEXT_PUBLIC_TO_EMAILS?.split(",")
+          .map((email) => email.trim())
+          .filter(Boolean)
+          .join("\n"),
+    });
   };
 
   const handleForceSendEmail = async () => {
@@ -84,7 +76,7 @@ export default function SetMenuAndSendEmail() {
       await sendSlackWebhook.mutateAsync({
         title: "Email újraküldve (menü mentése nélkül) 📧",
         body:
-          "**Címzettek**:\n" +
+          "Címzettek:\n" +
           env.NEXT_PUBLIC_TO_EMAILS?.split(",")
             .map((email) => email.trim())
             .filter(Boolean)
@@ -107,8 +99,17 @@ export default function SetMenuAndSendEmail() {
     return email.trim().split("@")[0];
   };
 
+  const handleExcelConfirm = async (
+    options: { soup: string; "a-menu": string; "b-menu": string }[],
+  ) => {
+    setMenuOptions(options);
+    await handleSaveAndSendEmail(options);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center">
+      <ExcelMenuImport onConfirm={handleExcelConfirm} />
+
       <SetMenuForm onChange={setMenuOptions} />
 
       {/* Actions Section */}
@@ -120,11 +121,17 @@ export default function SetMenuAndSendEmail() {
           <div className="flex flex-col items-center gap-2">
             <IconSubmitButton
               icon={<FaEnvelope />}
-              onClick={handleSaveAndSendEmail}
+              onClick={async () => {
+                try {
+                  await handleSaveAndSendEmail();
+                  return true;
+                } catch {
+                  return false;
+                }
+              }}
             />
             <span className="text-center text-sm text-gray-300">
-              Menü mentése
-              <br />& Email küldés
+              Menü kiküldése
             </span>
           </div>
 
@@ -135,12 +142,10 @@ export default function SetMenuAndSendEmail() {
               onClick={() => setShowResendConfirmDialog(true)}
               className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-2xl bg-[#565e85] p-3 text-white transition-colors hover:bg-[#3a445d]"
             >
-              <FaPaperPlane />
+              <FaEnvelope />
             </button>
             <span className="text-center text-sm text-gray-300">
               Email újraküldés
-              <br />
-              (menü mentése nélkül)
             </span>
           </div>
         </div>

@@ -274,31 +274,52 @@ function LunchOrder() {
                     />
                   </motion.div>
 
-                  <OrderForm
-                    options={menu.data?.options?.map((menuDay) => {
-                      if (!menuDay["a-menu"] && !menuDay["b-menu"]) {
-                        const newMenuDay = menuCombine(menuDay, false);
+                  {(() => {
+                    const optionsWithSoup = menu.data?.options ?? [];
+                    const soups = optionsWithSoup.map(
+                      (day) => (day as Record<string, string>).soup ?? "",
+                    );
+                    const optionsWithoutSoup = optionsWithSoup.map(
+                      (menuDay) => {
+                        const { soup: _soup, ...dayWithoutSoup } =
+                          menuDay as Record<string, string>;
+                        const menuDayWithoutSoup = dayWithoutSoup;
+                        if (
+                          !menuDayWithoutSoup["a-menu"] &&
+                          !menuDayWithoutSoup["b-menu"]
+                        ) {
+                          const newMenuDay = menuCombine(
+                            menuDayWithoutSoup,
+                            false,
+                          );
 
-                        // biome-ignore lint/suspicious/useIterableCallbackReturn: todo review
-                        Object.keys(newMenuDay).forEach(
-                          // biome-ignore lint/suspicious/noAssignInExpressions: todo review
-                          (key) => (newMenuDay[key] = ""),
-                        );
+                          // biome-ignore lint/suspicious/useIterableCallbackReturn: todo review
+                          Object.keys(newMenuDay).forEach(
+                            // biome-ignore lint/suspicious/noAssignInExpressions: todo review
+                            (key) => (newMenuDay[key] = ""),
+                          );
 
-                        return newMenuDay;
-                      }
+                          return newMenuDay;
+                        }
 
-                      return menuCombine(menuDay, false);
-                    })}
-                    isEditing={orderEditing}
-                    selectedOptions={selectedOptions}
-                    onChange={(chosenOptions) => {
-                      if (orderEditing || !orderExists) {
-                        setSelectedOptions(chosenOptions);
-                      }
-                    }}
-                    weekStartTimestamp={weekStartTimestamp}
-                  />
+                        return menuCombine(menuDayWithoutSoup, false);
+                      },
+                    );
+                    return (
+                      <OrderForm
+                        options={optionsWithoutSoup}
+                        soups={soups}
+                        isEditing={orderEditing}
+                        selectedOptions={selectedOptions}
+                        onChange={(chosenOptions) => {
+                          if (orderEditing || !orderExists) {
+                            setSelectedOptions(chosenOptions);
+                          }
+                        }}
+                        weekStartTimestamp={weekStartTimestamp}
+                      />
+                    );
+                  })()}
 
                   <AnimatePresence>
                     {!orderExists && (

@@ -21,12 +21,14 @@ export default function OrderForm({
   onChange,
   isEditing,
   weekStartTimestamp,
+  soups,
 }: {
   options: Record<string, string>[];
   selectedOptions: string[];
   onChange: (selectedOptions: string[]) => void;
   isEditing: boolean;
   weekStartTimestamp: number;
+  soups?: string[];
 }) {
   const isBigScreen = useMediaQuery({ query: createBreakpoint("lg") });
 
@@ -52,6 +54,15 @@ export default function OrderForm({
           <h1 className="text-center font-bold" key={dayIndex}>
             {days[dayIndex]} ({weekDates[dayIndex]})
           </h1>,
+          soups ? (
+            <div
+              className="flex overflow-auto items-center justify-center rounded-lg bg-gray-600 px-3 py-2 text-center text-sm text-gray-200 shadow-md"
+              key={`soup-${days[dayIndex]}`}
+              aria-hidden
+            >
+              {(soups[dayIndex] ?? "").trim() || "⎯⎯⎯"}
+            </div>
+          ) : null,
           ...Object.entries(day).map(([id, option]) =>
             !option ? (
               <div

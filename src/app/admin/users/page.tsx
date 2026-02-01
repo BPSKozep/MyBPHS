@@ -10,7 +10,9 @@ export default function Users() {
   return (
     <OnlyRoles roles={["administrator"]}>
       <PageWithHeader title="Admin / Felhasználók" homeLocation="/admin">
-        <UsersDataManager />
+        <div className="px-10">
+          <UsersDataManager />
+        </div>
       </PageWithHeader>
     </OnlyRoles>
   );

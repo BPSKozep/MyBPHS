@@ -4,12 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import {
-  FaBell,
-  FaEnvelope,
-  FaIdCard,
-  FaRightFromBracket,
-} from "react-icons/fa6";
+import { FaEnvelope, FaIdCard, FaRightFromBracket } from "react-icons/fa6";
 import PWAInstall from "@/components/PWAInstall";
 import {
   Sheet,
@@ -185,9 +180,6 @@ export default function MainHeader() {
               <div className="mt-auto">
                 <div className="rounded-xl bg-blue-600/20 p-4 backdrop-blur-sm border border-blue-500/30">
                   <div className="flex items-center space-x-2 mb-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/30">
-                      <FaBell className="text-blue-400" />
-                    </div>
                     <h3 className="text-sm font-semibold text-white">
                       Dev Tools
                     </h3>

@@ -27,7 +27,6 @@ export default function Orders() {
 
   const [year, setYear] = useState<number>(getWeekYear(nextWeek));
   const [week, setWeek] = useState<number>(getWeek(nextWeek));
-  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const {
     data: orderCounts,
     isLoading: isOrderCountsLoading,
@@ -38,9 +37,9 @@ export default function Orders() {
       week,
     },
     {
-      refetchInterval: autoRefreshEnabled ? 3000 : false,
+      refetchInterval: 3000,
       refetchIntervalInBackground: false,
-      refetchOnWindowFocus: autoRefreshEnabled,
+      refetchOnWindowFocus: true,
       staleTime: 0,
     },
   );
@@ -55,9 +54,9 @@ export default function Orders() {
       week,
     },
     {
-      refetchInterval: autoRefreshEnabled ? 3000 : false,
+      refetchInterval: 3000,
       refetchIntervalInBackground: false,
-      refetchOnWindowFocus: autoRefreshEnabled,
+      refetchOnWindowFocus: true,
       staleTime: 0,
     },
   );
@@ -92,22 +91,6 @@ export default function Orders() {
               setWeek(Number(e.target.value));
             }}
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setAutoRefreshEnabled(!autoRefreshEnabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none ${
-              autoRefreshEnabled ? "bg-green-600" : "bg-gray-600"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                autoRefreshEnabled ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-          <span className="text-sm text-gray-300">Automatikus frissítés</span>
         </div>
       </div>
       <div className="">
