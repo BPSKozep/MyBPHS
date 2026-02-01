@@ -55,15 +55,15 @@ export default function SetMenuAndSendEmail() {
 
     await sendEmail.mutateAsync();
 
-    // await sendSlackWebhook.mutateAsync({
-    //   title: "Új menü feltöltve, email kiküldve. 📩",
-    //   body:
-    //     "Címzettek:\n" +
-    //     env.NEXT_PUBLIC_TO_EMAILS?.split(",")
-    //       .map((email) => email.trim())
-    //       .filter(Boolean)
-    //       .join("\n"),
-    // });
+    await sendSlackWebhook.mutateAsync({
+      title: "Új menü feltöltve, email kiküldve. 📩",
+      body:
+        "Címzettek:\n" +
+        env.NEXT_PUBLIC_TO_EMAILS?.split(",")
+          .map((email) => email.trim())
+          .filter(Boolean)
+          .join("\n"),
+    });
   };
 
   const handleForceSendEmail = async () => {
