@@ -18,19 +18,42 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      googleImage?: string;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
   }
 }
 
+declare module "next-auth/jwt" {
+  interface JWT {
+    googleImage?: string;
+  }
+}
+
+// Google profile type for type-safe access to picture
+interface GoogleProfile {
+  picture?: string;
+  email?: string;
+  name?: string;
+}
+
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    jwt: ({ token, profile }) => {
+      // Capture Google profile picture URL during sign-in
+      const googleProfile = profile as GoogleProfile | undefined;
+      if (googleProfile?.picture) {
+        token.googleImage = googleProfile.picture;
+      }
+      return token;
+    },
     session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
         id: token.sub,
+        googleImage: token.googleImage,
       },
     }),
     async signIn({ profile }) {
