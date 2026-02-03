@@ -95,15 +95,13 @@ export default function MainHeader() {
           >
             <SheetHeader>
               <SheetTitle className="text-2xl font-bold text-white">
-                Felhasználói profil
+                Profil
               </SheetTitle>
-              <SheetDescription className="text-gray-400">
-                Itt megtekintheted a saját információidat vagy kijelentkezhetsz.
-              </SheetDescription>
+              <SheetDescription />
             </SheetHeader>
 
             {/* Main Content Area */}
-            <div className="flex flex-1 flex-col">
+            <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-4 [scrollbar-width:thin] [scrollbar-color:#4b5563_transparent]">
               {/* Profile Header */}
               <div className="mt-6 flex flex-col items-center space-y-4">
                 <div className="relative">
@@ -182,7 +180,7 @@ export default function MainHeader() {
 
             {/* Development Test Section */}
             {process.env.NODE_ENV === "development" && (
-              <div className="mt-auto">
+              <div>
                 <div className="rounded-xl bg-blue-600/20 p-4 backdrop-blur-sm border border-blue-500/30">
                   <div className="flex items-center space-x-2 mb-3">
                     <h3 className="text-sm font-semibold text-white">
@@ -220,7 +218,7 @@ export default function MainHeader() {
             )}
 
             {/* Footer */}
-            <div className="mt-auto mb-4 flex flex-col items-center justify-center space-y-2 rounded-xl bg-slate-700/50 p-4 text-center backdrop-blur-sm">
+            <div className="mb-4 flex flex-col items-center justify-center space-y-2 rounded-xl bg-slate-700/50 p-4 text-center backdrop-blur-sm">
               <h1 className="text-2xl font-bold text-white">
                 <span className="font-handwriting text-amber-400">My</span>
                 <span className="font-black">BPHS</span>
