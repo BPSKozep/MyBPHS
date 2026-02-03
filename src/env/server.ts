@@ -70,6 +70,26 @@ export const env = createEnv({
     GOOGLE_ID: z.string(),
     GOOGLE_SECRET: z.string(),
     PING_SECRET: z.string(),
+    S3_ENDPOINT:
+      process.env.NODE_ENV === "production"
+        ? z.string()
+        : z.string().optional(),
+    S3_ACCESS_KEY_ID:
+      process.env.NODE_ENV === "production"
+        ? z.string()
+        : z.string().optional(),
+    S3_SECRET_ACCESS_KEY:
+      process.env.NODE_ENV === "production"
+        ? z.string()
+        : z.string().optional(),
+    S3_BUCKET_NAME:
+      process.env.NODE_ENV === "production"
+        ? z.string()
+        : z.string().optional(),
+    S3_REGION:
+      process.env.NODE_ENV === "production"
+        ? z.string()
+        : z.string().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),

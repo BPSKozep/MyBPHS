@@ -7,6 +7,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Providers from "@/app/providers";
 import IdentifyUser from "@/components/auth/IdentifyUser";
+import ProfilePictureSync from "@/components/auth/ProfilePictureSync";
 import MainHeader from "@/components/MainHeader";
 import PageTransition from "@/components/PageTransition";
 import { getServerAuthSession } from "@/server/auth";
@@ -63,10 +64,12 @@ export default async function RootLayout({
         )}
         <Providers>
           <IdentifyUser>
-            <div className="box-border flex h-screen w-full flex-col">
-              <MainHeader />
-              <PageTransition>{children}</PageTransition>
-            </div>
+            <ProfilePictureSync>
+              <div className="box-border flex h-screen w-full flex-col">
+                <MainHeader />
+                <PageTransition>{children}</PageTransition>
+              </div>
+            </ProfilePictureSync>
           </IdentifyUser>
         </Providers>
       </body>

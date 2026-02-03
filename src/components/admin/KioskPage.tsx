@@ -11,12 +11,14 @@ import PageWithHeader from "@/components/PageWithHeader";
 import { api } from "@/trpc/react";
 import { useKioskErrorLogger } from "@/utils/useKioskErrorLogger";
 
+const DEFAULT_PROFILE_IMAGE = "https://cdn.bphs.hu/no_picture.png";
+
 export default function KioskPage() {
   const [nfcId, setNfcId] = useState("");
   const [primarySocketFailed, setPrimarySocketFailed] = useState(false);
   const [socketConnected, setSocketConnected] = useState(false);
   const devTags = ["8b2a1345", "4bf41145", "00000000"];
-  const [profileImageURL] = useState("https://cdn.bphs.hu/no_picture.png");
+  const [profileImageURL, setProfileImageURL] = useState(DEFAULT_PROFILE_IMAGE);
 
   const { logError } = useKioskErrorLogger();
 
@@ -205,9 +207,24 @@ export default function KioskPage() {
     profileImageURL,
   ]);
 
-  // useEffect(() => {
-  //   if (user?.email) setProfileImageURL(`https://cdn.bphs.hu/${user?.email}`);
-  // }, [user]);
+  // Fetch profile picture from S3 when user is loaded
+  const { data: profilePictureData } = api.profilePicture.getUrl.useQuery(
+    { email: user?.email ?? undefined },
+    {
+      enabled: !!user?.email,
+      staleTime: Infinity,
+      gcTime: 0,
+    },
+  );
+
+  // Update profile image URL when data changes
+  useEffect(() => {
+    if (profilePictureData?.exists && profilePictureData.url) {
+      setProfileImageURL(profilePictureData.url);
+    } else {
+      setProfileImageURL(DEFAULT_PROFILE_IMAGE);
+    }
+  }, [profilePictureData]);
 
   const orderCounts = useMemo(() => {
     if (!kioskCounts) return {};
@@ -342,10 +359,11 @@ export default function KioskPage() {
                 className="m-10 aspect-square rounded-full object-cover object-[50%_20%]"
                 height={200}
                 width={200}
-                // onError={() => {
-                //   if (!profileImageURL.includes("no_picture.png"))
-                //     setProfileImageURL("https://cdn.bphs.hu/no_picture.png");
-                // }}
+                onError={() => {
+                  if (profileImageURL !== DEFAULT_PROFILE_IMAGE) {
+                    setProfileImageURL(DEFAULT_PROFILE_IMAGE);
+                  }
+                }}
               />
 
               <h1 className="text-bold text-7xl">{user?.name}</h1>

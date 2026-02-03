@@ -51,6 +51,8 @@ export function useKioskErrorLogger() {
 
   const logError = useCallback(
     async (errorDetails: KioskErrorDetails) => {
+      if (process.env.NODE_ENV === "development") return;
+
       const { error, context, errorType } = errorDetails;
 
       // Extract error information

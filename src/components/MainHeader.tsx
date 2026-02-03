@@ -4,7 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import { FaEnvelope, FaIdCard, FaRightFromBracket } from "react-icons/fa6";
+import {
+  FaEnvelope,
+  FaGithub,
+  FaIdCard,
+  FaRightFromBracket,
+} from "react-icons/fa6";
 import PWAInstall from "@/components/PWAInstall";
 import {
   Sheet,
@@ -214,14 +219,38 @@ export default function MainHeader() {
               </div>
             )}
 
+            {/* Footer */}
+            <div className="mt-auto mb-4 flex flex-col items-center justify-center space-y-2 rounded-xl bg-slate-700/50 p-4 text-center backdrop-blur-sm">
+              <h1 className="text-2xl font-bold text-white">
+                <span className="font-handwriting text-amber-400">My</span>
+                <span className="font-black">BPHS</span>
+              </h1>
+
+              <p className="text-sm text-gray-400">
+                <Link
+                  href="mailto:support@bphs.hu"
+                  className="transition-colors hover:text-white"
+                >
+                  support@bphs.hu
+                </Link>
+              </p>
+              <div className="flex items-center space-x-2">
+                <p className="text-[10px] text-gray-400">
+                  Build: {process.env.NEXT_PUBLIC_BUILD_DATE ?? "Unknown"}
+                </p>
+                <Link
+                  href="https://github.com/BPSKozep/MyBPHS"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 transition-colors hover:text-white"
+                >
+                  <FaGithub size={20} />
+                </Link>
+              </div>
+            </div>
+
             {/* Sign Out Button - Fixed at bottom */}
-            <div
-              className={
-                process.env.NODE_ENV === "development"
-                  ? "mt-4 mb-6"
-                  : "mt-auto mb-6"
-              }
-            >
+            <div className="mb-6 mt-2">
               <button
                 className="w-full cursor-pointer rounded-xl bg-red-600/20 p-4 text-white transition-all duration-200 hover:bg-red-600/30 focus:ring-2 focus:ring-red-500/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 type="button"
