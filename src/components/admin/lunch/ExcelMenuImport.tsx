@@ -26,6 +26,7 @@ type ParsedWeekMenu = {
 
 const DAY_NAMES = ["HÉTFŐ", "KEDD", "SZERDA", "CSÜTÖRTÖK", "PÉNTEK"];
 const DAY_NAMES_DISPLAY = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
+const DAY_INITIALS = ["H", "K", "Sz", "Cs", "P"];
 
 function parseExcelMenu(workbook: XLSX.WorkBook): ParsedWeekMenu | null {
   const firstSheetName = workbook.SheetNames[0];
@@ -198,6 +199,13 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [enabledDays, setEnabledDays] = useState<boolean[]>([
+    true,
+    true,
+    true,
+    true,
+    true,
+  ]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleOpenExcelDialog = () => {
@@ -206,6 +214,7 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
     setEditableParsedMenu(null);
     setParseError(null);
     setSendError(null);
+    setEnabledDays([true, true, true, true, true]);
   };
 
   const handleFileUpload = async (
@@ -223,14 +232,12 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
       const parsed = parseExcelMenu(workbook);
 
       if (!parsed) {
-        setParseError(
-          "Nem sikerült feldolgozni az Excel fájlt. Ellenőrizd, hogy a megfelelő formátumú fájlt töltötted fel.",
-        );
+        setParseError("Nem sikerült feldolgozni az Excel fájlt.");
         return;
       }
 
       if (parsed.days.length !== 5) {
-        setParseError("Nem található mind az 5 nap az Excel fájlban.");
+        setParseError("Nem található mind az 5 nap.");
         return;
       }
 
@@ -266,19 +273,53 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
     });
   };
 
+  const handleToggleDay = (dayIndex: number) => {
+    setEnabledDays((prev) => {
+      const newEnabledDays = [...prev];
+      newEnabledDays[dayIndex] = !newEnabledDays[dayIndex];
+      return newEnabledDays;
+    });
+  };
+
   const handleApplyParsedMenu = () => {
     if (!editableParsedMenu) return;
     setExcelStep("confirm");
   };
 
+  const handleCreateEmptyMenu = () => {
+    const emptyMenu: ParsedWeekMenu = {
+      dateRange: "",
+      days: Array(5)
+        .fill(null)
+        .map(() => ({
+          soup: "",
+          aMenu: "",
+          bMenu: "",
+        })),
+    };
+    setEditableParsedMenu(emptyMenu);
+    setExcelStep("preview");
+  };
+
   const handleConfirmAndSend = async () => {
     if (!editableParsedMenu) return;
 
-    const newOptions: MenuOption[] = editableParsedMenu.days.map((day) => ({
-      soup: day.soup,
-      "a-menu": day.aMenu,
-      "b-menu": day.bMenu,
-    }));
+    const newOptions: MenuOption[] = editableParsedMenu.days.map(
+      (day, index) => {
+        if (!enabledDays[index]) {
+          return {
+            soup: "",
+            "a-menu": "",
+            "b-menu": "",
+          };
+        }
+        return {
+          soup: day.soup,
+          "a-menu": day.aMenu,
+          "b-menu": day.bMenu,
+        };
+      },
+    );
 
     setSendError(null);
     setIsSending(true);
@@ -312,20 +353,20 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto border-gray-600 bg-[#2e2e2e]">
           <DialogHeader>
             <DialogTitle className="text-white">
-              {excelStep === "upload" && "Excel Importálás"}
+              {excelStep === "upload" && "Menü létrehozás"}
               {excelStep === "preview" && "Előnézet"}
               {excelStep === "confirm" && "Megerősítés"}
             </DialogTitle>
             <DialogDescription className="text-gray-300">
               {excelStep === "upload" &&
-                "Töltsd fel az étlap Excel fájlt a menü automatikus kitöltéséhez."}
+                "Töltsd fel az étlap Excel fájlt vagy hozz létre egy üres menüt."}
               {excelStep === "preview" &&
-                "Ellenőrizd és szükség esetén módosítsd a beolvasott menüt."}
+                "Ellenőrizd és szükség esetén módosítsd a menüt."}
             </DialogDescription>
           </DialogHeader>
 
           {excelStep === "upload" && (
-            <div className="flex flex-col items-center gap-4 py-8">
+            <div className="relative flex flex-col items-center gap-4 pt-8">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -342,9 +383,7 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                 <span className="text-lg font-medium text-white">
                   {isProcessing ? "Feldolgozás..." : "Kattints a feltöltéshez"}
                 </span>
-                <span className="text-sm text-gray-400">
-                  .xlsx vagy .xls fájl
-                </span>
+                <span className="text-sm text-gray-400">.xlsx / .xls</span>
               </label>
 
               {parseError && (
@@ -352,6 +391,17 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                   {parseError}
                 </div>
               )}
+
+              <div className="">
+                <Button
+                  type="button"
+                  onClick={handleCreateEmptyMenu}
+                  variant="outline"
+                  className="border-gray-500 bg-transparent text-white hover:bg-gray-700 hover:text-white hover:cursor-pointer"
+                >
+                  Üres menü létrehozása
+                </Button>
+              </div>
             </div>
           )}
 
@@ -363,11 +413,34 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                 </div>
               )}
 
+              <div className="flex items-center justify-center gap-4">
+                {DAY_INITIALS.map((initial, index) => (
+                  <label
+                    key={DAY_NAMES_DISPLAY[index]}
+                    className="flex flex-col items-center gap-1 cursor-pointer"
+                  >
+                    <span className="text-xs text-gray-400 font-medium">
+                      {initial}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={enabledDays[index]}
+                      onChange={() => handleToggleDay(index)}
+                      className="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-2 focus:ring-green-500 focus:ring-offset-0 cursor-pointer"
+                    />
+                  </label>
+                ))}
+              </div>
+
               <div className="grid gap-4">
                 {editableParsedMenu.days.map((day, index) => (
                   <div
                     key={DAY_NAMES_DISPLAY[index]}
-                    className="rounded-lg bg-gray-700/50 p-4"
+                    className={`rounded-lg p-4 transition-opacity ${
+                      enabledDays[index]
+                        ? "bg-gray-700/50"
+                        : "bg-gray-700/20 opacity-50"
+                    }`}
                   >
                     <h3 className="mb-3 text-lg font-bold text-white">
                       {DAY_NAMES_DISPLAY[index]}
@@ -382,11 +455,12 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                         </label>
                         <textarea
                           id={`soup-${index}`}
-                          value={day.soup}
+                          value={enabledDays[index] ? day.soup : ""}
                           onChange={(e) =>
                             handleEditParsedMenu(index, "soup", e.target.value)
                           }
-                          className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400"
+                          disabled={!enabledDays[index]}
+                          className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
                           placeholder="Leves"
                           rows={1}
                         />
@@ -401,7 +475,7 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                           </label>
                           <textarea
                             id={`amenu-${index}`}
-                            value={day.aMenu}
+                            value={enabledDays[index] ? day.aMenu : ""}
                             onChange={(e) =>
                               handleEditParsedMenu(
                                 index,
@@ -409,7 +483,8 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                                 e.target.value,
                               )
                             }
-                            className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400"
+                            disabled={!enabledDays[index]}
+                            className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
                             placeholder="A Menü"
                             rows={2}
                           />
@@ -423,7 +498,7 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                           </label>
                           <textarea
                             id={`bmenu-${index}`}
-                            value={day.bMenu}
+                            value={enabledDays[index] ? day.bMenu : ""}
                             onChange={(e) =>
                               handleEditParsedMenu(
                                 index,
@@ -431,7 +506,8 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                                 e.target.value,
                               )
                             }
-                            className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400"
+                            disabled={!enabledDays[index]}
+                            className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
                             placeholder="B Menü"
                             rows={2}
                           />
@@ -470,22 +546,34 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                   {editableParsedMenu.days.map((day, index) => (
                     <div
                       key={DAY_NAMES_DISPLAY[index]}
-                      className="flex items-start gap-2 border-b border-gray-600 pb-2 last:border-0"
+                      className={`flex items-start gap-2 border-b border-gray-600 pb-2 last:border-0 ${
+                        !enabledDays[index] ? "opacity-50" : ""
+                      }`}
                     >
                       <span className="w-20 shrink-0 font-medium text-gray-300">
                         {DAY_NAMES_DISPLAY[index]}:
                       </span>
                       <div className="text-gray-200">
-                        {day.soup ? (
+                        {!enabledDays[index] ? (
+                          <span className="italic text-gray-400">
+                            Nincs menü
+                          </span>
+                        ) : (
                           <>
-                            <span className="text-amber-400">Leves:</span>{" "}
-                            {day.soup}
+                            {day.soup ? (
+                              <>
+                                <span className="text-amber-400">Leves:</span>{" "}
+                                {day.soup}
+                                <span className="mx-2 text-gray-500">|</span>
+                              </>
+                            ) : null}
+                            <span className="text-green-400">A:</span>{" "}
+                            {day.aMenu}
                             <span className="mx-2 text-gray-500">|</span>
+                            <span className="text-blue-400">B:</span>{" "}
+                            {day.bMenu}
                           </>
-                        ) : null}
-                        <span className="text-green-400">A:</span> {day.aMenu}
-                        <span className="mx-2 text-gray-500">|</span>
-                        <span className="text-blue-400">B:</span> {day.bMenu}
+                        )}
                       </div>
                     </div>
                   ))}
