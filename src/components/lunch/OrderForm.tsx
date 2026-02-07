@@ -49,67 +49,78 @@ export default function OrderForm({
     >
       {wrapConditional(
         transpose2DArray,
-        options.map((day, dayIndex) => [
-          // biome-ignore lint/suspicious/noArrayIndexKey: no index
-          <h1 className="text-center font-bold" key={dayIndex}>
-            {days[dayIndex]} ({weekDates[dayIndex]})
-          </h1>,
-          soups ? (
-            <div
-              className="flex overflow-auto items-center justify-center rounded-lg bg-gray-600 px-3 py-2 text-center text-sm text-gray-200 shadow-md"
-              key={`soup-${days[dayIndex]}`}
-              aria-hidden
-            >
-              {(soups[dayIndex] ?? "").trim() || "⎯⎯⎯"}
-            </div>
-          ) : null,
-          ...Object.entries(day).map(([id, option]) =>
-            !option ? (
-              <div
-                className="hidden lg:block"
-                key={`option-${dayIndex + id}`}
-              ></div>
-            ) : (
-              <button
-                type="button"
-                className={`overflow-auto rounded-lg ${
-                  selectedOptions[dayIndex] === id
-                    ? "bg-[#5d9a84] font-bold shadow-lg"
-                    : "bg-[#565e85] shadow-md"
-                } px-3 py-2 shadow-md ${isEditing ? "cursor-pointer" : ""}`}
-                onClick={() => {
-                  const newOptions = [...selectedOptions];
-
-                  newOptions[dayIndex] = id;
-
-                  onChange(newOptions);
-                }}
-                key={`option-${dayIndex + id}`}
-              >
-                {option}
-              </button>
-            ),
-          ),
-          <button
-            type="button"
-            className={`overflow-auto rounded-lg ${
-              selectedOptions[dayIndex] === "i_am_not_want_food"
-                ? "bg-[#7c4242] font-bold shadow-lg"
-                : "bg-[#9a5d5d] shadow-md"
-            } px-3 py-2`}
-            onClick={() => {
-              const newOptions = [...selectedOptions];
-
-              newOptions[dayIndex] = "i_am_not_want_food";
-
-              onChange(newOptions);
-            }}
+        options.map((day, dayIndex) => {
+          const soupValue = soups?.[dayIndex] ?? "";
+          const hasSoup = soupValue.trim() !== "";
+          return [
             // biome-ignore lint/suspicious/noArrayIndexKey: no index
-            key={`no-order-${dayIndex}`}
-          >
-            Nem kérek ebédet
-          </button>,
-        ]),
+            <h1 className="text-center font-bold" key={dayIndex}>
+              {days[dayIndex]} ({weekDates[dayIndex]})
+            </h1>,
+            soups ? (
+              !hasSoup ? (
+                <div
+                  className="hidden lg:block"
+                  key={`soup-${days[dayIndex]}`}
+                ></div>
+              ) : (
+                <div
+                  className="flex overflow-auto items-center justify-center rounded-lg bg-gray-600 px-3 py-2 text-center text-sm text-gray-200 shadow-md"
+                  key={`soup-${days[dayIndex]}`}
+                  aria-hidden
+                >
+                  {soupValue}
+                </div>
+              )
+            ) : null,
+            ...Object.entries(day).map(([id, option]) =>
+              !option ? (
+                <div
+                  className="hidden lg:block"
+                  key={`option-${dayIndex + id}`}
+                ></div>
+              ) : (
+                <button
+                  type="button"
+                  className={`overflow-auto rounded-lg ${
+                    selectedOptions[dayIndex] === id
+                      ? "bg-[#5d9a84] font-bold shadow-lg"
+                      : "bg-[#565e85] shadow-md"
+                  } px-3 py-2 shadow-md ${isEditing ? "cursor-pointer" : ""}`}
+                  onClick={() => {
+                    const newOptions = [...selectedOptions];
+
+                    newOptions[dayIndex] = id;
+
+                    onChange(newOptions);
+                  }}
+                  key={`option-${dayIndex + id}`}
+                >
+                  {option}
+                </button>
+              ),
+            ),
+            <button
+              type="button"
+              className={`overflow-auto rounded-lg ${
+                selectedOptions[dayIndex] === "i_am_not_want_food"
+                  ? "bg-[#7c4242] font-bold shadow-lg"
+                  : "bg-[#9a5d5d] shadow-md"
+              } px-3 py-2`}
+              onClick={() => {
+                const newOptions = [...selectedOptions];
+
+                newOptions[dayIndex] = "i_am_not_want_food";
+
+                onChange(newOptions);
+              }}
+              // biome-ignore lint/suspicious/noArrayIndexKey: no index
+              key={`no-order-${dayIndex}`}
+            >
+              Nem kérek ebédet
+            </button>,
+          ];
+        }),
         isBigScreen,
       )}
     </div>
