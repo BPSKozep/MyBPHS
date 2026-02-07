@@ -49,9 +49,7 @@ export const emailRouter = createTRPCRouter({
       z.object({
         emailFormat: z.enum(["general", "update", "important"]),
         emailTo: z.union([
-          z
-            .string()
-            .email(), // Single email for user emails
+          z.string().email(), // Single email for user emails
           z.enum([
             // Group emails
             "bphs-sysadmins@budapest.school",
