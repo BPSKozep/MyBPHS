@@ -46,7 +46,7 @@
     "nanoid": "^5.1.6",
     "next": "16.1.6",
     "next-auth": "^4.24.13",
-    "posthog-js": "^1.342.1",
+    "posthog-js": "^1.343.0",
     "prettier": "^3.8.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
