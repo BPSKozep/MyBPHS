@@ -490,7 +490,7 @@ export const orderRouter = createTRPCRouter({
 
       return result;
     }),
-  getOrderDocumentCount: protectedProcedure
+  getOrderCount: protectedProcedure
     .input(z.strictObject({ year: z.number(), week: z.number() }))
     .output(z.number())
     .query(async ({ ctx, input }) => {

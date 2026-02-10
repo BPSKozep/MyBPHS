@@ -16,7 +16,7 @@ export default function CloseMenuOrders() {
   const year = getWeekYear(date);
 
   const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
-  const orderDocCount = api.order.getOrderDocumentCount.useQuery({
+  const orderDocCount = api.order.getOrderCount.useQuery({
     year,
     week,
   });
