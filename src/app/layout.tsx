@@ -13,6 +13,7 @@ import PageTransition from "@/components/PageTransition";
 import { getServerAuthSession } from "@/server/auth";
 
 const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
   applicationName: "MyBPHS",
   title: {
     default: "MyBPHS",
