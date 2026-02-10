@@ -36,10 +36,7 @@ export default function MainHeader() {
     enabled: !!data?.user?.email,
   });
 
-  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
-
   const [signOutLoading, setSignOutLoading] = useState(false);
-  const [testWebhookLoading, setTestWebhookLoading] = useState(false);
 
   const userInitial = data?.user?.name?.charAt(0)?.toUpperCase() ?? "U";
 
@@ -103,7 +100,7 @@ export default function MainHeader() {
             {/* Main Content Area */}
             <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-4 [scrollbar-width:thin] [scrollbar-color:#4b5563_transparent]">
               {/* Profile Header */}
-              <div className="mt-6 flex flex-col items-center space-y-4">
+              <div className="mt-2 flex flex-col items-center space-y-2">
                 <div className="relative">
                   {data?.user?.image && !imageError ? (
                     <Image
@@ -124,12 +121,12 @@ export default function MainHeader() {
                 </div>
                 <div className="text-center">
                   <h3 className="text-xl font-semibold text-white">
-                    {data?.user?.name ?? "Névtelen felhasználó"}
+                    {data?.user?.name ?? "-"}
                   </h3>
                 </div>
                 {userDetails.data?.roles &&
                   userDetails.data.roles.length > 0 && (
-                    <div className="mt-1 text-xs font-medium text-gray-400">
+                    <div className="text-xs font-medium text-gray-400">
                       {userDetails.data.roles
                         .map(
                           (role) =>
@@ -141,7 +138,7 @@ export default function MainHeader() {
               </div>
 
               {/* User Details */}
-              <div className="mt-8 space-y-4">
+              <div className="mt-4 space-y-4">
                 {/* Email Section */}
                 <div className="rounded-xl bg-slate-700/50 p-4 backdrop-blur-sm">
                   <div className="flex items-center space-x-3">
@@ -177,45 +174,6 @@ export default function MainHeader() {
                 </div>
               </div>
             </div>
-
-            {/* Development Test Section */}
-            {process.env.NODE_ENV === "development" && (
-              <div>
-                <div className="rounded-xl bg-blue-600/20 p-4 backdrop-blur-sm border border-blue-500/30">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <h3 className="text-sm font-semibold text-white">
-                      Dev Tools
-                    </h3>
-                  </div>
-                  <button
-                    className="w-full cursor-pointer rounded-lg bg-blue-600/30 p-3 text-sm text-white transition-all duration-200 hover:bg-blue-600/40 focus:ring-2 focus:ring-blue-500/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    type="button"
-                    onClick={async () => {
-                      setTestWebhookLoading(true);
-                      try {
-                        await sendSlackWebhook.mutateAsync({
-                          title: "Test Webhook",
-                          body: `Teszt üzenet küldve: ${new Date().toLocaleString("hu-HU")}`,
-                        });
-                      } catch (error) {
-                        console.error("Failed to send test webhook:", error);
-                      } finally {
-                        setTestWebhookLoading(false);
-                      }
-                    }}
-                    disabled={testWebhookLoading}
-                  >
-                    {testWebhookLoading ? (
-                      <div className="flex items-center justify-center">
-                        <SmallLoading />
-                      </div>
-                    ) : (
-                      "Teszt Webhook Küldése"
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Footer */}
             <div className="mb-4 flex flex-col items-center justify-center space-y-2 rounded-xl bg-slate-700/50 p-4 text-center backdrop-blur-sm">
