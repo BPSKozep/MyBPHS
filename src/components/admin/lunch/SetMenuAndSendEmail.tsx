@@ -18,7 +18,7 @@ import { api } from "@/trpc/react";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
 import sleep from "@/utils/sleep";
 
-const testing = true; // Disable email and slack webhook
+const testing = false; // Disable email and slack webhook
 
 export default function SetMenuAndSendEmail() {
   const [showResendConfirmDialog, setShowResendConfirmDialog] = useState(false);
