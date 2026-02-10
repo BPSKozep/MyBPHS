@@ -38,6 +38,7 @@
     "@trpc/tanstack-react-query": "^11.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "docx": "^9.5.1",
     "generate-password": "^1.7.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.563.0",

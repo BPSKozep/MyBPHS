@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Fragment, useMemo, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import WordOrdersExport from "@/components/admin/lunch/WordOrdersExport";
 import Loading from "@/components/Loading";
 import { api } from "@/trpc/react";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
@@ -83,7 +84,6 @@ export default function Orders() {
   return (
     <>
       <div className="mb-5 flex flex-col items-center justify-center gap-4 md:flex-row">
-        <h1 className="text-center font-bold text-white">Leadott rendelések</h1>
         <div className="flex flex-col items-center gap-2">
           <input
             type="number"
@@ -253,6 +253,12 @@ export default function Orders() {
                 </motion.div>
               )}
             </AnimatePresence>
+          </div>
+        )}
+
+        {menu && menu.options.length > 0 && (
+          <div className="my-4 flex justify-center">
+            <WordOrdersExport year={year} week={week} />
           </div>
         )}
       </div>
