@@ -63,7 +63,7 @@
     "tailwind-merge": "^3.4.0",
     "use-debounce": "^10.1.0",
     "xlsx": "^0.18.5",
-    "zod": "^3.25.76"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.14",
