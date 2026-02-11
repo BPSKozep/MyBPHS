@@ -67,21 +67,25 @@ export default function WordOrdersExport({
   const [headcounts, setHeadcounts] = useState<number[]>([50, 50, 50, 50, 50]);
   const [exportError, setExportError] = useState<string | null>(null);
 
-  const { data: orderCounts } = api.order.getOrderCounts.useQuery(
-    { year, week },
-    { staleTime: 0 },
-  );
+  const { data: orderCounts } = api.order.getOrderCounts.useQuery({
+    year,
+    week,
+  });
 
-  const { data: menu } = api.menu.get.useQuery(
-    { year, week },
-    { staleTime: 0 },
-  );
+  const { data: orderDocCount } = api.order.getOrderCount.useQuery({
+    year,
+    week,
+  });
+
+  const { data: menu } = api.menu.get.useQuery({ year, week });
 
   const { data: userList } = api.user.list.useQuery("all");
 
   const setIsOpen = api.menu.setIsopen.useMutation();
 
   const defaultHeadcount = userList?.length ?? 80;
+
+  const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
   const handleOpen = () => {
     setShowDialog(true);
@@ -312,6 +316,13 @@ export default function WordOrdersExport({
         week,
         year,
         isOpen: false,
+      });
+
+      const totalOrders = orderDocCount ?? 0;
+
+      await sendSlackWebhook.mutateAsync({
+        title: `Beküldések lezárva a(z) ${week}. hétre ❌`,
+        body: `Összes leadott rendelés: ${String(totalOrders)}`,
       });
 
       setStep("done");
