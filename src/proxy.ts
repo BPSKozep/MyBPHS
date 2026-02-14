@@ -5,7 +5,7 @@ const AUTH_WHITELIST = [
   "/auth",
   "/forbidden",
   "/onboarding",
-  "/auth",
+  "/public",
   "/robots.txt",
   "/sitemap.xml",
   "/relay-cgHT",
