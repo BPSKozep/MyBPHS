@@ -315,8 +315,8 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
         }
         return {
           soup: day.soup,
-          "a-menu": day.aMenu,
-          "b-menu": day.bMenu,
+          "a-menu": day.aMenu ? `A | ${day.aMenu}` : "",
+          "b-menu": day.bMenu ? `B | ${day.bMenu}` : "",
         };
       },
     );
