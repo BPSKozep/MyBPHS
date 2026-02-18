@@ -19,7 +19,7 @@ export default function Lunch() {
       <Preview>Az ebédrendelés már elérhető a következő hétre!</Preview>
       <Tailwind>
         <Body className="bg-gray-900 font-sans">
-          <Container className="mt-16 bg-slate-800 p-8">
+          <Container className="my-16 bg-slate-800 p-8 rounded-lg">
             <Section className="">
               <Img
                 src="https://cdn.bphs.hu/mybphs-logo.png"
@@ -49,8 +49,9 @@ export default function Lunch() {
               </Text>
               <Hr />
               <Text className="text-xs leading-4 text-slate-400">
-                Budapest School Általános Iskola és Gimnázium, Budapest, II.
-                János Pál pápa tér 25.
+                Budapest School Általános Iskola és Gimnázium
+                <br />
+                Budapest, II. János Pál pápa tér 25, 1081
               </Text>
             </Section>
           </Container>
