@@ -20,7 +20,7 @@ import sleep from "@/utils/sleep";
 
 const testing = false; // Disable email and slack webhook
 
-export default function SetMenuAndSendEmail() {
+export default function CreateMenu() {
   const [showResendConfirmDialog, setShowResendConfirmDialog] = useState(false);
 
   const createMenu = api.menu.create.useMutation();

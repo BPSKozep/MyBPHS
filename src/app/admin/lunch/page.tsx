@@ -1,6 +1,6 @@
 import CloseMenuOrders from "@/components/admin/lunch/CloseMenuOrders";
+import CreateMenu from "@/components/admin/lunch/CreateMenu";
 import LunchOrders from "@/components/admin/lunch/LunchOrders";
-import SetMenuAndSendEmail from "@/components/admin/lunch/SetMenuAndSendEmail";
 import TokenCheck from "@/components/admin/lunch/TokenCheck";
 import OnlyRoles from "@/components/auth/OnlyRoles";
 import Card from "@/components/Card";
@@ -17,7 +17,7 @@ export default function LunchAdmin() {
         <div className="flex w-full max-w-full min-w-0 flex-col justify-center gap-5 md:flex-row px-10">
           <div className="min-w-0 flex-1">
             <Card>
-              <SetMenuAndSendEmail />
+              <CreateMenu />
             </Card>
           </div>
           <div className="min-w-0 flex-1">
