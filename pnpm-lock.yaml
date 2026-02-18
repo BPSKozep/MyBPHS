@@ -124,8 +124,8 @@ importers:
         specifier: ^4.24.13
         version: 4.24.13(next@16.1.6(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(nodemailer@7.0.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       posthog-js:
-        specifier: ^1.343.0
-        version: 1.343.0
+        specifier: ^1.347.2
+        version: 1.347.2
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
@@ -197,8 +197,8 @@ importers:
         specifier: ^17.3.0
         version: 17.3.0
       lefthook:
-        specifier: ^2.1.0
-        version: 2.1.0
+        specifier: ^2.1.1
+        version: 2.1.1
       postcss:
         specifier: ^8.5.6
         version: 8.5.6
@@ -798,8 +798,8 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
-  '@opentelemetry/core@2.5.0':
-    resolution: {integrity: sha512-ka4H8OM6+DlUhSAZpONu0cPBtPPTQKxbxVzC4CzVx5+K4JnroJVBtDzLAMx4/3CDTJXRvVFhpFjtl4SaiTNoyQ==}
+  '@opentelemetry/core@2.5.1':
+    resolution: {integrity: sha512-Dwlc+3HAZqpgTYq0MUyZABjFkcrKTePwuiFVLjahGD8cx3enqihmpAmdgNFO1R4m/sIe5afjJrA25Prqy4NXlA==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
@@ -828,8 +828,8 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
-  '@opentelemetry/resources@2.5.0':
-    resolution: {integrity: sha512-F8W52ApePshpoSrfsSk1H2yJn9aKjCrbpQF1M9Qii0GHzbfVeFUB+rc3X4aggyZD8x9Gu3Slua+s6krmq6Dt8g==}
+  '@opentelemetry/resources@2.5.1':
+    resolution: {integrity: sha512-BViBCdE/GuXRlp9k7nS1w6wJvY5fnFX5XvuEtWsTAOQFIO89Eru7lGW3WbfbxtCuZ/GbrJfAziXG0w0dpxL7eQ==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
@@ -859,11 +859,11 @@ packages:
   '@panva/hkdf@1.2.1':
     resolution: {integrity: sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw==}
 
-  '@posthog/core@1.20.1':
-    resolution: {integrity: sha512-uoTmWkYCtLYFpiK37/JCq+BuCA/OZn1qQZn5cPv1EEKt3ni3Zgg48xWCnSEyGFl5KKSXlfCruiRTwnbAtCgrBA==}
+  '@posthog/core@1.22.0':
+    resolution: {integrity: sha512-WkmOnq95aAOu6yk6r5LWr5cfXsQdpVbWDCwOxQwxSne8YV6GuZET1ziO5toSQXgrgbdcjrSz2/GopAfiL6iiAA==}
 
-  '@posthog/types@1.343.0':
-    resolution: {integrity: sha512-MZMHo6Xp5SzdYA68UIL7q/CvdaHqJ4b/yLuvahF6K8HSz64oaMjIA4YlZpL2cIaWIigxPZl62nI2b6sl/Vd2eQ==}
+  '@posthog/types@1.347.2':
+    resolution: {integrity: sha512-aT+r/7jXOzPmUHO6sutoWzczPcYIZyhmWt1f1OvY4zKC7Pwp/ZsJWKFTxjV02p0PZz96AE83eLTe7w7b6tjhIw==}
 
   '@protobufjs/aspromise@1.1.2':
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
@@ -2494,58 +2494,58 @@ packages:
   leac@0.6.0:
     resolution: {integrity: sha512-y+SqErxb8h7nE/fiEX07jsbuhrpO9lL8eca7/Y1nuWV2moNlXhyd59iDGcRf6moVyDMbmTNzL40SUyrFU/yDpg==}
 
-  lefthook-darwin-arm64@2.1.0:
-    resolution: {integrity: sha512-u2hjHLQXWSFfzO7ln2n/uEydSzfC9sc5cDC7tvKSuOdhvBwaJ0AQ7ZeuqqCQ4YfVIJfYOom1SVE9CBd10FVyig==}
+  lefthook-darwin-arm64@2.1.1:
+    resolution: {integrity: sha512-O/RS1j03/Fnq5zCzEb2r7UOBsqPeBuf1C5pMkIJcO4TSE6hf3rhLUkcorKc2M5ni/n5zLGtzQUXHV08/fSAT3Q==}
     cpu: [arm64]
     os: [darwin]
 
-  lefthook-darwin-x64@2.1.0:
-    resolution: {integrity: sha512-zz5rcyrtOZpxon7uE+c0KC/o2ypJeLZql5CL0Y9oaTuECbmhfokm8glsGnyWstW/++PuMpZYYr/qsCJA5elxkQ==}
+  lefthook-darwin-x64@2.1.1:
+    resolution: {integrity: sha512-mm/kdKl81ROPoYnj9XYk5JDqj+/6Al8w/SSPDfhItkLJyl4pqS+hWUOP6gDGrnuRk8S0DvJ2+hzhnDsQnZohWQ==}
     cpu: [x64]
     os: [darwin]
 
-  lefthook-freebsd-arm64@2.1.0:
-    resolution: {integrity: sha512-+mXNCNuFHNGYLrDqYWDeHH7kWCLCJFPpspx5PAAm+PD37PRMZJrTqDbaNK9qCghC1tdmT4/Lvilf/ewXHPlaKw==}
+  lefthook-freebsd-arm64@2.1.1:
+    resolution: {integrity: sha512-F7JXlKmjxGqGbCWPLND0bVB4DMQezIe48pEwTlUQZbxh450c2gP5Q8FdttMZKOT163kBGGTqJAJSEC6zW+QSxA==}
     cpu: [arm64]
     os: [freebsd]
 
-  lefthook-freebsd-x64@2.1.0:
-    resolution: {integrity: sha512-+AU2HD7szuDsUdHue/E3OnF84B2ae/h7CGKpuIUHJntgoJ4kxf89oDvq2/xl8kDCn9cT76UUjgeZUgFYLRj+6Q==}
+  lefthook-freebsd-x64@2.1.1:
+    resolution: {integrity: sha512-Po8/lJMqNzKSZPuEI46dLuWoBoXtAxCuRpeOh6DAV/M4RhBynaCu8rLMZ9BqF7cVbZEWoplOmYo6HdOuiYpCkQ==}
     cpu: [x64]
     os: [freebsd]
 
-  lefthook-linux-arm64@2.1.0:
-    resolution: {integrity: sha512-KM70eV1tsEib1/tk+3TFxIdH84EaYlIg5KTQWAg+LB1N23nTQ7lL4Dnh1je6f6KW4tf21nmoMUqsh0xvMkQk8Q==}
+  lefthook-linux-arm64@2.1.1:
+    resolution: {integrity: sha512-mI2ljFgPEqHxI8vrN9nKgnVu63Rz1KisDbPwlvs7BTYNwq3sncdK5ukpGR4zzWdh6saNJ5tCtHEtep5GQI11nw==}
     cpu: [arm64]
     os: [linux]
 
-  lefthook-linux-x64@2.1.0:
-    resolution: {integrity: sha512-6Bxmv+l7LiYq9W0IE6v2lmlRtBp6pisnlzhcouMGvH3rDwEGw11NAyRJZA3IPGEMAkIuhnlnVTUwAUzKomfJLg==}
+  lefthook-linux-x64@2.1.1:
+    resolution: {integrity: sha512-m3G/FaxC+crxeg9XeaUuHfEoL+i9gbkg2Hp2KD2IcVVIxprqlyqf0Hb8zbLV2NMXuo5RSGokJu44oAoTO3Ou2g==}
     cpu: [x64]
     os: [linux]
 
-  lefthook-openbsd-arm64@2.1.0:
-    resolution: {integrity: sha512-ppJNK0bBSPLC8gqksRw5zI/0uLeMA5cK+hmZ4ofcuGNmdrN1dfl2Tx84fdeef0NcQY0ii9Y3j3icIKngIoid/g==}
+  lefthook-openbsd-arm64@2.1.1:
+    resolution: {integrity: sha512-gz/8FJPvhjOdOFt1GmFvuvDOe+W+BBRjoeAT1/mTgkN7HCXMXgqNjjvakQKQeGz1I1v08wXG1ZNf5y+T9XBCDQ==}
     cpu: [arm64]
     os: [openbsd]
 
-  lefthook-openbsd-x64@2.1.0:
-    resolution: {integrity: sha512-8k9lQsMYqQGu4spaQ8RNSOJidxIcOyfaoF2FPZhthtBfRV3cgVFGrsQ0hbIi5pvQRGUlCqYuCN79qauXHmnL3Q==}
+  lefthook-openbsd-x64@2.1.1:
+    resolution: {integrity: sha512-ch3lyMUtbmtWUufaQVn4IoEs/2hjK51XqaCdY1mh5ca//VctR1peknIwQ5feHu+vATCDviWQ7HsdNDewm3HMPg==}
     cpu: [x64]
     os: [openbsd]
 
-  lefthook-windows-arm64@2.1.0:
-    resolution: {integrity: sha512-0WN+grrxt9zP9NGRcztoPXcz25tteem91rfLWgQFab+50csJ47zldlsB7/eOS/eHG5mUg5g5NPR4XefnXtjOcQ==}
+  lefthook-windows-arm64@2.1.1:
+    resolution: {integrity: sha512-mm3PZhKDs9FE/jQDimkfWxtoj9xQ2k8uw2MdhtC825bhvIh+MEi0WFj/MOW+ug0RBg0I55tGYzZ5aVuozAWpTQ==}
     cpu: [arm64]
     os: [win32]
 
-  lefthook-windows-x64@2.1.0:
-    resolution: {integrity: sha512-XbO/5nAZQLpUn0tPpgCYfFBFJHnymSglQ73jD6wymNrR1j8I5EcXGlP6YcLhnZ83yzsdLC+gup+N6IqUeiyRdw==}
+  lefthook-windows-x64@2.1.1:
+    resolution: {integrity: sha512-1L2oGIzmhfOTxfwbe5mpSQ+m3ilpvGNymwIhn4UHq6hwHsUL6HEhODqx02GfBn6OXpVIr56bvdBAusjL/SVYGQ==}
     cpu: [x64]
     os: [win32]
 
-  lefthook@2.1.0:
-    resolution: {integrity: sha512-+vS+yywGQW6CN1J1hbGkez//6ixGHIQqfxDN/d3JDm531w9GfGt2lAWTDfZTw/CEl80XsN0raFcnEraR3ldw9g==}
+  lefthook@2.1.1:
+    resolution: {integrity: sha512-Tl9h9c+sG3ShzTHKuR3LAIblnnh+Mgxnm2Ul7yu9cu260Z27LEbO3V6Zw4YZFP59/2rlD42pt/llYsQCkkCFzw==}
     hasBin: true
 
   libbase64@1.3.0:
@@ -3007,8 +3007,8 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  posthog-js@1.343.0:
-    resolution: {integrity: sha512-w+zD7bqK5HqwQPcGRr0bDa+kEHmO17WkErCRQA6mPLXp0q4b9IX5fIiJiN31S98DtqLsVlhlnHUBJyEA1MMAVw==}
+  posthog-js@1.347.2:
+    resolution: {integrity: sha512-hDbsSU30gfNhC11cBYSPpwUYB4DglbCN2G8W8NPIR/KXhT03shmuxabra/uaoI4blkr8SSSpxwvYV4gGa3hXrA==}
 
   preact-render-to-string@5.2.6:
     resolution: {integrity: sha512-JyhErpYOvBV1hEPwIxc/fHWXPfnEGdRKxc8gFdAZ7XV4tlzyzG847XAyEZqoDnynP88akM4eaHcSOzNcLWFguw==}
@@ -4410,7 +4410,7 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.39.0
 
-  '@opentelemetry/core@2.5.0(@opentelemetry/api@1.9.0)':
+  '@opentelemetry/core@2.5.1(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.39.0
@@ -4447,10 +4447,10 @@ snapshots:
       '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.39.0
 
-  '@opentelemetry/resources@2.5.0(@opentelemetry/api@1.9.0)':
+  '@opentelemetry/resources@2.5.1(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.5.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.5.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.39.0
 
   '@opentelemetry/sdk-logs@0.208.0(@opentelemetry/api@1.9.0)':
@@ -4477,11 +4477,11 @@ snapshots:
 
   '@panva/hkdf@1.2.1': {}
 
-  '@posthog/core@1.20.1':
+  '@posthog/core@1.22.0':
     dependencies:
       cross-spawn: 7.0.6
 
-  '@posthog/types@1.343.0': {}
+  '@posthog/types@1.347.2': {}
 
   '@protobufjs/aspromise@1.1.2': {}
 
@@ -6103,48 +6103,48 @@ snapshots:
 
   leac@0.6.0: {}
 
-  lefthook-darwin-arm64@2.1.0:
+  lefthook-darwin-arm64@2.1.1:
     optional: true
 
-  lefthook-darwin-x64@2.1.0:
+  lefthook-darwin-x64@2.1.1:
     optional: true
 
-  lefthook-freebsd-arm64@2.1.0:
+  lefthook-freebsd-arm64@2.1.1:
     optional: true
 
-  lefthook-freebsd-x64@2.1.0:
+  lefthook-freebsd-x64@2.1.1:
     optional: true
 
-  lefthook-linux-arm64@2.1.0:
+  lefthook-linux-arm64@2.1.1:
     optional: true
 
-  lefthook-linux-x64@2.1.0:
+  lefthook-linux-x64@2.1.1:
     optional: true
 
-  lefthook-openbsd-arm64@2.1.0:
+  lefthook-openbsd-arm64@2.1.1:
     optional: true
 
-  lefthook-openbsd-x64@2.1.0:
+  lefthook-openbsd-x64@2.1.1:
     optional: true
 
-  lefthook-windows-arm64@2.1.0:
+  lefthook-windows-arm64@2.1.1:
     optional: true
 
-  lefthook-windows-x64@2.1.0:
+  lefthook-windows-x64@2.1.1:
     optional: true
 
-  lefthook@2.1.0:
+  lefthook@2.1.1:
     optionalDependencies:
-      lefthook-darwin-arm64: 2.1.0
-      lefthook-darwin-x64: 2.1.0
-      lefthook-freebsd-arm64: 2.1.0
-      lefthook-freebsd-x64: 2.1.0
-      lefthook-linux-arm64: 2.1.0
-      lefthook-linux-x64: 2.1.0
-      lefthook-openbsd-arm64: 2.1.0
-      lefthook-openbsd-x64: 2.1.0
-      lefthook-windows-arm64: 2.1.0
-      lefthook-windows-x64: 2.1.0
+      lefthook-darwin-arm64: 2.1.1
+      lefthook-darwin-x64: 2.1.1
+      lefthook-freebsd-arm64: 2.1.1
+      lefthook-freebsd-x64: 2.1.1
+      lefthook-linux-arm64: 2.1.1
+      lefthook-linux-x64: 2.1.1
+      lefthook-openbsd-arm64: 2.1.1
+      lefthook-openbsd-x64: 2.1.1
+      lefthook-windows-arm64: 2.1.1
+      lefthook-windows-x64: 2.1.1
 
   libbase64@1.3.0: {}
 
@@ -6791,15 +6791,15 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  posthog-js@1.343.0:
+  posthog-js@1.347.2:
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.208.0
       '@opentelemetry/exporter-logs-otlp-http': 0.208.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources': 2.5.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/resources': 2.5.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-logs': 0.208.0(@opentelemetry/api@1.9.0)
-      '@posthog/core': 1.20.1
-      '@posthog/types': 1.343.0
+      '@posthog/core': 1.22.0
+      '@posthog/types': 1.347.2
       core-js: 3.48.0
       dompurify: 3.3.1
       fflate: 0.4.8
