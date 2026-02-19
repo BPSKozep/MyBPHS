@@ -3,6 +3,7 @@
 import {
   AlignmentType,
   Document,
+  Footer,
   HeadingLevel,
   Packer,
   Paragraph,
@@ -38,17 +39,6 @@ type ExportDayData = {
   lines: { key: string; label: string; count: number }[];
   total: number;
   filledCount: number;
-};
-
-const getDisplayLabel = (key: string, label: string): string => {
-  switch (key) {
-    case "a-menu":
-      return `A Menü - ${label}`;
-    case "b-menu":
-      return `B Menü - ${label}`;
-    default:
-      return label;
-  }
 };
 
 type WordOrdersExportProps = {
@@ -127,7 +117,7 @@ export default function WordOrdersExport({
       for (const [key, label] of Object.entries(combined)) {
         const count = dayCounts[key] ?? 0;
         totalOrders += count;
-        lines.push({ key, label: getDisplayLabel(key, label), count });
+        lines.push({ key, label, count });
       }
 
       const remaining = Math.max(0, target - totalOrders);
@@ -150,17 +140,31 @@ export default function WordOrdersExport({
   };
 
   const generateDocx = async (exportData: (ExportDayData | null)[]) => {
+    const now = new Date();
+    const hunDateStr = now.toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
     const children: (Paragraph | Table)[] = [
       new Paragraph({
-        text: "Budapest School JPP - Ebédrendelés",
+        children: [
+          new TextRun({
+            text: "Budapest School JPP - Ebédrendelés",
+            noProof: true,
+          }),
+        ],
         heading: HeadingLevel.HEADING_1,
         alignment: AlignmentType.CENTER,
       }),
       new Paragraph({
-        text: `${year}. év ${week}. hét`,
+        children: [
+          new TextRun({ text: `${year}. év ${week}. hét`, noProof: true }),
+        ],
         heading: HeadingLevel.HEADING_2,
         alignment: AlignmentType.CENTER,
-        spacing: { after: 400 },
+        spacing: { after: 200 },
       }),
     ];
 
@@ -169,9 +173,9 @@ export default function WordOrdersExport({
 
       children.push(
         new Paragraph({
-          text: dayData.dayName,
+          children: [new TextRun({ text: dayData.dayName, noProof: true })],
           heading: HeadingLevel.HEADING_3,
-          spacing: { before: 400, after: 100 },
+          spacing: { before: 200, after: 60 },
         }),
       );
 
@@ -181,7 +185,9 @@ export default function WordOrdersExport({
           new TableCell({
             children: [
               new Paragraph({
-                children: [new TextRun({ text: "Menü", bold: true })],
+                children: [
+                  new TextRun({ text: "Menü", bold: true, noProof: true }),
+                ],
               }),
             ],
             width: { size: 70, type: WidthType.PERCENTAGE },
@@ -189,7 +195,9 @@ export default function WordOrdersExport({
           new TableCell({
             children: [
               new Paragraph({
-                children: [new TextRun({ text: "Darab", bold: true })],
+                children: [
+                  new TextRun({ text: "Darab", bold: true, noProof: true }),
+                ],
                 alignment: AlignmentType.CENTER,
               }),
             ],
@@ -203,12 +211,20 @@ export default function WordOrdersExport({
           new TableRow({
             children: [
               new TableCell({
-                children: [new Paragraph({ text: line.label })],
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: line.label, noProof: true }),
+                    ],
+                  }),
+                ],
               }),
               new TableCell({
                 children: [
                   new Paragraph({
-                    text: String(line.count),
+                    children: [
+                      new TextRun({ text: String(line.count), noProof: true }),
+                    ],
                     alignment: AlignmentType.CENTER,
                   }),
                 ],
@@ -222,7 +238,9 @@ export default function WordOrdersExport({
           new TableCell({
             children: [
               new Paragraph({
-                children: [new TextRun({ text: "Összesen", bold: true })],
+                children: [
+                  new TextRun({ text: "Összesen", bold: true, noProof: true }),
+                ],
               }),
             ],
           }),
@@ -230,7 +248,11 @@ export default function WordOrdersExport({
             children: [
               new Paragraph({
                 children: [
-                  new TextRun({ text: String(dayData.total), bold: true }),
+                  new TextRun({
+                    text: String(dayData.total),
+                    bold: true,
+                    noProof: true,
+                  }),
                 ],
                 alignment: AlignmentType.CENTER,
               }),
@@ -247,10 +269,44 @@ export default function WordOrdersExport({
       );
     }
 
+    const footerChildren = [
+      new TextRun({
+        text: `Generálva a MyBPHS rendszerrel  |  ${hunDateStr}  |  support@bphs.hu`,
+        size: 16,
+        color: "000000",
+        font: DEFAULT_FONT,
+        noProof: true,
+      }),
+    ];
+
     const doc = new Document({
       creator: "MyBPHS",
       title: `Budapest School JPP - Ebédrendelés - ${year}. év ${week}. hét`,
-      sections: [{ children }],
+      sections: [
+        {
+          properties: {
+            page: {
+              margin: {
+                top: 720,
+                bottom: 720,
+                left: 1080,
+                right: 1080,
+              },
+            },
+          },
+          footers: {
+            default: new Footer({
+              children: [
+                new Paragraph({
+                  children: footerChildren,
+                  alignment: AlignmentType.CENTER,
+                }),
+              ],
+            }),
+          },
+          children,
+        },
+      ],
       styles: {
         default: {
           document: {
@@ -261,7 +317,7 @@ export default function WordOrdersExport({
               font: DEFAULT_FONT,
               color: HEADING_COLOR,
               bold: true,
-              size: 32,
+              size: 26,
             },
           },
           heading2: {
@@ -269,14 +325,14 @@ export default function WordOrdersExport({
               font: DEFAULT_FONT,
               color: HEADING_COLOR,
               bold: true,
-              size: 24,
+              size: 20,
             },
           },
           heading3: {
             run: {
               font: "Segoe UI Semibold",
               color: HEADING_COLOR,
-              size: 24,
+              size: 20,
             },
           },
         },

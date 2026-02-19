@@ -18,9 +18,7 @@ import { api } from "@/trpc/react";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
 import sleep from "@/utils/sleep";
 
-const testing = false; // Disable email and slack webhook
-
-export default function SetMenuAndSendEmail() {
+export default function CreateMenu() {
   const [showResendConfirmDialog, setShowResendConfirmDialog] = useState(false);
 
   const createMenu = api.menu.create.useMutation();
@@ -43,19 +41,17 @@ export default function SetMenuAndSendEmail() {
       year: getWeekYear(date),
     });
 
-    if (!testing) {
-      await sendEmail.mutateAsync();
+    await sendEmail.mutateAsync();
 
-      await sendSlackWebhook.mutateAsync({
-        title: "Új menü feltöltve, email kiküldve. 📩",
-        body:
-          "Címzettek:\n" +
-          env.NEXT_PUBLIC_TO_EMAILS?.split(",")
-            .map((email) => email.trim())
-            .filter(Boolean)
-            .join("\n"),
-      });
-    }
+    await sendSlackWebhook.mutateAsync({
+      title: "Új menü feltöltve, email kiküldve. 📩",
+      body:
+        "Címzettek:\n" +
+        env.NEXT_PUBLIC_TO_EMAILS?.split(",")
+          .map((email) => email.trim())
+          .filter(Boolean)
+          .join("\n"),
+    });
   };
 
   const handleForceSendEmail = async () => {

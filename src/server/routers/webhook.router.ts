@@ -38,6 +38,10 @@ export const webhookRouter = createTRPCRouter({
         });
       }
 
+      if (env.DISABLE_WEBHOOKS) {
+        return;
+      }
+
       const isDev = process.env.NODE_ENV !== "production";
 
       // If title and body are provided, send as an embed
@@ -107,6 +111,10 @@ export const webhookRouter = createTRPCRouter({
           code: "BAD_REQUEST",
           message: "Slack webhook URL is not set",
         });
+      }
+
+      if (env.DISABLE_WEBHOOKS) {
+        return;
       }
 
       const isDev = process.env.NODE_ENV !== "production";
