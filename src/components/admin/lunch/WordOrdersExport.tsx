@@ -1,23 +1,9 @@
 "use client";
 
-import {
-  AlignmentType,
-  Document,
-  Footer,
-  HeadingLevel,
-  Packer,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-  WidthType,
-} from "docx";
 import { useState } from "react";
-import { FaFileWord } from "react-icons/fa6";
+import { FaFilePdf } from "react-icons/fa6";
 
 const HEADING_COLOR = "EB2626";
-const DEFAULT_FONT = "Segoe UI";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -68,6 +54,11 @@ export default function WordOrdersExport({
   });
 
   const { data: menu } = api.menu.get.useQuery({ year, week });
+
+  const { data: menuOpenStatus } = api.menu.getIsOpen.useQuery({
+    year,
+    week,
+  });
 
   const { data: userList } = api.user.list.useQuery("all");
 
@@ -139,7 +130,17 @@ export default function WordOrdersExport({
     });
   };
 
-  const generateDocx = async (exportData: (ExportDayData | null)[]) => {
+  const isOpenForOrders = menuOpenStatus?.isOpenForOrders ?? true;
+
+  const generatePdf = async (exportData: (ExportDayData | null)[]) => {
+    const [pdfMakeModule, pdfFontsModule] = await Promise.all([
+      import("pdfmake/build/pdfmake"),
+      import("pdfmake/build/vfs_fonts"),
+    ]);
+
+    const pdfMake = pdfMakeModule.default;
+    pdfMake.addVirtualFileSystem(pdfFontsModule.default);
+
     const now = new Date();
     const hunDateStr = now.toLocaleDateString("hu-HU", {
       year: "numeric",
@@ -147,207 +148,96 @@ export default function WordOrdersExport({
       day: "numeric",
     });
 
-    const children: (Paragraph | Table)[] = [
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: "Budapest School JPP - Ebédrendelés",
-            noProof: true,
-          }),
-        ],
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: `${year}. év ${week}. hét`, noProof: true }),
-        ],
-        heading: HeadingLevel.HEADING_2,
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 200 },
-      }),
-    ];
+    const content: unknown[] = [];
 
     for (const dayData of exportData) {
       if (!dayData) continue;
 
-      children.push(
-        new Paragraph({
-          children: [new TextRun({ text: dayData.dayName, noProof: true })],
-          heading: HeadingLevel.HEADING_3,
-          spacing: { before: 200, after: 60 },
-        }),
-      );
-
-      const headerRow = new TableRow({
-        tableHeader: true,
-        children: [
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({ text: "Menü", bold: true, noProof: true }),
-                ],
-              }),
+      content.push(
+        {
+          text: dayData.dayName,
+          style: "dayHeader",
+          margin: [0, 8, 0, 4],
+        },
+        {
+          table: {
+            widths: ["*", 50],
+            body: [
+              [
+                { text: "Menü", style: "tableHeader" },
+                {
+                  text: "Darab",
+                  style: "tableHeader",
+                  alignment: "center",
+                },
+              ],
+              ...dayData.lines.map((line) => [
+                { text: line.label },
+                { text: String(line.count), alignment: "center" },
+              ]),
+              [
+                { text: "Összesen", bold: true },
+                {
+                  text: String(dayData.total),
+                  bold: true,
+                  alignment: "center",
+                },
+              ],
             ],
-            width: { size: 70, type: WidthType.PERCENTAGE },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({ text: "Darab", bold: true, noProof: true }),
-                ],
-                alignment: AlignmentType.CENTER,
-              }),
-            ],
-            width: { size: 30, type: WidthType.PERCENTAGE },
-          }),
-        ],
-      });
-
-      const dataRows = dayData.lines.map(
-        (line) =>
-          new TableRow({
-            children: [
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({ text: line.label, noProof: true }),
-                    ],
-                  }),
-                ],
-              }),
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({ text: String(line.count), noProof: true }),
-                    ],
-                    alignment: AlignmentType.CENTER,
-                  }),
-                ],
-              }),
-            ],
-          }),
-      );
-
-      const totalRow = new TableRow({
-        children: [
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({ text: "Összesen", bold: true, noProof: true }),
-                ],
-              }),
-            ],
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: String(dayData.total),
-                    bold: true,
-                    noProof: true,
-                  }),
-                ],
-                alignment: AlignmentType.CENTER,
-              }),
-            ],
-          }),
-        ],
-      });
-
-      children.push(
-        new Table({
-          rows: [headerRow, ...dataRows, totalRow],
-          width: { size: 100, type: WidthType.PERCENTAGE },
-        }),
+          },
+          layout: "lightHorizontalLines",
+        },
       );
     }
 
-    const footerChildren = [
-      new TextRun({
-        text: `Generálva a MyBPHS rendszerrel  |  ${hunDateStr}  |  support@bphs.hu`,
-        size: 16,
-        color: "000000",
-        font: DEFAULT_FONT,
-        noProof: true,
-      }),
-    ];
-
-    const doc = new Document({
-      creator: "MyBPHS",
-      title: `Budapest School JPP - Ebédrendelés - ${year}. év ${week}. hét`,
-      sections: [
-        {
-          properties: {
-            page: {
-              margin: {
-                top: 720,
-                bottom: 720,
-                left: 1080,
-                right: 1080,
-              },
-            },
-          },
-          footers: {
-            default: new Footer({
-              children: [
-                new Paragraph({
-                  children: footerChildren,
-                  alignment: AlignmentType.CENTER,
-                }),
-              ],
-            }),
-          },
-          children,
-        },
-      ],
+    const docDefinition = {
+      content,
       styles: {
-        default: {
-          document: {
-            run: { font: DEFAULT_FONT },
-          },
-          heading1: {
-            run: {
-              font: DEFAULT_FONT,
-              color: HEADING_COLOR,
-              bold: true,
-              size: 26,
-            },
-          },
-          heading2: {
-            run: {
-              font: DEFAULT_FONT,
-              color: HEADING_COLOR,
-              bold: true,
-              size: 20,
-            },
-          },
-          heading3: {
-            run: {
-              font: "Segoe UI Semibold",
-              color: HEADING_COLOR,
-              size: 20,
-            },
-          },
+        title: {
+          fontSize: 16,
+          bold: true,
+          color: `#${HEADING_COLOR}`,
+        },
+        subtitle: {
+          fontSize: 12,
+          bold: true,
+          color: `#${HEADING_COLOR}`,
+        },
+        dayHeader: {
+          fontSize: 14,
+          bold: true,
+          color: `#${HEADING_COLOR}`,
+        },
+        tableHeader: {
+          bold: true,
+        },
+        note: {
+          fontSize: 9,
+          italics: true,
+          color: "#fbbf24",
         },
       },
-    });
+      defaultStyle: {
+        fontSize: 10,
+      },
+      pageMargins: [40, 40, 40, 40],
+      header: () => ({
+        margin: [40, 20, 40, 10],
+        text: `Budapest School JPP - Ebédrendelés - ${year}/${week}`,
+        style: "title",
+        alignment: "center",
+      }),
+      footer: () => ({
+        text: `Generálta a MyBPHS rendszer  |  ${hunDateStr}  |  support@bphs.hu`,
+        alignment: "center",
+        fontSize: 8,
+        margin: [40, 0, 40, 10],
+      }),
+    };
 
-    const blob = await Packer.toBlob(doc);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `budapest_school_jpp_ebedrendeles_${year}_${week}.docx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    await pdfMake
+      .createPdf(docDefinition)
+      .download(`budapest_school_jpp_ebedrendeles_${year}_${week}.pdf`);
   };
 
   const handleExport = async () => {
@@ -364,22 +254,24 @@ export default function WordOrdersExport({
 
       await sleep(800);
 
-      await generateDocx(exportData);
+      await generatePdf(exportData);
 
       await sleep(400);
 
-      await setIsOpen.mutateAsync({
-        week,
-        year,
-        isOpen: false,
-      });
+      if (isOpenForOrders) {
+        await setIsOpen.mutateAsync({
+          week,
+          year,
+          isOpen: false,
+        });
 
-      const totalOrders = orderDocCount ?? 0;
+        const totalOrders = orderDocCount ?? 0;
 
-      await sendSlackWebhook.mutateAsync({
-        title: `Beküldések lezárva a(z) ${week}. hétre ❌`,
-        body: `Összes leadott rendelés: ${String(totalOrders)}`,
-      });
+        await sendSlackWebhook.mutateAsync({
+          title: `Beküldések lezárva a(z) ${week}. hétre ❌`,
+          body: `Összes leadott rendelés: ${String(totalOrders)}`,
+        });
+      }
 
       setStep("done");
     } catch (err) {
@@ -397,10 +289,10 @@ export default function WordOrdersExport({
       <Button
         type="button"
         onClick={handleOpen}
-        className="bg-[#2b579a] text-white hover:bg-[#1e3f6f]"
+        className="bg-red-700 text-white hover:bg-red-800"
       >
-        <FaFileWord className="mr-2 h-4 w-4" />
-        Exportálás Word-be
+        <FaFilePdf className="mr-2 h-4 w-4" />
+        Exportálás
       </Button>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
@@ -416,8 +308,14 @@ export default function WordOrdersExport({
               {step === "input" && "Add meg a létszámot."}
               {step === "preview" &&
                 "Ellenőrizd az összesítést az exportálás előtt."}
-              {step === "exporting" && "Generálás és lezárás folyamatban..."}
-              {step === "done" && "Sikeresen exportálva és lezárva."}
+              {step === "exporting" &&
+                (isOpenForOrders
+                  ? "Generálás és lezárás folyamatban..."
+                  : "PDF generálása folyamatban...")}
+              {step === "done" &&
+                (isOpenForOrders
+                  ? "Sikeresen exportálva és lezárva."
+                  : "Sikeresen exportálva.")}
             </DialogDescription>
           </DialogHeader>
 
@@ -483,7 +381,7 @@ export default function WordOrdersExport({
                 <Button
                   onClick={() => setStep("preview")}
                   disabled={!menu || !orderCounts}
-                  className="bg-[#2b579a] text-white hover:bg-[#1e3f6f]"
+                  className="bg-red-700 text-white hover:bg-red-800"
                 >
                   Tovább
                 </Button>
@@ -496,6 +394,19 @@ export default function WordOrdersExport({
             <div className="flex flex-col gap-4">
               <div className="text-center text-sm text-gray-400">
                 {year}. év {week}. hét
+              </div>
+
+              <div className="text-center text-xs">
+                {isOpenForOrders ? (
+                  <span className="text-amber-400">
+                    Az exportálás lezárja a rendeléseket erre a hétre.
+                  </span>
+                ) : (
+                  <span className="text-gray-400">
+                    A rendelés már zárva erre a hétre, az export csak PDF-et
+                    generál.
+                  </span>
+                )}
               </div>
 
               {exportData.map((dayData) => {
@@ -527,11 +438,6 @@ export default function WordOrdersExport({
                         </span>
                       </div>
                     </div>
-                    {dayData.filledCount > 0 && (
-                      <p className="mt-1 text-xs italic text-amber-400">
-                        ({dayData.filledCount} pótlás A menüvel)
-                      </p>
-                    )}
                   </div>
                 );
               })}
@@ -555,10 +461,12 @@ export default function WordOrdersExport({
                 </Button>
                 <Button
                   onClick={handleExport}
-                  className="bg-[#2b579a] text-white hover:bg-[#1e3f6f]"
+                  className="bg-red-700 text-white hover:bg-red-800"
                 >
-                  <FaFileWord className="mr-2" />
-                  Exportálás & Lezárás
+                  <FaFilePdf className="mr-2" />
+                  {isOpenForOrders
+                    ? "Exportálás & Lezárás"
+                    : "Exportálás PDF-be"}
                 </Button>
               </DialogFooter>
             </div>
@@ -567,7 +475,7 @@ export default function WordOrdersExport({
           {/* Step 3: Exporting */}
           {step === "exporting" && (
             <div className="flex flex-col items-center gap-4 py-8">
-              <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-600 border-t-blue-500" />
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-600 border-t-red-500" />
               <p className="text-gray-300">Dokumentum generálása...</p>
             </div>
           )}
@@ -593,7 +501,9 @@ export default function WordOrdersExport({
                 </svg>
               </div>
               <p className="text-center text-gray-300">
-                Sikeresen exportálva és lezárva a(z) {week}. hétre.
+                {isOpenForOrders
+                  ? `Sikeresen exportálva és lezárva a(z) ${week}. hétre.`
+                  : `Sikeresen exportálva a(z) ${week}. hétre.`}
               </p>
               <Button
                 onClick={() => setShowDialog(false)}

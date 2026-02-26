@@ -45,3 +45,5 @@ public/fallback-*
 
 core
 .vercel
+
+/.husky/
