@@ -41,7 +41,7 @@
     "generate-password": "^1.7.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.563.0",
-    "mongoose": "^9.1.6",
+    "mongoose": "^9.2.2",
     "motion": "^12.34.0",
     "nanoid": "^5.1.6",
     "next": "16.1.6",
