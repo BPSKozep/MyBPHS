@@ -28,6 +28,25 @@ export const menuRouter = createTRPCRouter({
         isOpenForOrders: menu.isOpenForOrders,
       };
     }),
+  getIsOpen: protectedProcedure
+    .input(z.strictObject({ week: z.number(), year: z.number() }))
+    .output(
+      z.strictObject({
+        isOpenForOrders: z.boolean(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const menu = await Menu.findOne({
+        week: input.week,
+        year: input.year,
+      });
+
+      if (!menu) {
+        return { isOpenForOrders: true };
+      }
+
+      return { isOpenForOrders: menu.isOpenForOrders };
+    }),
   create: protectedProcedure
     .input(
       z.strictObject({

@@ -345,7 +345,7 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
           className="bg-[#2d7d46] text-white hover:bg-[#236339]"
         >
           <FaFileExcel className="mr-2 h-4 w-4" />
-          Importálás Excelből
+          Importálás
         </Button>
       </div>
 
