@@ -31,7 +31,7 @@
     "@tiptap/extension-link": "^3.19.0",
     "@tiptap/extension-text-align": "^3.19.0",
     "@tiptap/react": "^3.19.0",
-    "@tiptap/starter-kit": "^3.19.0",
+    "@tiptap/starter-kit": "^3.20.0",
     "@trpc/client": "^11.9.0",
     "@trpc/react-query": "^11.9.0",
     "@trpc/server": "^11.9.0",
