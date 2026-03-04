@@ -4,6 +4,7 @@ import { groupRouter } from "@/server/routers/group.router";
 import { kioskRouter } from "@/server/routers/kiosk.router";
 import { laptopRouter } from "@/server/routers/laptop.router";
 import { menuRouter } from "@/server/routers/menu.router";
+import { networkingRouter } from "@/server/routers/networking.router";
 import { orderRouter } from "@/server/routers/order.router";
 import { paymentsRouter } from "@/server/routers/payments.router";
 import { profilePictureRouter } from "@/server/routers/profilePicture.router";
@@ -23,6 +24,7 @@ export const appRouter = createTRPCRouter({
   payments: paymentsRouter,
   laptop: laptopRouter,
   profilePicture: profilePictureRouter,
+  networking: networkingRouter,
 });
 
 // export type definition of API

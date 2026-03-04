@@ -85,6 +85,14 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
+    FORTIAPI_HOST:
+      process.env.NODE_ENV === "production"
+        ? z.string()
+        : z.string().optional(),
+    FORTIAPI_PROXY_SECRET:
+      process.env.NODE_ENV === "production"
+        ? z.string()
+        : z.string().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
