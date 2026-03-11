@@ -40,7 +40,7 @@ export function InfoBox({
     >
       <div className="flex items-center gap-3">
         {Icon && (
-          <Icon className={cn("h-5 w-5 flex-shrink-0", iconStyles[variant])} />
+          <Icon className={cn("h-5 w-5 shrink-0", iconStyles[variant])} />
         )}
         <div className="flex-1">{children}</div>
       </div>
