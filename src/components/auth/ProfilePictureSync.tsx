@@ -30,38 +30,7 @@ export default function ProfilePictureSync({ children }: PropsWithChildren) {
           googleImageUrl: session.user.googleImage,
         });
 
-        if (!data.needsUpload) {
-          console.debug(data.message || "Profile picture already up to date");
-          return;
-        }
-
-        if (data.presignedUrl && data.imageBase64 && data.contentType) {
-          const binaryString = atob(data.imageBase64);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          const imageBlob = new Blob([bytes], { type: data.contentType });
-
-          // Only send Content-Type header (required, part of signature).
-          // Don't add x-amz-meta-* headers - metadata is in the presigned URL.
-          const uploadResponse = await fetch(data.presignedUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Type": data.contentType,
-            },
-            body: imageBlob,
-          });
-
-          if (uploadResponse.ok) {
-            console.debug("Profile picture synced successfully");
-          } else {
-            console.error(
-              "Failed to upload profile picture to S3:",
-              uploadResponse.status,
-            );
-          }
-        }
+        console.debug(data.message ?? "Profile picture sync complete");
       } catch (error) {
         console.error("Error syncing profile picture:", error);
       }

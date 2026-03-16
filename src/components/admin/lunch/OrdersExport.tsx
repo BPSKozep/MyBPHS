@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaFilePdf } from "react-icons/fa6";
 
 const HEADING_COLOR = "EB2626";
@@ -14,34 +14,80 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import globalOptions from "@/data/global_options.json";
 import { api } from "@/trpc/react";
 import menuCombine from "@/utils/menuCombine";
 import sleep from "@/utils/sleep";
 
 const DAY_NAMES_DISPLAY = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 
+// Derive special meals from global_options, excluding the "no order" sentinel
+const SPECIAL_MEALS: { key: string; label: string }[] = Object.entries(
+  globalOptions,
+)
+  .filter(([key]) => key !== "i_am_not_want_food")
+  .map(([key, label]) => ({ key, label }));
+
 type ExportDayData = {
   dayName: string;
-  lines: { key: string; label: string; count: number }[];
+  lines: { key: string; label: string; count: number; manualDelta: number }[];
+  missingSpecials: { key: string; label: string }[];
   total: number;
   filledCount: number;
 };
 
-type WordOrdersExportProps = {
+type ManualCorrections = Record<string, number>;
+
+const correctionStorageKey = (year: number, week: number) =>
+  `orders-export-corrections:${year}:${week}`;
+
+function loadCorrections(year: number, week: number): ManualCorrections {
+  try {
+    const raw = localStorage.getItem(correctionStorageKey(year, week));
+    if (!raw) return {};
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))
+      return {};
+    const result: ManualCorrections = {};
+    for (const [k, v] of Object.entries(parsed)) {
+      if (typeof v === "number") result[k] = v;
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
+
+function saveCorrections(
+  year: number,
+  week: number,
+  corrections: ManualCorrections,
+) {
+  try {
+    localStorage.setItem(
+      correctionStorageKey(year, week),
+      JSON.stringify(corrections),
+    );
+  } catch {
+    // ignore
+  }
+}
+
+type OrdersExportProps = {
   year: number;
   week: number;
 };
 
-export default function WordOrdersExport({
-  year,
-  week,
-}: WordOrdersExportProps) {
+export default function OrdersExport({ year, week }: OrdersExportProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [step, setStep] = useState<"input" | "preview" | "exporting" | "done">(
     "input",
   );
   const [headcounts, setHeadcounts] = useState<number[]>([50, 50, 50, 50, 50]);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [manualCorrections, setManualCorrections] = useState<ManualCorrections>(
+    {},
+  );
 
   const { data: orderCounts } = api.order.getOrderCounts.useQuery({
     year,
@@ -79,7 +125,25 @@ export default function WordOrdersExport({
       defaultHeadcount,
       defaultHeadcount,
     ]);
+    setManualCorrections(loadCorrections(year, week));
   };
+
+  const handleCorrection = useCallback(
+    (dayIndex: number, lineKey: string, delta: 1 | -1) => {
+      const corrKey = `${dayIndex}:${lineKey}`;
+      setManualCorrections((prev) => {
+        const next = { ...prev, [corrKey]: (prev[corrKey] ?? 0) + delta };
+        saveCorrections(year, week, next);
+        return next;
+      });
+    },
+    [year, week],
+  );
+
+  // Keep localStorage in sync whenever corrections change externally (e.g. week prop change)
+  useEffect(() => {
+    setManualCorrections(loadCorrections(year, week));
+  }, [year, week]);
 
   const handleHeadcountChange = (dayIndex: number, value: number) => {
     setHeadcounts((prev) => {
@@ -102,13 +166,18 @@ export default function WordOrdersExport({
       const dayCounts = orderCounts[dayIndex] ?? {};
       const target = headcounts[dayIndex] ?? 0;
 
-      const lines: { key: string; label: string; count: number }[] = [];
+      const lines: {
+        key: string;
+        label: string;
+        count: number;
+        manualDelta: number;
+      }[] = [];
       let totalOrders = 0;
 
       for (const [key, label] of Object.entries(combined)) {
-        const count = dayCounts[key] ?? 0;
-        totalOrders += count;
-        lines.push({ key, label, count });
+        const baseCount = dayCounts[key] ?? 0;
+        totalOrders += baseCount;
+        lines.push({ key, label, count: baseCount, manualDelta: 0 });
       }
 
       const remaining = Math.max(0, target - totalOrders);
@@ -119,12 +188,30 @@ export default function WordOrdersExport({
         }
       }
 
-      const total = totalOrders + remaining;
+      // Apply manual corrections and compute corrected totals
+      let correctedTotal = 0;
+      for (const line of lines) {
+        const corrKey = `${dayIndex}:${line.key}`;
+        const delta = manualCorrections[corrKey] ?? 0;
+        line.manualDelta = delta;
+        line.count = Math.max(0, line.count + delta);
+        correctedTotal += line.count;
+      }
+
+      const visibleKeys = new Set(
+        lines
+          .filter((l) => l.count > 0 || l.manualDelta !== 0)
+          .map((l) => l.key),
+      );
+      const missingSpecials = SPECIAL_MEALS.filter(
+        ({ key }) => !visibleKeys.has(key),
+      );
 
       return {
         dayName,
-        lines: lines.filter((l) => l.count > 0),
-        total,
+        lines: lines.filter((l) => l.count > 0 || l.manualDelta !== 0),
+        missingSpecials,
+        total: correctedTotal,
         filledCount: remaining,
       };
     });
@@ -409,7 +496,7 @@ export default function WordOrdersExport({
                 )}
               </div>
 
-              {exportData.map((dayData) => {
+              {exportData.map((dayData, dayIndex) => {
                 if (!dayData) return null;
                 return (
                   <div
@@ -423,12 +510,41 @@ export default function WordOrdersExport({
                       {dayData.lines.map((line) => (
                         <div
                           key={line.key}
-                          className="flex justify-between text-sm"
+                          className="flex items-center justify-between text-sm"
                         >
                           <span className="text-gray-200">{line.label}</span>
-                          <span className="font-mono text-white">
-                            {line.count}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleCorrection(dayIndex, line.key, -1)
+                              }
+                              className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-600/60 text-gray-400 transition-colors hover:bg-gray-500/70 hover:text-gray-200"
+                              aria-label={`Csökkentés: ${line.label}`}
+                            >
+                              <span className="text-xs leading-none">−</span>
+                            </button>
+                            <span className="font-mono text-white">
+                              {line.count}
+                            </span>
+                            {line.manualDelta !== 0 && (
+                              <span className="font-mono text-xs text-yellow-400">
+                                {line.manualDelta > 0
+                                  ? `(+${line.manualDelta})`
+                                  : `(${line.manualDelta})`}
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleCorrection(dayIndex, line.key, 1)
+                              }
+                              className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-600/60 text-gray-400 transition-colors hover:bg-gray-500/70 hover:text-gray-200"
+                              aria-label={`Növelés: ${line.label}`}
+                            >
+                              <span className="text-xs leading-none">+</span>
+                            </button>
+                          </div>
                         </div>
                       ))}
                       <div className="mt-2 flex justify-between border-t border-gray-600 pt-2 text-sm font-bold">
@@ -437,6 +553,24 @@ export default function WordOrdersExport({
                           {dayData.total}
                         </span>
                       </div>
+                      {dayData.missingSpecials.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5 border-t border-gray-700/60 pt-2">
+                          {dayData.missingSpecials.map((special) => (
+                            <button
+                              key={special.key}
+                              type="button"
+                              onClick={() =>
+                                handleCorrection(dayIndex, special.key, 1)
+                              }
+                              className="flex items-center gap-1 rounded-full bg-gray-700/50 px-2 py-0.5 text-xs text-gray-500 transition-colors hover:bg-gray-600/60 hover:text-gray-300"
+                              aria-label={`Hozzáadás: ${special.label}`}
+                            >
+                              <span>+</span>
+                              {special.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

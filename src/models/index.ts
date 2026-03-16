@@ -6,4 +6,4 @@ import Menu from "./Menu.model";
 import Order from "./Order.model";
 import User from "./User.model";
 
-export { User, Group, GroupOverride, Menu, Order, Kiosk, LaptopLogin };
+export { Group, GroupOverride, Kiosk, LaptopLogin, Menu, Order, User };

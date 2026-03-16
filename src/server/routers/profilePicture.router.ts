@@ -32,7 +32,7 @@ function getS3Client() {
 }
 
 /**
- * Compute a SHA-256 hash of the image buffer for comparison
+ * Compute a SHA-256 hash of the image buffer for change detection.
  */
 async function computeHash(buffer: ArrayBuffer): Promise<string> {
   const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
@@ -46,17 +46,23 @@ function getS3Key(email: string): string {
 
 export const profilePictureRouter = createTRPCRouter({
   /**
-   * Check if profile picture needs to be uploaded and return presigned URL if so
+   * Sync the user's Google profile picture to R2 storage.
+   *
+   * Upload happens server-side so metadata is written reliably.
+   * Presigned PUTs cannot carry x-amz-meta-* headers through CF R2 — they
+   * are silently dropped, making hash-based deduplication impossible.
+   *
+   * Cache strategy (two-level, cheapest check first):
+   *   1. HeadObject → read stored google-image-url metadata from R2.
+   *      If the URL hasn't changed the image hasn't changed → skip fetch.
+   *   2. If the URL did change, fetch the new image, compare SHA-256 hashes.
+   *      Upload only when content actually differs.
    */
   checkAndGetUploadUrl: protectedProcedure
     .input(z.object({ googleImageUrl: z.string().url() }))
     .output(
       z.object({
         needsUpload: z.boolean(),
-        presignedUrl: z.string().optional(),
-        contentType: z.string().optional(),
-        googleImageHash: z.string().optional(),
-        imageBase64: z.string().optional(),
         message: z.string().optional(),
       }),
     )
@@ -75,58 +81,56 @@ export const profilePictureRouter = createTRPCRouter({
       }
 
       const key = getS3Key(email);
+      const bucket = env.S3_BUCKET_NAME;
 
-      // Fetch the Google image to get its content
+      // ── Level 1: URL cache (cheapest — no Google fetch required) ──────────
+      let storedHash: string | null = null;
+      let storedUrl: string | null = null;
+      try {
+        const headResponse = await s3Client.send(
+          new HeadObjectCommand({ Bucket: bucket, Key: key }),
+        );
+        storedHash = headResponse.Metadata?.["google-image-hash"] ?? null;
+        storedUrl = headResponse.Metadata?.["google-image-url"] ?? null;
+      } catch {
+        // Object doesn't exist yet — fall through to upload.
+      }
+
+      if (storedHash && storedUrl === input.googleImageUrl) {
+        return { needsUpload: false, message: "Image already up to date" };
+      }
+
+      // ── Level 2: Hash comparison (fetch required) ─────────────────────────
       const googleResponse = await fetch(input.googleImageUrl);
       if (!googleResponse.ok) {
         return { needsUpload: false, message: "Failed to fetch Google image" };
       }
 
-      const googleImageBuffer = await googleResponse.arrayBuffer();
-      const googleImageHash = await computeHash(googleImageBuffer);
+      const imageBuffer = await googleResponse.arrayBuffer();
+      const imageHash = await computeHash(imageBuffer);
       const contentType =
-        googleResponse.headers.get("content-type") || "image/jpeg";
+        googleResponse.headers.get("content-type") ?? "image/jpeg";
 
-      // Check if image already exists in S3 with matching hash
-      let existingHash: string | null = null;
-      try {
-        const headCommand = new HeadObjectCommand({
-          Bucket: env.S3_BUCKET_NAME,
-          Key: key,
-        });
-        const headResponse = await s3Client.send(headCommand);
-        existingHash = headResponse.Metadata?.["google-image-hash"] || null;
-      } catch {
-        // Object doesn't exist, that's fine
-      }
-
-      // If hashes match, no upload needed
-      if (existingHash && existingHash === googleImageHash) {
+      if (storedHash && storedHash === imageHash) {
         return { needsUpload: false, message: "Image already up to date" };
       }
 
-      // Generate presigned URL for upload
-      const putCommand = new PutObjectCommand({
-        Bucket: env.S3_BUCKET_NAME,
-        Key: key,
-        ContentType: contentType,
-        Metadata: {
-          "google-image-hash": googleImageHash,
-        },
-      });
+      // ── Upload directly from the server ───────────────────────────────────
+      // Metadata is written inline with the object — no presigned URL required.
+      await s3Client.send(
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          Body: Buffer.from(imageBuffer),
+          ContentType: contentType,
+          Metadata: {
+            "google-image-hash": imageHash,
+            "google-image-url": input.googleImageUrl,
+          },
+        }),
+      );
 
-      const presignedUrl = await getSignedUrl(s3Client, putCommand, {
-        expiresIn: 300, // 5 minutes
-        signableHeaders: new Set(["content-type"]),
-      });
-
-      return {
-        needsUpload: true,
-        presignedUrl,
-        contentType,
-        googleImageHash,
-        imageBase64: Buffer.from(googleImageBuffer).toString("base64"),
-      };
+      return { needsUpload: true, message: "Profile picture updated" };
     }),
 
   /**

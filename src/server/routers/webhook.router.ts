@@ -38,7 +38,7 @@ export const webhookRouter = createTRPCRouter({
         });
       }
 
-      if (env.DISABLE_WEBHOOKS) {
+      if (env.DISABLE_WEBHOOKS === "true") {
         return;
       }
 
@@ -113,7 +113,7 @@ export const webhookRouter = createTRPCRouter({
         });
       }
 
-      if (env.DISABLE_WEBHOOKS) {
+      if (env.DISABLE_WEBHOOKS === "true") {
         return;
       }
 
