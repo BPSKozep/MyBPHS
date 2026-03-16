@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Fragment, useMemo, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import WordOrdersExport from "@/components/admin/lunch/WordOrdersExport";
+import OrdersExport from "@/components/admin/lunch/OrdersExport";
 import Loading from "@/components/Loading";
 import { api } from "@/trpc/react";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
@@ -258,7 +258,7 @@ export default function Orders() {
 
         {menu && menu.options.length > 0 && (
           <div className="my-4 flex justify-center">
-            <WordOrdersExport year={year} week={week} />
+            <OrdersExport year={year} week={week} />
           </div>
         )}
       </div>

@@ -27,15 +27,12 @@ type ExportDayData = {
   filledCount: number;
 };
 
-type WordOrdersExportProps = {
+type OrdersExportProps = {
   year: number;
   week: number;
 };
 
-export default function WordOrdersExport({
-  year,
-  week,
-}: WordOrdersExportProps) {
+export default function OrdersExport({ year, week }: OrdersExportProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [step, setStep] = useState<"input" | "preview" | "exporting" | "done">(
     "input",
