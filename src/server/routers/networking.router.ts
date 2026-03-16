@@ -21,14 +21,14 @@ export const networkingRouter = createTRPCRouter({
       });
     }
 
-    const host = env.FORTIAPI_HOST!.startsWith("http")
-      ? env.FORTIAPI_HOST!
+    const host = env.FORTIAPI_HOST.startsWith("http")
+      ? env.FORTIAPI_HOST
       : `https://${env.FORTIAPI_HOST}`;
 
     const response = await fetch(`${host}/api/v2/cmdb/system/interface/Guest`, {
       method: "GET",
       headers: {
-        "X-Proxy-Secret": env.FORTIAPI_PROXY_SECRET!,
+        "X-Proxy-Secret": env.FORTIAPI_PROXY_SECRET,
       },
     });
 
@@ -62,8 +62,8 @@ export const networkingRouter = createTRPCRouter({
         });
       }
 
-      const host = env.FORTIAPI_HOST!.startsWith("http")
-        ? env.FORTIAPI_HOST!
+      const host = env.FORTIAPI_HOST.startsWith("http")
+        ? env.FORTIAPI_HOST
         : `https://${env.FORTIAPI_HOST}`;
 
       const response = await fetch(
@@ -72,7 +72,7 @@ export const networkingRouter = createTRPCRouter({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "X-Proxy-Secret": env.FORTIAPI_PROXY_SECRET!,
+            "X-Proxy-Secret": env.FORTIAPI_PROXY_SECRET,
           },
           body: JSON.stringify({
             "replacemsg-override-group": enabled
