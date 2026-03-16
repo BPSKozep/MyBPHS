@@ -97,6 +97,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    RESEND_INCOMING_SENDERS: z.string(),
   },
 
   experimental__runtimeEnv: process.env,

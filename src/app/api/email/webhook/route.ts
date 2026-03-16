@@ -17,6 +17,11 @@ const EXCEL_MIME_TYPES = [
   "application/vnd.ms-excel",
 ];
 
+const RESEND_INCOMING_SENDERS = (env.RESEND_INCOMING_SENDERS ?? "")
+  .split(",")
+  .map((email: string) => email.trim().toLowerCase())
+  .filter(Boolean);
+
 interface ResendAttachment {
   id: string;
   filename: string;
@@ -122,6 +127,11 @@ export async function POST(req: Request) {
 
     if (event.type === "email.received") {
       const sender = event.data.from;
+
+      if (!RESEND_INCOMING_SENDERS.includes(sender)) {
+        return NextResponse.json({ ok: true });
+      }
+
       const hasExcel = (event.data.attachments ?? []).some(isExcelAttachment);
 
       if (!hasExcel) {
