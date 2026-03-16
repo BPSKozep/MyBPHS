@@ -41,6 +41,7 @@ export const env = createEnv({
         : z.string().optional(),
     DISABLE_WEBHOOKS: z.string().optional().default("false"),
     RESEND_API_KEY: z.string().optional(),
+    RESEND_WEBHOOK_SECRET: z.string().optional(),
     STRIPE_SECRET_KEY: z.string().optional(),
     STRIPE_PRICE_ID:
       process.env.NODE_ENV === "production"
@@ -96,6 +97,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    RESEND_INCOMING_SENDERS: z.string(),
   },
 
   experimental__runtimeEnv: process.env,
