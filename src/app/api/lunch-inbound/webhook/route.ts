@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import * as XLSX from "xlsx";
 import mongooseConnect from "@/clients/mongoose";
 import ExcelImport from "@/emails/excelImport";
+import ExcelImportDenied from "@/emails/excelImportDenied";
 import Lunch from "@/emails/lunch";
 import { env } from "@/env/server";
 import { Menu } from "@/models";
@@ -129,6 +130,12 @@ export async function POST(req: Request) {
       const sender = event.data.from;
 
       if (!RESEND_INCOMING_SENDERS.includes(sender)) {
+        await resend.emails.send({
+          from: "MyBPHS <my@bphs.hu>",
+          to: sender,
+          subject: "MyBPHS | Excel import nem engedélyezett",
+          react: ExcelImportDenied(),
+        });
         return NextResponse.json({ ok: true });
       }
 
