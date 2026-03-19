@@ -47,7 +47,12 @@ export default function NetworkingToggleGuestWifi() {
             ) : isError ? (
               <span className="text-red-400">Hiba a státusz lekérésekor</span>
             ) : data?.enabled ? (
-              <span className="text-green-400">Bekapcsolva</span>
+              <span className="text-green-400">
+                Bekapcsolva &mdash;{" "}
+                {data.connectedUsers === 0
+                  ? "nincs csatlakozott eszköz"
+                  : `${data.connectedUsers} csatlakozott eszköz`}
+              </span>
             ) : (
               <span className="text-gray-400">Kikapcsolva</span>
             )}
