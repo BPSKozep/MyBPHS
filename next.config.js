@@ -18,6 +18,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: "/healthz",
+        destination: "/api/healthz",
+      },
+      {
         source: "/relay-cgHT/static/:path*",
         destination: "https://eu-assets.i.posthog.com/static/:path*",
       },
