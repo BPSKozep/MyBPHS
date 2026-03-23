@@ -12,11 +12,11 @@ export const webhookRouter = createTRPCRouter({
           title: z.string().optional(),
           body: z.string().optional(),
           // Discord expects a decimal color integer (0 - 16777215)
-          color: z.number().int().min(0).max(16777215).optional(),
+          color: z.int().min(0).max(16777215).optional(),
           error: z.boolean().optional(),
         })
         .refine((data) => !!data.message || (!!data.title && !!data.body), {
-          message: "Either 'message' or both 'title' and 'body' are required",
+          error: "Either 'message' or both 'title' and 'body' are required",
         }),
     )
     .mutation(async ({ input }) => {
@@ -91,7 +91,7 @@ export const webhookRouter = createTRPCRouter({
           error: z.boolean().optional(),
         })
         .refine((data) => !!data.message || (!!data.title && !!data.body), {
-          message: "Either 'message' or both 'title' and 'body' are required",
+          error: "Either 'message' or both 'title' and 'body' are required",
         }),
     )
     .mutation(async ({ input }) => {

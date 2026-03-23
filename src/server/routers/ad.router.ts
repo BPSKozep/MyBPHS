@@ -186,7 +186,7 @@ export const adRouter = createTRPCRouter({
     }),
 
   deleteUsers: protectedProcedure
-    .input(z.array(z.string().email()))
+    .input(z.array(z.email()))
     .mutation(async ({ input }) => {
       const response = await fetch(`${env.PU_URL}/ad/delete-users`, {
         method: "POST",
