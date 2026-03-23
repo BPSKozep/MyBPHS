@@ -72,7 +72,7 @@ export const adRouter = createTRPCRouter({
       // If user doesn't exist in AD, create them first
       if (!userExistsInAD) {
         const createUserResponse = await fetch(
-          `${env.PU_URL}/ad/create-user/${user.email}`,
+          `${env.PU_URL}/ad/create-user/${encodeURIComponent(user.email ?? "")}`,
           {
             method: "POST",
             headers: {
@@ -94,14 +94,28 @@ export const adRouter = createTRPCRouter({
         }
       }
 
-      await fetch(`${env.PU_URL}/ad/password-reset/${user.email}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${puToken}`,
+      const response = await fetch(
+        `${env.PU_URL}/ad/password-reset/${encodeURIComponent(user.email ?? "")}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${puToken}`,
+          },
+          body: JSON.stringify({ password: input }),
         },
-        body: JSON.stringify({ password: input }),
-      });
+      );
+
+      if (!response.ok) {
+        // Read error details only when failing; avoids unnecessary body consumption.
+        const errorText = await response.text().catch(() => "");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to reset AD user password: ${response.status} ${response.statusText}${
+            errorText ? ` - ${errorText}` : ""
+          }`,
+        });
+      }
 
       user.laptopPasswordChanged = new Date();
       await user.save();
