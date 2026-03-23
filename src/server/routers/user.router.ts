@@ -558,7 +558,63 @@ export const userRouter = createTRPCRouter({
 
       return {
         deletedCount: result.deletedCount,
-        message: `${result.deletedCount} felhasználó törölve`,
+        message: `${result.deletedCount} user(s) deleted`,
+      };
+    }),
+
+  // Offboard users by NFC IDs: delete their AD accounts and MongoDB documents
+  offboard: protectedProcedure
+    .input(z.array(z.string()).min(1))
+    .mutation(async ({ ctx, input: nfcIds }) => {
+      const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
+
+      const users = await User.find({ nfcId: { $in: nfcIds } }).exec();
+
+      if (users.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No users found for the provided NFC IDs",
+        });
+      }
+
+      const emails = users.map((u) => u.email);
+
+      // Delete AD accounts (best-effort — don't fail offboarding if AD is down)
+      try {
+        const puToken = env.PU_TOKEN;
+        if (puToken && env.PU_URL) {
+          const response = await fetch(`${env.PU_URL}/ad/delete-users`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${puToken}`,
+            },
+            body: JSON.stringify({ emails }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text().catch(() => "");
+            console.error(
+              `AD deletion failed (${response.status}): ${errorText}`,
+            );
+          }
+        }
+      } catch (error) {
+        console.error("AD service unavailable during offboarding:", error);
+      }
+
+      const result = await User.deleteMany({ nfcId: { $in: nfcIds } });
+
+      return {
+        deletedCount: result.deletedCount,
+        message: `${result.deletedCount} user(s) offboarded`,
       };
     }),
 

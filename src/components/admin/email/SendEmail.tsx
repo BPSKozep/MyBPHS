@@ -622,7 +622,7 @@ export default function SendEmail() {
               <Button
                 variant="outline"
                 onClick={() => setShowConfirmDialog(false)}
-                className="border-gray-600 bg-[#2e2e2e] text-white hover:bg-[#404040] hover:text-white"
+                className="border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
               >
                 Mégse
               </Button>

@@ -461,7 +461,7 @@ export default function OrdersExport({ year, week }: OrdersExportProps) {
                 <Button
                   variant="outline"
                   onClick={() => setShowDialog(false)}
-                  className="border-gray-500 bg-transparent text-white hover:bg-gray-700 hover:text-white"
+                  className="border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
                 >
                   Mégse
                 </Button>
