@@ -40,19 +40,19 @@ export default function SchoolPasswordReset() {
 
   const faqItems = [
     {
-      question: "Mire való ez a jelszó?",
+      question: "Mire való?",
       answer:
         "Ez a jelszó az iskolai számítógépekre és az ENT WiFi-re való bejelentkezéshez szükséges.",
     },
     {
-      question: "Ki látja a jelszavamat?",
+      question: "Ki látja?",
       answer:
         "Senki. A jelszavad, titkosított formátumban, az iskolai szerverén van tárolva, így senki sem tud hozzáférni.",
     },
     {
-      question: "Mit tegyek, ha elfelejtett a jelszavam?",
+      question: "Mit tegyek, ha elfelejtett?",
       answer:
-        "Ezen az oldalon bármikor visszaállíthatod. Csak add meg az új jelszót és mentsd el.",
+        "Ezen az oldalon bármikor visszaállíthatod. Csak add meg az új jelszavadat és mentsd el.",
     },
   ];
 
@@ -234,7 +234,7 @@ export default function SchoolPasswordReset() {
                   <div className="flex items-center gap-2">
                     <FaCircleQuestion className="h-4 w-4 text-blue-400" />
                     <span className="font-semibold text-white">
-                      Hogyan használd?
+                      Ezt hol használhatom?
                     </span>
                   </div>
                   <motion.div
