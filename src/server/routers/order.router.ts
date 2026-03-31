@@ -12,7 +12,7 @@ export const orderRouter = createTRPCRouter({
   get: protectedProcedure
     .input(
       z.strictObject({
-        email: z.string().email().optional(),
+        email: z.email().optional(),
         year: z.number().optional(),
         week: z.number().optional(),
       }),
@@ -75,7 +75,7 @@ export const orderRouter = createTRPCRouter({
   getAllWeek: protectedProcedure
     .input(
       z.strictObject({
-        email: z.string().email().optional(),
+        email: z.email().optional(),
         year: z.number().optional(),
         week: z.number().optional(),
       }),
@@ -583,7 +583,7 @@ export const orderRouter = createTRPCRouter({
   adminEdit: protectedProcedure
     .input(
       z.strictObject({
-        email: z.string().email(),
+        email: z.email(),
         week: z.number(),
         year: z.number(),
         order: z
@@ -646,7 +646,7 @@ export const orderRouter = createTRPCRouter({
   adminCreateDefaultOrder: protectedProcedure
     .input(
       z.strictObject({
-        email: z.string().email(),
+        email: z.email(),
         week: z.number(),
         year: z.number(),
       }),

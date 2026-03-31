@@ -59,7 +59,7 @@ export const profilePictureRouter = createTRPCRouter({
    *      Upload only when content actually differs.
    */
   checkAndGetUploadUrl: protectedProcedure
-    .input(z.object({ googleImageUrl: z.string().url() }))
+    .input(z.object({ googleImageUrl: z.url() }))
     .output(
       z.object({
         needsUpload: z.boolean(),
@@ -137,7 +137,7 @@ export const profilePictureRouter = createTRPCRouter({
    * Get profile picture URL for a user by email
    */
   getUrl: protectedProcedure
-    .input(z.object({ email: z.string().email().optional() }))
+    .input(z.object({ email: z.email().optional() }))
     .output(
       z.object({
         url: z.string().nullable(),

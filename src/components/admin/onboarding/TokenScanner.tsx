@@ -2,6 +2,7 @@
 
 import {
   CheckCircleIcon,
+  LogOutIcon,
   PrinterIcon,
   ScanIcon,
   TrashIcon,
@@ -12,6 +13,14 @@ import NFCInput from "@/components/admin/lunch/NFCInput";
 import Card from "@/components/Card";
 import SmallLoading from "@/components/SmallLoading";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
@@ -19,11 +28,13 @@ interface ScannedToken {
   id: string;
   timestamp: Date;
   isAssociated: boolean;
+  userName?: string;
 }
 
 export default function TokenScanner() {
   const [nfcId, setNfcId] = useState<string>("");
   const [scannedTokens, setScannedTokens] = useState<ScannedToken[]>([]);
+  const [showOffboardDialog, setShowOffboardDialog] = useState(false);
 
   // Query to check if token is associated with a user
   const {
@@ -32,6 +43,14 @@ export default function TokenScanner() {
     isLoading: isUserLoading,
   } = api.user.getUserByNfcId.useQuery(nfcId, {
     enabled: !!nfcId,
+  });
+
+  const offboardMutation = api.user.offboard.useMutation({
+    onSuccess: () => {
+      // Remove offboarded tokens from the scanned list
+      setScannedTokens((prev) => prev.filter((t) => !t.isAssociated));
+      setShowOffboardDialog(false);
+    },
   });
 
   // Handle new scanned token
@@ -47,6 +66,7 @@ export default function TokenScanner() {
           id: nfcId,
           timestamp: new Date(),
           isAssociated,
+          userName: user?.name,
         };
 
         setScannedTokens((prev) => [newToken, ...prev]);
@@ -62,9 +82,16 @@ export default function TokenScanner() {
     (token) => !token.isAssociated,
   );
 
+  // Get associated tokens for offboarding
+  const associatedTokens = scannedTokens.filter((token) => token.isAssociated);
+
   // Clear all tokens
   const clearTokens = () => {
     setScannedTokens([]);
+  };
+
+  const handleOffboard = () => {
+    offboardMutation.mutate(associatedTokens.map((t) => t.id));
   };
 
   // Detect if user is on mobile device
@@ -274,6 +301,16 @@ export default function TokenScanner() {
               </span>
             </Button>
             <Button
+              onClick={() => setShowOffboardDialog(true)}
+              disabled={associatedTokens.length === 0}
+              className="flex items-center gap-2 bg-orange-600 text-white hover:bg-orange-700 hover:text-white"
+            >
+              <LogOutIcon className="size-4" />
+              <span className="hidden sm:block">
+                Offboard ({associatedTokens.length})
+              </span>
+            </Button>
+            <Button
               variant="outline"
               onClick={clearTokens}
               disabled={scannedTokens.length === 0}
@@ -313,10 +350,15 @@ export default function TokenScanner() {
                     ) : (
                       <CheckCircleIcon className="size-5 text-green-500" />
                     )}
-                    <div>
+                    <div className="flex flex-col gap-1">
                       <code className="rounded border border-gray-500 bg-[#565656] px-2 py-1 font-mono text-sm text-white">
                         {token.id}
                       </code>
+                      {token.isAssociated && token.userName && (
+                        <span className="text-xs text-red-300">
+                          {token.userName}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -325,6 +367,57 @@ export default function TokenScanner() {
           </div>
         </div>
       </div>
+
+      {/* Offboard Confirmation Dialog */}
+      <Dialog open={showOffboardDialog} onOpenChange={setShowOffboardDialog}>
+        <DialogContent className="border-gray-700 bg-gray-900 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">
+              Offboard megerősítése
+            </DialogTitle>
+            <DialogDescription />
+          </DialogHeader>
+          <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-gray-700 bg-gray-800 p-3">
+            {associatedTokens.map((token) => (
+              <div
+                key={token.id}
+                className="flex items-center justify-between text-sm"
+              >
+                <span className="font-medium text-white">
+                  {token.userName ?? "Ismeretlen"}
+                </span>
+                <code className="rounded border border-gray-600 bg-gray-700 px-1.5 py-0.5 font-mono text-xs text-gray-300">
+                  {token.id}
+                </code>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowOffboardDialog(false)}
+              disabled={offboardMutation.isPending}
+              className="border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+            >
+              Mégse
+            </Button>
+            <Button
+              onClick={handleOffboard}
+              disabled={offboardMutation.isPending}
+              className="bg-orange-600 text-white hover:bg-orange-700"
+            >
+              {offboardMutation.isPending ? (
+                <SmallLoading />
+              ) : (
+                <>
+                  <LogOutIcon className="size-4" />
+                  Offboard
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

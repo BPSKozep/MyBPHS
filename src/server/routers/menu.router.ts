@@ -11,7 +11,7 @@ export const menuRouter = createTRPCRouter({
     .input(z.strictObject({ week: z.number(), year: z.number() }))
     .output(
       z.strictObject({
-        options: z.record(z.string()).array(),
+        options: z.record(z.string(), z.string()).array(),
         isOpenForOrders: z.boolean(),
       }),
     )
@@ -52,7 +52,7 @@ export const menuRouter = createTRPCRouter({
       z.strictObject({
         week: z.number().optional(),
         year: z.number().optional(),
-        options: z.record(z.string()).array(),
+        options: z.record(z.string(), z.string()).array(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

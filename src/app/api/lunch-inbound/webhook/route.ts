@@ -97,7 +97,7 @@ async function replyToSender(
     subject: error
       ? "MyBPHS | Excel importálás sikertelen"
       : "MyBPHS | Excel importálás sikeres",
-    cc: ["jpp-tech@budapestschool.org"],
+    cc: ["edit.braun@budapestschool.org", "jpp-tech@budapestschool.org"],
     react: ExcelImport({ menu, error }),
   });
 }

@@ -23,7 +23,7 @@ const resend = new Resend(env.RESEND_API_KEY);
 
 export const userRouter = createTRPCRouter({
   get: protectedProcedure
-    .input(z.string().email())
+    .input(z.email())
     .output(
       z
         .object({
@@ -82,7 +82,7 @@ export const userRouter = createTRPCRouter({
         .lean<IUser>();
     }),
   getTimetable: protectedProcedure
-    .input(z.string().email())
+    .input(z.email())
     .output(z.string().nullable().array().array())
     .query(async ({ ctx, input }) => {
       const authorized = await checkRoles(ctx.session, ["administrator"]);
@@ -188,7 +188,7 @@ export const userRouter = createTRPCRouter({
         mode: z.enum(["add", "remove", "replace"]),
         update: z
           .object({
-            email: z.string().email(),
+            email: z.email(),
             newGroups: z.string().array(),
           })
           .array(),
@@ -293,7 +293,7 @@ export const userRouter = createTRPCRouter({
       }));
     }),
   getNfcId: protectedProcedure
-    .input(z.string().email())
+    .input(z.email())
     .output(z.string())
     .query(async ({ input }) => {
       const user = await User.findOne({ email: input });
@@ -336,7 +336,7 @@ export const userRouter = createTRPCRouter({
       z.object({
         _id: z.string(),
         name: z.string(),
-        email: z.string().email(),
+        email: z.email(),
         nfcId: z.string(),
         roles: z.array(z.string()),
         blocked: z.boolean(),
@@ -460,7 +460,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string().min(1),
-        email: z.string().email(),
+        email: z.email(),
         nfcId: z.string().min(1),
         roles: z.array(z.string()).min(1),
         blocked: z.boolean().default(false),
@@ -558,13 +558,69 @@ export const userRouter = createTRPCRouter({
 
       return {
         deletedCount: result.deletedCount,
-        message: `${result.deletedCount} felhasználó törölve`,
+        message: `${result.deletedCount} user(s) deleted`,
+      };
+    }),
+
+  // Offboard users by NFC IDs: delete their AD accounts and MongoDB documents
+  offboard: protectedProcedure
+    .input(z.array(z.string()).min(1))
+    .mutation(async ({ ctx, input: nfcIds }) => {
+      const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
+
+      const users = await User.find({ nfcId: { $in: nfcIds } }).exec();
+
+      if (users.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No users found for the provided NFC IDs",
+        });
+      }
+
+      const emails = users.map((u) => u.email);
+
+      // Delete AD accounts (best-effort — don't fail offboarding if AD is down)
+      try {
+        const puToken = env.PU_TOKEN;
+        if (puToken && env.PU_URL) {
+          const response = await fetch(`${env.PU_URL}/ad/delete-users`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${puToken}`,
+            },
+            body: JSON.stringify({ emails }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text().catch(() => "");
+            console.error(
+              `AD deletion failed (${response.status}): ${errorText}`,
+            );
+          }
+        }
+      } catch (error) {
+        console.error("AD service unavailable during offboarding:", error);
+      }
+
+      const result = await User.deleteMany({ nfcId: { $in: nfcIds } });
+
+      return {
+        deletedCount: result.deletedCount,
+        message: `${result.deletedCount} user(s) offboarded`,
       };
     }),
 
   // Check if a user exists by email
   checkExists: publicProcedure
-    .input(z.object({ email: z.string().email() }))
+    .input(z.object({ email: z.email() }))
     .output(z.boolean())
     .query(async ({ input }) => {
       await mongooseConnect();
@@ -576,7 +632,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        email: z.string().email(),
+        email: z.email(),
         password: z.string(),
         nfcId: z.string(),
         verificationCode: z.string().length(6),

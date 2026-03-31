@@ -49,7 +49,7 @@ export const emailRouter = createTRPCRouter({
       z.object({
         emailFormat: z.enum(["general", "update", "important"]),
         emailTo: z.union([
-          z.string().email(), // Single email for user emails
+          z.email(), // Single email for user emails
           z.enum([
             // Group emails
             "bphs-sysadmins@budapest.school",
@@ -131,7 +131,7 @@ export const emailRouter = createTRPCRouter({
   sendVerificationCode: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
+        email: z.email(),
         name: z.string(),
       }),
     )
@@ -167,7 +167,7 @@ export const emailRouter = createTRPCRouter({
   verifyAndDeleteCode: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
+        email: z.email(),
         code: z.string().length(6),
       }),
     )
@@ -205,7 +205,7 @@ export const emailRouter = createTRPCRouter({
   verifyCode: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
+        email: z.email(),
         code: z.string().length(6),
       }),
     )
@@ -244,7 +244,7 @@ export const emailRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        email: z.string().email(),
+        email: z.email(),
         isOnboarding: z.boolean().default(false),
       }),
     )
