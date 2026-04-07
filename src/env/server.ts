@@ -42,6 +42,7 @@ export const env = createEnv({
     DISABLE_WEBHOOKS: z.string().optional().default("false"),
     RESEND_API_KEY: z.string().optional(),
     RESEND_WEBHOOK_SECRET: z.string().optional(),
+    GOOGLE_APPSCRIPT_SECRET: z.string().optional(),
     STRIPE_SECRET_KEY: z.string().optional(),
     STRIPE_PRICE_ID:
       process.env.NODE_ENV === "production"
