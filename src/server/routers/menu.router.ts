@@ -89,6 +89,40 @@ export const menuRouter = createTRPCRouter({
         isOpenForOrders: true,
       }).save();
     }),
+  update: protectedProcedure
+    .input(
+      z.strictObject({
+        week: z.number(),
+        year: z.number(),
+        options: z.record(z.string(), z.string()).array(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
+
+      const menu = await Menu.findOne({
+        week: input.week,
+        year: input.year,
+      });
+
+      if (!menu) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Menu not found for specified week.",
+        });
+      }
+
+      menu.options = input.options;
+
+      await menu.save();
+    }),
   setIsopen: protectedProcedure
     .input(
       z.strictObject({
