@@ -1,3 +1,4 @@
+import GoogleGroup from "./GoogleGroup.model";
 import Group from "./Group.model";
 import GroupOverride from "./GroupOverride.model";
 import Kiosk from "./Kiosk.model";
@@ -6,4 +7,13 @@ import Menu from "./Menu.model";
 import Order from "./Order.model";
 import User from "./User.model";
 
-export { Group, GroupOverride, Kiosk, LaptopLogin, Menu, Order, User };
+export {
+  GoogleGroup,
+  Group,
+  GroupOverride,
+  Kiosk,
+  LaptopLogin,
+  Menu,
+  Order,
+  User,
+};

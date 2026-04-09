@@ -105,10 +105,17 @@ export default function TokenScanner() {
 
   // Generate HTML content for tokens
   const generateTokensHtml = () => {
+    const qrSrc = `${window.location.origin}/mybphs-qrcode.svg`;
     const tokensHtml = unassociatedTokens
       .slice()
       .reverse()
-      .map((token) => `<div class="token-item">${token.id}</div>`)
+      .map(
+        (token) => `
+        <div class="token-item">
+          <img class="token-qr" src="${qrSrc}" alt="QR" />
+          <span class="token-id">${token.id}</span>
+        </div>`,
+      )
       .join("");
 
     return `
@@ -144,8 +151,7 @@ export default function TokenScanner() {
                     }
                     .token-item {
                         border: 1px solid #000;
-                        padding: 8px;
-                        text-align: center;
+                        padding: 4px 6px;
                         font-weight: bold;
                         font-size: 18px;
                         background: white;
@@ -153,8 +159,19 @@ export default function TokenScanner() {
                         break-inside: avoid;
                         min-height: 40px;
                         display: flex;
+                        flex-direction: row;
                         align-items: center;
-                        justify-content: center;
+                        gap: 6px;
+                    }
+                    .token-qr {
+                        height: 34px;
+                        width: 34px;
+                        flex-shrink: 0;
+                        display: block;
+                    }
+                    .token-id {
+                        flex: 1;
+                        text-align: center;
                     }
                     @media print {
                         body { -webkit-print-color-adjust: exact; }
@@ -167,7 +184,11 @@ export default function TokenScanner() {
                         }
                         .token-item {
                             font-size: 16px;
-                            padding: 6px;
+                            padding: 4px 6px;
+                        }
+                        .token-qr {
+                            height: 30px;
+                            width: 30px;
                         }
                     }
                 </style>

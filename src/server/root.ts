@@ -1,5 +1,6 @@
 import { adRouter } from "@/server/routers/ad.router";
 import { emailRouter } from "@/server/routers/email.router";
+import { googleGroupRouter } from "@/server/routers/googleGroup.router";
 import { groupRouter } from "@/server/routers/group.router";
 import { kioskRouter } from "@/server/routers/kiosk.router";
 import { laptopRouter } from "@/server/routers/laptop.router";
@@ -15,6 +16,7 @@ import { createCallerFactory, createTRPCRouter } from "@/server/trpc";
 export const appRouter = createTRPCRouter({
   user: userRouter,
   group: groupRouter,
+  googleGroup: googleGroupRouter,
   menu: menuRouter,
   order: orderRouter,
   email: emailRouter,
