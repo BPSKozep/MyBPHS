@@ -1,4 +1,6 @@
+import mongooseConnect from "@/clients/mongoose";
 import { env } from "@/env/server";
+import { GoogleGroup } from "@/models";
 
 type UserMember = {
   name: string;
@@ -115,6 +117,14 @@ export async function POST(request: Request) {
     console.log("[api/users] Received users payload", {
       group: body.group,
       membersCount: body.members.length,
+      members: body.members,
+    });
+
+    await mongooseConnect();
+    await GoogleGroup.create({
+      group: body.group,
+      receivedAt: new Date(),
+      memberCount: body.members.length,
       members: body.members,
     });
 

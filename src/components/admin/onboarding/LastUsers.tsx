@@ -1,6 +1,7 @@
 "use client";
 
-import { UserIcon } from "lucide-react";
+import { ChevronDownIcon, UserIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import React from "react";
 import Card from "@/components/Card";
 import Loading from "@/components/Loading";
@@ -8,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 export default function LastUsers() {
+  const [isOpen, setIsOpen] = React.useState(false);
+
   const {
     data: users,
     isLoading,
@@ -44,67 +47,91 @@ export default function LastUsers() {
 
   return (
     <Card>
-      <div className="space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-600 pb-3">
-          <div className="flex items-center gap-2">
-            <UserIcon className="size-5 text-white" />
-            <h2 className="text-lg font-semibold text-white">
-              Legújabb felhasználók
-            </h2>
-          </div>
+      {/* Header — always visible, click to toggle */}
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between focus:outline-none"
+      >
+        <div className="flex items-center gap-2">
+          <UserIcon className="size-5 text-white" />
+          <h2 className="text-lg font-semibold text-white">
+            Legújabb felhasználók
+          </h2>
         </div>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+        >
+          <ChevronDownIcon className="size-5 text-gray-400" />
+        </motion.div>
+      </button>
 
-        {/* Users List */}
-        <div className="scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600 max-h-96 overflow-y-auto">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <Loading />
-              <p className="mt-4 text-sm text-gray-300">
-                Felhasználók betöltése...
-              </p>
-            </div>
-          ) : latestUsers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <UserIcon className="size-12 text-gray-500" />
-              <p className="mt-4 text-lg font-medium text-gray-300">
-                Nincs felhasználó
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {latestUsers.map((user, index) => (
-                <div
-                  key={user._id}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-[#2a2a2a]",
-                    index % 2 === 0
-                      ? "border-gray-600 bg-[#242424]"
-                      : "border-gray-600 bg-[#2e2e2e]",
-                  )}
-                >
-                  {/* Avatar */}
-                  <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-bold text-white">
-                    {getUserInitials(user.name)}
-                  </div>
+      {/* Animated body */}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className="space-y-3 pt-3">
+              <div className="border-t border-gray-600" />
 
-                  {/* User Info */}
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-white">{user.name}</h3>
-                    </div>
-                    <p className="text-sm break-all text-gray-300">
-                      {user.email}
+              {/* Users list */}
+              <div className="scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600 max-h-96 overflow-y-auto">
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Loading />
+                    <p className="mt-4 text-sm text-gray-300">
+                      Felhasználók betöltése...
                     </p>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ) : latestUsers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <UserIcon className="size-12 text-gray-500" />
+                    <p className="mt-4 text-lg font-medium text-gray-300">
+                      Nincs felhasználó
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {latestUsers.map((user, index) => (
+                      <div
+                        key={user._id}
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-[#2a2a2a]",
+                          index % 2 === 0
+                            ? "border-gray-600 bg-[#242424]"
+                            : "border-gray-600 bg-[#2e2e2e]",
+                        )}
+                      >
+                        <div className="flex size-10 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-sm font-bold text-white">
+                          {getUserInitials(user.name)}
+                        </div>
 
-        <div className="border-t border-gray-600 pt-3"></div>
-      </div>
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium text-white">
+                              {user.name}
+                            </h3>
+                          </div>
+                          <p className="break-all text-sm text-gray-300">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 }
