@@ -176,8 +176,7 @@ export default function EditMenuDialog({ year, week }: Props) {
                           onChange={(e) =>
                             updateDay(dayIndex, "soup", e.target.value)
                           }
-                          placeholder="pl. Gulyásleves"
-                          className="w-full rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div className="flex flex-col gap-1">
@@ -193,9 +192,8 @@ export default function EditMenuDialog({ year, week }: Props) {
                           onChange={(e) =>
                             updateDay(dayIndex, "a-menu", e.target.value)
                           }
-                          placeholder="pl. Rántott csirke"
                           rows={2}
-                          className="w-full resize-none rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full resize-none rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div className="flex flex-col gap-1">
@@ -211,9 +209,8 @@ export default function EditMenuDialog({ year, week }: Props) {
                           onChange={(e) =>
                             updateDay(dayIndex, "b-menu", e.target.value)
                           }
-                          placeholder="pl. Főzelék"
                           rows={2}
-                          className="w-full resize-none rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full resize-none rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                     </div>
