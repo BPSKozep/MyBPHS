@@ -200,225 +200,240 @@ function LunchOrder() {
               </Card>
             )}
             {showMenu && (
-              <Card>
-                {orderExists && menu.data.isOpenForOrders && (
-                  <div className="mb-5">
-                    <div className="absolute -top-[0.9rem] -right-[0.9rem]">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileFocus={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 500,
-                          damping: 20,
-                        }}
+              <motion.div
+                initial={false}
+                animate={{
+                  paddingTop:
+                    orderExists && menu.data.isOpenForOrders
+                      ? "1.5rem"
+                      : "0rem",
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 28,
+                }}
+              >
+                <Card>
+                  {orderExists && menu.data.isOpenForOrders && (
+                    <div className="mb-5">
+                      <div className="absolute -top-[0.9rem] -right-[0.9rem]">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileFocus={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 20,
+                          }}
+                          onClick={() => {
+                            setOrderEditing(!orderEditing);
+
+                            const newSelectedOptions = order.data?.map(
+                              (day) => day.chosen,
+                            );
+
+                            setSelectedOptions(newSelectedOptions);
+                          }}
+                        >
+                          <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-slate-600 drop-shadow-2xl">
+                            <FaEdit />
+                          </div>
+                        </motion.button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col items-center justify-center gap-4">
+                    <motion.div
+                      className="flex w-full items-center justify-between"
+                      initial={{
+                        opacity: 1,
+                        height: "auto",
+                      }}
+                      animate={{
+                        opacity: orderEditing ? 0 : 1,
+                        height: orderEditing ? 0 : "auto",
+                      }}
+                      transition={{
+                        height: {
+                          delay: orderEditing ? 0.2 : 0,
+                        },
+                      }}
+                    >
+                      <IconButton
+                        icon={<FaArrowLeft />}
                         onClick={() => {
-                          setOrderEditing(!orderEditing);
-
-                          const newSelectedOptions = order.data?.map(
-                            (day) => day.chosen,
-                          );
-
-                          setSelectedOptions(newSelectedOptions);
+                          setWeekOffset((offset) => offset - 1);
+                          setClosedMenuShown(false);
                         }}
-                      >
-                        <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-slate-600 drop-shadow-2xl">
-                          <FaEdit />
-                        </div>
-                      </motion.button>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <motion.div
-                    className="flex w-full items-center justify-between"
-                    initial={{
-                      opacity: 1,
-                      height: "auto",
-                    }}
-                    animate={{
-                      opacity: orderEditing ? 0 : 1,
-                      height: orderEditing ? 0 : "auto",
-                    }}
-                    transition={{
-                      height: {
-                        delay: orderEditing ? 0.2 : 0,
-                      },
-                    }}
-                  >
-                    <IconButton
-                      icon={<FaArrowLeft />}
-                      onClick={() => {
-                        setWeekOffset((offset) => offset - 1);
-                        setClosedMenuShown(false);
-                      }}
-                      disabled={orderEditing}
-                      className="cursor-pointer"
-                    />
-                    <div className="text-center">
-                      <p className="mx-2 text-center text-lg font-bold md:text-xl">{`${year}. ${week}. hét`}</p>
-                      <p className="mx-1 inline-block text-center text-base font-bold text-white md:text-lg">
-                        {orderExists ? `Leadott rendelés` : `Rendelés`}
-                      </p>
-                    </div>
-                    <IconButton
-                      icon={<FaArrowRight />}
-                      onClick={() => {
-                        setWeekOffset((offset) => offset + 1);
-                        setClosedMenuShown(false);
-                      }}
-                      disabled={orderEditing}
-                      className="cursor-pointer"
-                    />
-                  </motion.div>
-
-                  {(() => {
-                    const optionsWithSoup = menu.data?.options ?? [];
-                    const soups = optionsWithSoup.map(
-                      (day) => (day as Record<string, string>).soup ?? "",
-                    );
-                    const optionsWithoutSoup = optionsWithSoup.map(
-                      (menuDay) => {
-                        const { soup: _soup, ...dayWithoutSoup } =
-                          menuDay as Record<string, string>;
-                        const menuDayWithoutSoup = dayWithoutSoup;
-                        if (
-                          !menuDayWithoutSoup["a-menu"] &&
-                          !menuDayWithoutSoup["b-menu"]
-                        ) {
-                          const newMenuDay = menuCombine(
-                            menuDayWithoutSoup,
-                            false,
-                          );
-
-                          // biome-ignore lint/suspicious/useIterableCallbackReturn: todo review
-                          Object.keys(newMenuDay).forEach(
-                            // biome-ignore lint/suspicious/noAssignInExpressions: todo review
-                            (key) => (newMenuDay[key] = ""),
-                          );
-
-                          return newMenuDay;
-                        }
-
-                        return menuCombine(menuDayWithoutSoup, false);
-                      },
-                    );
-                    return (
-                      <OrderForm
-                        options={optionsWithoutSoup}
-                        soups={soups}
-                        isEditing={orderEditing}
-                        selectedOptions={selectedOptions}
-                        onChange={(chosenOptions) => {
-                          if (orderEditing || !orderExists) {
-                            setSelectedOptions(chosenOptions);
-                          }
-                        }}
-                        weekStartTimestamp={weekStartTimestamp}
+                        disabled={orderEditing}
+                        className="cursor-pointer"
                       />
-                    );
-                  })()}
-
-                  <AnimatePresence>
-                    {!orderExists && (
-                      <motion.div
-                        initial={{
-                          opacity: 1,
-                          height: "auto",
+                      <div className="text-center">
+                        <p className="mx-2 text-center text-lg font-bold md:text-xl">{`${year}. ${week}. hét`}</p>
+                        <p className="mx-1 inline-block text-center text-base font-bold text-white md:text-lg">
+                          {orderExists ? `Leadott rendelés` : `Rendelés`}
+                        </p>
+                      </div>
+                      <IconButton
+                        icon={<FaArrowRight />}
+                        onClick={() => {
+                          setWeekOffset((offset) => offset + 1);
+                          setClosedMenuShown(false);
                         }}
-                        exit={{
-                          opacity: 0,
-                          height: 0,
-                        }}
-                        transition={{
-                          height: { delay: 0.5 },
-                        }}
-                      >
-                        <IconSubmitButton
-                          icon={<FaEnvelope />}
-                          onClick={async () => {
-                            try {
-                              await sleep(500);
+                        disabled={orderEditing}
+                        className="cursor-pointer"
+                      />
+                    </motion.div>
 
-                              await createOrder.mutateAsync({
-                                week,
-                                year,
-                                chosenOptions: selectedOptions,
-                              });
+                    {(() => {
+                      const optionsWithSoup = menu.data?.options ?? [];
+                      const soups = optionsWithSoup.map(
+                        (day) => (day as Record<string, string>).soup ?? "",
+                      );
+                      const optionsWithoutSoup = optionsWithSoup.map(
+                        (menuDay) => {
+                          const { soup: _soup, ...dayWithoutSoup } =
+                            menuDay as Record<string, string>;
+                          const menuDayWithoutSoup = dayWithoutSoup;
+                          if (
+                            !menuDayWithoutSoup["a-menu"] &&
+                            !menuDayWithoutSoup["b-menu"]
+                          ) {
+                            const newMenuDay = menuCombine(
+                              menuDayWithoutSoup,
+                              false,
+                            );
 
-                              await sleep(1700)
-                                .then(() => {
-                                  order.refetch().catch((error) => {
-                                    console.error(error);
-                                  });
-                                })
-                                .catch((error) => {
-                                  console.error(error);
+                            // biome-ignore lint/suspicious/useIterableCallbackReturn: todo review
+                            Object.keys(newMenuDay).forEach(
+                              // biome-ignore lint/suspicious/noAssignInExpressions: todo review
+                              (key) => (newMenuDay[key] = ""),
+                            );
+
+                            return newMenuDay;
+                          }
+
+                          return menuCombine(menuDayWithoutSoup, false);
+                        },
+                      );
+                      return (
+                        <OrderForm
+                          options={optionsWithoutSoup}
+                          soups={soups}
+                          isEditing={orderEditing}
+                          selectedOptions={selectedOptions}
+                          onChange={(chosenOptions) => {
+                            if (orderEditing || !orderExists) {
+                              setSelectedOptions(chosenOptions);
+                            }
+                          }}
+                          weekStartTimestamp={weekStartTimestamp}
+                        />
+                      );
+                    })()}
+
+                    <AnimatePresence>
+                      {!orderExists && (
+                        <motion.div
+                          initial={{
+                            opacity: 1,
+                            height: "auto",
+                          }}
+                          exit={{
+                            opacity: 0,
+                            height: 0,
+                          }}
+                          transition={{
+                            height: { delay: 0.5 },
+                          }}
+                        >
+                          <IconSubmitButton
+                            icon={<FaEnvelope />}
+                            onClick={async () => {
+                              try {
+                                await sleep(500);
+
+                                await createOrder.mutateAsync({
+                                  week,
+                                  year,
+                                  chosenOptions: selectedOptions,
                                 });
 
-                              return true;
-                            } catch (err) {
-                              await sendSlackWebhook.mutateAsync({
-                                title: "LunchOrder Hiba",
-                                body:
-                                  session.data?.user?.email +
-                                  "\n\n" +
-                                  String(err),
-                                error: true,
-                              });
-                              return false;
-                            }
+                                await sleep(1700)
+                                  .then(() => {
+                                    order.refetch().catch((error) => {
+                                      console.error(error);
+                                    });
+                                  })
+                                  .catch((error) => {
+                                    console.error(error);
+                                  });
+
+                                return true;
+                              } catch (err) {
+                                await sendSlackWebhook.mutateAsync({
+                                  title: "LunchOrder Hiba",
+                                  body:
+                                    session.data?.user?.email +
+                                    "\n\n" +
+                                    String(err),
+                                  error: true,
+                                });
+                                return false;
+                              }
+                            }}
+                          />
+                        </motion.div>
+                      )}
+
+                      {orderEditing && (
+                        <motion.div
+                          initial={{
+                            opacity: 1,
+                            height: "auto",
                           }}
-                        />
-                      </motion.div>
-                    )}
-
-                    {orderEditing && (
-                      <motion.div
-                        initial={{
-                          opacity: 1,
-                          height: "auto",
-                        }}
-                        exit={{
-                          opacity: 0,
-                          height: 0,
-                        }}
-                        transition={{
-                          height: { delay: 0.5 },
-                        }}
-                      >
-                        <IconSubmitButton
-                          icon={<FaEdit />}
-                          onClick={async () => {
-                            try {
-                              await sleep(500);
-
-                              await editOrder.mutateAsync({
-                                week,
-                                year,
-                                chosenOptions: selectedOptions,
-                              });
-
-                              setOrderEditing(false);
-
-                              return true;
-                            } catch (err) {
-                              await sendSlackWebhook.mutateAsync({
-                                title: "LunchOrder-Edit Hiba",
-                                body: String(err),
-                                error: true,
-                              });
-                              return false;
-                            }
+                          exit={{
+                            opacity: 0,
+                            height: 0,
                           }}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </Card>
+                          transition={{
+                            height: { delay: 0.5 },
+                          }}
+                        >
+                          <IconSubmitButton
+                            icon={<FaEdit />}
+                            onClick={async () => {
+                              try {
+                                await sleep(500);
+
+                                await editOrder.mutateAsync({
+                                  week,
+                                  year,
+                                  chosenOptions: selectedOptions,
+                                });
+
+                                setOrderEditing(false);
+
+                                return true;
+                              } catch (err) {
+                                await sendSlackWebhook.mutateAsync({
+                                  title: "LunchOrder-Edit Hiba",
+                                  body: String(err),
+                                  error: true,
+                                });
+                                return false;
+                              }
+                            }}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </Card>
+              </motion.div>
             )}
           </div>
         </div>
