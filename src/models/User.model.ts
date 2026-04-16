@@ -7,7 +7,8 @@ export interface IUser {
   email: string;
   roles: string[];
   groups: Types.ObjectId[];
-  nfcId: string;
+  nfcId?: string;
+  joinDate?: Date;
   laptopPasswordChanged?: Date;
   blocked?: boolean;
 }
@@ -31,8 +32,13 @@ const userSchema = new Schema<IUser>({
   },
   nfcId: {
     type: String,
-    required: true,
+    required: false,
     index: true,
+    sparse: true,
+  },
+  joinDate: {
+    type: Date,
+    required: false,
   },
   laptopPasswordChanged: {
     type: Date,

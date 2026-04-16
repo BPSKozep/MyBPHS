@@ -69,12 +69,7 @@ export default function AddUserDialog({
   });
 
   const handleCreateUser = () => {
-    if (
-      !newUser.name ||
-      !newUser.email ||
-      !newUser.nfcId ||
-      newUser.roles.length === 0
-    ) {
+    if (!newUser.name || !newUser.email || newUser.roles.length === 0) {
       onError(
         "Hiányzó adatok",
         "Kérlek tölts ki minden kötelező mezőt és válassz legalább egy szerepet.",
@@ -82,7 +77,10 @@ export default function AddUserDialog({
       return;
     }
 
-    createUserMutation.mutate(newUser);
+    createUserMutation.mutate({
+      ...newUser,
+      nfcId: newUser.nfcId || undefined,
+    });
   };
 
   const toggleNewUserRole = (role: string) => {
@@ -153,7 +151,7 @@ export default function AddUserDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="nfcId" className="text-white">
-              NFC ID*
+              NFC ID <span className="text-xs text-gray-400">(opcionális)</span>
             </Label>
             <Input
               id="nfcId"

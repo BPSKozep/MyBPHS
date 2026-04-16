@@ -1,6 +1,7 @@
 import mongooseConnect from "@/clients/mongoose";
 import { env } from "@/env/server";
 import { GoogleGroup } from "@/models";
+import { reconcileGoogleGroupSnapshot } from "@/server/services/googleSync";
 
 type UserMember = {
   name: string;
@@ -114,24 +115,28 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("[api/users] Received users payload", {
-      group: body.group,
-      membersCount: body.members.length,
-      members: body.members,
-    });
-
     await mongooseConnect();
-    await GoogleGroup.create({
+    const snapshot = await GoogleGroup.create({
       group: body.group,
       receivedAt: new Date(),
       memberCount: body.members.length,
       members: body.members,
     });
 
+    // Reconcile the snapshot against the User collection (remote wins)
+    try {
+      await reconcileGoogleGroupSnapshot(snapshot._id.toString());
+    } catch (reconcileError) {
+      console.error(
+        "[api/users] Reconciliation failed (snapshot stored successfully):",
+        reconcileError,
+      );
+    }
+
     return new Response(
       JSON.stringify({
         ok: true,
-        message: "Payload received",
+        message: "Payload received and reconciled",
         received: {
           group: body.group,
           membersCount: body.members.length,

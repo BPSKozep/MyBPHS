@@ -31,6 +31,9 @@ export const userRouter = createTRPCRouter({
           email: z.string(),
           roles: z.string().array(),
           blocked: z.boolean().optional(),
+          nfcId: z.string().nullable().optional(),
+          joinDate: z.date().nullable().optional(),
+          laptopPasswordChanged: z.date().nullable().optional(),
         })
         .nullable(),
     )
@@ -259,6 +262,7 @@ export const userRouter = createTRPCRouter({
           email: z.string(),
           name: z.string(),
           blocked: z.boolean(),
+          joinDate: z.date().nullable(),
         }),
       ),
     )
@@ -282,7 +286,7 @@ export const userRouter = createTRPCRouter({
       }
 
       const users = await User.find(roleFilter).select(
-        "_id email name blocked",
+        "_id email name blocked joinDate",
       );
 
       return users.map((user) => ({
@@ -290,6 +294,7 @@ export const userRouter = createTRPCRouter({
         email: user.email,
         name: user.name,
         blocked: user.blocked ?? false,
+        joinDate: user.joinDate ?? null,
       }));
     }),
   getNfcId: protectedProcedure
@@ -335,9 +340,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         _id: z.string(),
-        name: z.string(),
-        email: z.email(),
-        nfcId: z.string(),
+        nfcId: z.string().nullable(),
         roles: z.array(z.string()),
         blocked: z.boolean(),
       }),
@@ -352,11 +355,34 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      const { _id, ...updateData } = input;
+      const { _id, nfcId, roles, blocked } = input;
 
-      const updatedUser = await User.findByIdAndUpdate(_id, updateData, {
-        new: true,
-      }).exec();
+      // Prevent setting an nfcId already used by a different user
+      if (nfcId) {
+        const conflict = await User.findOne({
+          nfcId: nfcId.toLowerCase().trim(),
+          _id: { $ne: _id },
+        });
+        if (conflict) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Ez az NFC azonosító már foglalt.",
+          });
+        }
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(
+        _id,
+        {
+          $set: {
+            roles,
+            blocked,
+            ...(nfcId !== null ? { nfcId: nfcId.toLowerCase().trim() } : {}),
+          },
+          ...(nfcId === null ? { $unset: { nfcId: "" } } : {}),
+        },
+        { new: true },
+      ).exec();
 
       if (!updatedUser) {
         throw new TRPCError({
@@ -369,10 +395,61 @@ export const userRouter = createTRPCRouter({
         _id: updatedUser._id?.toString() ?? "",
         name: updatedUser.name,
         email: updatedUser.email,
-        nfcId: updatedUser.nfcId,
+        nfcId: updatedUser.nfcId ?? null,
         roles: updatedUser.roles,
         blocked: updatedUser.blocked ?? false,
       };
+    }),
+
+  setNfcId: protectedProcedure
+    .input(
+      z.object({
+        nfcId: z
+          .string()
+          .regex(
+            /^[0-9A-Fa-f]{8}$/,
+            "Az NFC azonosító pontosan 8 hexadecimális karakter kell legyen.",
+          ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const email = ctx.session.user?.email;
+
+      if (!email) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+
+      const normalizedNfcId = input.nfcId.toLowerCase();
+
+      const conflict = await User.findOne({
+        nfcId: normalizedNfcId,
+        email: { $ne: email },
+      });
+
+      if (conflict) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Ez az NFC azonosító már foglalt.",
+        });
+      }
+
+      const user = await User.findOneAndUpdate(
+        { email },
+        { $set: { nfcId: normalizedNfcId } },
+        { new: true },
+      );
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      return { nfcId: user.nfcId ?? null };
     }),
 
   // Get all users
@@ -383,7 +460,8 @@ export const userRouter = createTRPCRouter({
           _id: z.string(),
           name: z.string(),
           email: z.string(),
-          nfcId: z.string(),
+          nfcId: z.string().nullable(),
+          joinDate: z.date().nullable(),
           laptopPasswordChanged: z.date().nullable(),
           roles: z.array(z.string()),
           blocked: z.boolean(),
@@ -443,7 +521,8 @@ export const userRouter = createTRPCRouter({
           _id: user._id?.toString() ?? "",
           name: user.name,
           email: user.email,
-          nfcId: user.nfcId,
+          nfcId: user.nfcId ?? null,
+          joinDate: user.joinDate ?? null,
           laptopPasswordChanged: user.laptopPasswordChanged ?? null,
           roles: user.roles,
           blocked: user.blocked ?? false,
@@ -461,7 +540,8 @@ export const userRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1),
         email: z.email(),
-        nfcId: z.string().min(1),
+        nfcId: z.string().optional(),
+        joinDate: z.date().optional(),
         roles: z.array(z.string()).min(1),
         blocked: z.boolean().default(false),
         sendWelcomeEmail: z.boolean().default(true),
@@ -478,10 +558,16 @@ export const userRouter = createTRPCRouter({
       }
       await mongooseConnect();
 
-      // Check if user with this email or nfcId already exists
-      const existingUser = await User.findOne({
-        $or: [{ email: input.email }, { nfcId: input.nfcId }],
-      });
+      // Build conflict check: always check by email, check nfcId only if provided
+      const orConditions: Record<string, string>[] = [{ email: input.email }];
+      const normalizedNfcId = input.nfcId
+        ? input.nfcId.toLowerCase().trim()
+        : undefined;
+      if (normalizedNfcId) {
+        orConditions.push({ nfcId: normalizedNfcId });
+      }
+
+      const existingUser = await User.findOne({ $or: orConditions });
 
       if (existingUser) {
         throw new TRPCError({
@@ -493,7 +579,8 @@ export const userRouter = createTRPCRouter({
       const newUser = await User.create({
         name: input.name,
         email: input.email,
-        nfcId: input.nfcId.toLowerCase().trim(),
+        ...(normalizedNfcId ? { nfcId: normalizedNfcId } : {}),
+        ...(input.joinDate ? { joinDate: input.joinDate } : {}),
         roles: input.roles,
         blocked: input.blocked,
         groups: [],
@@ -524,7 +611,7 @@ export const userRouter = createTRPCRouter({
         _id: newUser._id?.toString() ?? "",
         name: newUser.name,
         email: newUser.email,
-        nfcId: newUser.nfcId,
+        nfcId: newUser.nfcId ?? null,
         roles: newUser.roles,
         blocked: newUser.blocked ?? false,
         laptopPasswordChanged: newUser.laptopPasswordChanged ?? null,
@@ -587,30 +674,80 @@ export const userRouter = createTRPCRouter({
       const emails = users.map((u) => u.email);
 
       // Delete AD accounts (best-effort — don't fail offboarding if AD is down)
-      try {
-        const puToken = env.PU_TOKEN;
-        if (puToken && env.PU_URL) {
-          const response = await fetch(`${env.PU_URL}/ad/delete-users`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${puToken}`,
-            },
-            body: JSON.stringify({ emails }),
-          });
+      // Dev safety: never delete AD users while running in development env.
+      if (env.NODE_ENV !== "development") {
+        try {
+          const puToken = env.PU_TOKEN;
+          if (puToken && env.PU_URL) {
+            const response = await fetch(`${env.PU_URL}/ad/delete-users`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${puToken}`,
+              },
+              body: JSON.stringify({ emails }),
+            });
 
-          if (!response.ok) {
-            const errorText = await response.text().catch(() => "");
-            console.error(
-              `AD deletion failed (${response.status}): ${errorText}`,
-            );
+            if (!response.ok) {
+              const errorText = await response.text().catch(() => "");
+              console.error(
+                `AD deletion failed (${response.status}): ${errorText}`,
+              );
+            }
           }
+        } catch (error) {
+          console.error("AD service unavailable during offboarding:", error);
         }
-      } catch (error) {
-        console.error("AD service unavailable during offboarding:", error);
       }
 
       const result = await User.deleteMany({ nfcId: { $in: nfcIds } });
+
+      return {
+        deletedCount: result.deletedCount,
+        message: `${result.deletedCount} user(s) offboarded`,
+      };
+    }),
+
+  // Offboard users by emails
+  offboardByEmails: protectedProcedure
+    .input(z.array(z.email()).min(1))
+    .mutation(async ({ ctx, input: emails }) => {
+      const authorized = await checkRoles(ctx.session, ["administrator"]);
+
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
+
+      // Delete AD accounts (best-effort)
+      if (env.NODE_ENV !== "development") {
+        try {
+          const puToken = env.PU_TOKEN;
+          if (puToken && env.PU_URL) {
+            const response = await fetch(`${env.PU_URL}/ad/delete-users`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${puToken}`,
+              },
+              body: JSON.stringify({ emails }),
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text().catch(() => "");
+              console.error(
+                `AD deletion failed (${response.status}): ${errorText}`,
+              );
+            }
+          }
+        } catch (error) {
+          console.error("AD service unavailable during offboarding:", error);
+        }
+      }
+
+      const result = await User.deleteMany({ email: { $in: emails } });
 
       return {
         deletedCount: result.deletedCount,
