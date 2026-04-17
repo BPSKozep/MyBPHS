@@ -8,6 +8,7 @@ import type { Metadata, Viewport } from "next";
 import Providers from "@/app/providers";
 import IdentifyUser from "@/components/auth/IdentifyUser";
 import ProfilePictureSync from "@/components/auth/ProfilePictureSync";
+import UserDataCaptureGuard from "@/components/auth/UserDataCaptureGuard";
 import MainHeader from "@/components/MainHeader";
 import PageTransition from "@/components/PageTransition";
 import { getServerAuthSession } from "@/server/auth";
@@ -66,10 +67,12 @@ export default async function RootLayout({
         <Providers>
           <IdentifyUser>
             <ProfilePictureSync>
-              <div className="box-border flex h-screen w-full flex-col">
-                <MainHeader />
-                <PageTransition>{children}</PageTransition>
-              </div>
+              <UserDataCaptureGuard>
+                <div className="box-border flex h-screen w-full flex-col">
+                  <MainHeader />
+                  <PageTransition>{children}</PageTransition>
+                </div>
+              </UserDataCaptureGuard>
             </ProfilePictureSync>
           </IdentifyUser>
         </Providers>

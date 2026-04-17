@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 export default function LastUsers() {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(true);
 
   const {
     data: users,
@@ -19,9 +19,21 @@ export default function LastUsers() {
     refetchInterval: 3000,
   });
 
+  const formatJoinDate = (joinDate: Date | null) => {
+    if (!joinDate) return "—";
+    return new Date(joinDate).toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
+
   const latestUsers = React.useMemo(() => {
     if (!users) return [];
-    return [...users].reverse().slice(0, 30);
+    const joinTime = (d: Date | null) => (d ? new Date(d).getTime() : 0);
+    return [...users]
+      .sort((a, b) => joinTime(b.joinDate) - joinTime(a.joinDate))
+      .slice(0, 30);
   }, [users]);
 
   const getUserInitials = (name: string): string => {
@@ -113,15 +125,23 @@ export default function LastUsers() {
                           {getUserInitials(user.name)}
                         </div>
 
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-medium text-white">
-                              {user.name}
-                            </h3>
+                        <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
+                          <div className="min-w-0 space-y-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium text-white">
+                                {user.name}
+                              </h3>
+                            </div>
+                            <p className="break-all text-sm text-gray-300">
+                              {user.email}
+                            </p>
                           </div>
-                          <p className="break-all text-sm text-gray-300">
-                            {user.email}
-                          </p>
+                          <span
+                            className="shrink-0 text-sm whitespace-nowrap text-gray-400"
+                            title="Csatlakozás dátuma"
+                          >
+                            {formatJoinDate(user.joinDate)}
+                          </span>
                         </div>
                       </div>
                     ))}

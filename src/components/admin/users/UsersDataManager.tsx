@@ -73,6 +73,7 @@ type SortableColumn =
   | "email"
   | "nfcId"
   | "blocked"
+  | "joinDate"
   | "laptopPasswordChanged"
   | "hasADAccount";
 type UserColumn =
@@ -82,6 +83,7 @@ type UserColumn =
   | "nfcId"
   | "roles"
   | "blocked"
+  | "joinDate"
   | "laptopPasswordChanged"
   | "hasADAccount"
   | "actions";
@@ -110,7 +112,8 @@ interface UserData {
   _id: string;
   name: string;
   email: string;
-  nfcId: string;
+  nfcId: string | null;
+  joinDate: Date | null;
   laptopPasswordChanged: Date | null;
   roles: string[];
   blocked: boolean;
@@ -129,6 +132,12 @@ const defaultColumns: ColumnConfig[] = [
   { key: "roles", label: "Szerepek", sortable: false, visible: true },
   { key: "blocked", label: "Blokkolva", sortable: true, visible: true },
   {
+    key: "joinDate",
+    label: "Csatlakozás dátuma",
+    sortable: true,
+    visible: true,
+  },
+  {
     key: "laptopPasswordChanged",
     label: "Iskolai jelszó módosítva",
     sortable: true,
@@ -139,9 +148,10 @@ const defaultColumns: ColumnConfig[] = [
 ];
 
 const editableFields: EditableFieldConfig[] = [
-  { key: "name", editable: true, type: "text" },
-  { key: "email", editable: true, type: "email" },
+  { key: "name", editable: false, type: "text" },
+  { key: "email", editable: false, type: "email" },
   { key: "nfcId", editable: true, type: "text" },
+  { key: "joinDate", editable: false, type: "text" },
   { key: "laptopPasswordChanged", editable: false, type: "text" },
   {
     key: "roles",
@@ -278,7 +288,7 @@ export default function UsersDataManager() {
         (user) =>
           user.name.toLowerCase().includes(searchLower) ||
           user.email.toLowerCase().includes(searchLower) ||
-          user.nfcId.toLowerCase().includes(searchLower),
+          (user.nfcId ?? "").toLowerCase().includes(searchLower),
       );
     }
 
@@ -296,9 +306,17 @@ export default function UsersDataManager() {
           compareResult = compareHungarianIgnoreCase(a.email, b.email);
           break;
         case "nfcId":
-          // NFC IDs are usually numeric/alphanumeric, but use Hungarian collation for consistency
-          compareResult = compareHungarianIgnoreCase(a.nfcId, b.nfcId);
+          compareResult = compareHungarianIgnoreCase(
+            a.nfcId ?? "",
+            b.nfcId ?? "",
+          );
           break;
+        case "joinDate": {
+          const aJoin = a.joinDate ? new Date(a.joinDate).getTime() : 0;
+          const bJoin = b.joinDate ? new Date(b.joinDate).getTime() : 0;
+          compareResult = aJoin - bJoin;
+          break;
+        }
         case "blocked": {
           const aBlocked = a.blocked ? 1 : 0;
           const bBlocked = b.blocked ? 1 : 0;
@@ -377,7 +395,6 @@ export default function UsersDataManager() {
   }, [editingUserId, cancelEditing]);
 
   const handleSort = (column: UserColumn) => {
-    // Only handle sorting for sortable columns
     if (column === "actions" || column === "select" || column === "roles")
       return;
 
@@ -398,7 +415,16 @@ export default function UsersDataManager() {
     );
   };
 
-  const formatDate = (date: Date | null) => {
+  const formatJoinDate = (date: Date | null) => {
+    if (!date) return "Soha";
+    return new Date(date).toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
+
+  const formatDateTime = (date: Date | null) => {
     if (!date) return "Soha";
     return new Date(date).toLocaleDateString("hu-HU", {
       year: "numeric",
@@ -414,7 +440,7 @@ export default function UsersDataManager() {
       column === "actions" ||
       column === "select" ||
       column === "roles" ||
-      sortBy !== column
+      (sortBy as string) !== column
     )
       return null;
     return sortDirection === "asc" ? (
@@ -442,8 +468,6 @@ export default function UsersDataManager() {
 
     updateUserMutation.mutate({
       _id: editingUserData._id,
-      name: editingUserData.name,
-      email: editingUserData.email,
       nfcId: editingUserData.nfcId,
       roles: editingUserData.roles,
       blocked: editingUserData.blocked,
@@ -598,8 +622,6 @@ export default function UsersDataManager() {
     updateUserMutation.mutate(
       {
         _id: mobileEditDialog.editedUser._id,
-        name: mobileEditDialog.editedUser.name,
-        email: mobileEditDialog.editedUser.email,
         nfcId: mobileEditDialog.editedUser.nfcId,
         roles: mobileEditDialog.editedUser.roles,
         blocked: mobileEditDialog.editedUser.blocked,
@@ -998,34 +1020,36 @@ export default function UsersDataManager() {
 
             {mobileEditDialog.editedUser && (
               <div className="space-y-4 pb-4">
-                {/* Name Field */}
+                {/* Name Field (read-only — synced from Google) */}
                 <div className="space-y-2">
-                  <Label htmlFor="mobile-name" className="text-white">
-                    Név
+                  <Label htmlFor="mobile-name" className="text-gray-400">
+                    Név{" "}
+                    <span className="text-xs text-gray-500">
+                      (szinkronizált)
+                    </span>
                   </Label>
                   <Input
                     id="mobile-name"
                     value={mobileEditDialog.editedUser.name}
-                    onChange={(e) =>
-                      updateMobileEditField("name", e.target.value)
-                    }
-                    className="border-gray-600 bg-[#565656] text-white"
+                    readOnly
+                    className="border-gray-600 bg-[#3a3a3a] text-gray-300 cursor-default"
                   />
                 </div>
 
-                {/* Email Field */}
+                {/* Email Field (read-only — synced from Google) */}
                 <div className="space-y-2">
-                  <Label htmlFor="mobile-email" className="text-white">
-                    Email
+                  <Label htmlFor="mobile-email" className="text-gray-400">
+                    Email{" "}
+                    <span className="text-xs text-gray-500">
+                      (szinkronizált)
+                    </span>
                   </Label>
                   <Input
                     id="mobile-email"
                     type="email"
                     value={mobileEditDialog.editedUser.email}
-                    onChange={(e) =>
-                      updateMobileEditField("email", e.target.value)
-                    }
-                    className="border-gray-600 bg-[#565656] text-white"
+                    readOnly
+                    className="border-gray-600 bg-[#3a3a3a] text-gray-300 cursor-default"
                   />
                 </div>
 
@@ -1036,9 +1060,10 @@ export default function UsersDataManager() {
                   </Label>
                   <Input
                     id="mobile-nfcId"
-                    value={mobileEditDialog.editedUser.nfcId}
+                    value={mobileEditDialog.editedUser.nfcId ?? ""}
+                    maxLength={8}
                     onChange={(e) =>
-                      updateMobileEditField("nfcId", e.target.value)
+                      updateMobileEditField("nfcId", e.target.value || null)
                     }
                     className="border-gray-600 bg-[#565656] font-mono text-white"
                   />
@@ -1127,11 +1152,19 @@ export default function UsersDataManager() {
                   </Button>
                 )}
 
+                {/* Join Date (Read-only) */}
+                <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#454545] p-4">
+                  <Label className="text-white">Csatlakozás dátuma</Label>
+                  <span className="text-sm text-gray-200">
+                    {formatJoinDate(mobileEditDialog.editedUser.joinDate)}
+                  </span>
+                </div>
+
                 {/* Password Changed (Read-only) */}
                 <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#454545] p-4">
                   <Label className="text-white">Iskolai jelszó módosítva</Label>
                   <span className="text-sm text-gray-200">
-                    {formatDate(
+                    {formatDateTime(
                       mobileEditDialog.editedUser.laptopPasswordChanged,
                     )}
                   </span>
@@ -1297,16 +1330,24 @@ export default function UsersDataManager() {
                               {isEditing &&
                               getFieldConfig("nfcId")?.editable ? (
                                 <Input
-                                  value={displayUser.nfcId}
+                                  value={displayUser.nfcId ?? ""}
                                   onChange={(e) =>
-                                    updateEditingField("nfcId", e.target.value)
+                                    updateEditingField(
+                                      "nfcId",
+                                      e.target.value || null,
+                                    )
                                   }
+                                  maxLength={8}
                                   className="h-8 border-gray-600 bg-[#565656] font-mono text-white"
                                 />
-                              ) : (
+                              ) : displayUser.nfcId ? (
                                 <code className="rounded border border-gray-500 bg-[#565656] px-2 py-1 font-mono text-sm text-white">
                                   {displayUser.nfcId}
                                 </code>
+                              ) : (
+                                <span className="text-xs text-gray-500">
+                                  Nincs
+                                </span>
                               )}
                             </div>
                           )}
@@ -1399,9 +1440,16 @@ export default function UsersDataManager() {
                               )}
                             </div>
                           )}
+                          {column.key === "joinDate" && (
+                            <span className="text-sm text-gray-200">
+                              {formatJoinDate(displayUser.joinDate)}
+                            </span>
+                          )}
                           {column.key === "laptopPasswordChanged" && (
                             <span className="text-sm text-gray-200">
-                              {formatDate(displayUser.laptopPasswordChanged)}
+                              {formatDateTime(
+                                displayUser.laptopPasswordChanged,
+                              )}
                             </span>
                           )}
                           {column.key === "hasADAccount" && (
