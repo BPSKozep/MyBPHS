@@ -133,6 +133,7 @@ export async function POST(req: Request) {
         await resend.emails.send({
           from: "MyBPHS <my@bphs.hu>",
           to: sender,
+          cc: ["edit.braun@budapestschool.org", "jpp-tech@budapestschool.org"],
           subject: "MyBPHS | Excel import nem engedélyezett",
           react: ExcelImportDenied({ sender }),
         });
