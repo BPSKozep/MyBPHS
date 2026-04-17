@@ -134,7 +134,7 @@ export async function POST(req: Request) {
           from: "MyBPHS <my@bphs.hu>",
           to: sender,
           subject: "MyBPHS | Excel import nem engedélyezett",
-          react: ExcelImportDenied(),
+          react: ExcelImportDenied({ sender }),
         });
         return NextResponse.json({ ok: true });
       }

@@ -10,7 +10,11 @@ import {
   Text,
 } from "@react-email/components";
 
-export default function ExcelImportDenied() {
+interface ExcelImportDeniedProps {
+  sender: string;
+}
+
+export default function ExcelImportDenied({ sender }: ExcelImportDeniedProps) {
   return (
     <Html>
       <Preview>
@@ -30,6 +34,7 @@ export default function ExcelImportDenied() {
               <Text className="text-base font-semibold leading-6 text-white">
                 Az Excel import nem érhető el erről a feladói címről.
               </Text>
+              <Text className="text-sm leading-5 text-slate-300">{sender}</Text>
               <Text className="text-sm leading-5 text-slate-400">
                 Ha úgy gondolod, hogy ez tévedés, kérjük vedd fel a kapcsolatot
                 az ügyfélszolgálattal:{" "}
