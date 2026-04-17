@@ -67,12 +67,12 @@ export default async function RootLayout({
         <Providers>
           <IdentifyUser>
             <ProfilePictureSync>
-              <UserDataCaptureGuard>
-                <div className="box-border flex h-screen w-full flex-col">
-                  <MainHeader />
-                  <PageTransition>{children}</PageTransition>
-                </div>
-              </UserDataCaptureGuard>
+              {/* <UserDataCaptureGuard> */}
+              <div className="box-border flex h-screen w-full flex-col">
+                <MainHeader />
+                <PageTransition>{children}</PageTransition>
+              </div>
+              {/* </UserDataCaptureGuard> */}
             </ProfilePictureSync>
           </IdentifyUser>
         </Providers>
