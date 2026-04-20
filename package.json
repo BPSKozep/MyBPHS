@@ -46,7 +46,7 @@
     "motion": "^12.38.0",
     "nanoid": "^5.1.7",
     "next": "16.2.3",
-    "next-auth": "^4.24.13",
+    "next-auth": "^4.24.14",
     "pdfmake": "^0.3.6",
     "posthog-js": "^1.367.0",
     "prettier": "^3.8.1",
