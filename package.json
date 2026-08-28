@@ -2,6 +2,7 @@
   "name": "mybphs",
   "version": "2.10.0",
   "private": true,
+  "packageManager": "pnpm@11.24.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
