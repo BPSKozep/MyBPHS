@@ -139,12 +139,12 @@ export default function WelcomeStep({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 6, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 max-w-[calc(100vw-3rem)] rounded-lg bg-gray-800 border border-gray-600 p-3 text-xs text-gray-200 shadow-xl z-50 text-left leading-relaxed"
+                className="absolute bottom-full right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mb-2 w-64 max-w-[calc(100vw-3rem)] rounded-lg bg-gray-800 border border-gray-600 p-3 text-xs text-gray-200 shadow-xl z-50 text-left leading-relaxed"
                 role="tooltip"
               >
                 A regisztráció alatt szükség lesz az egyéni token azonosítódra.
                 A tokenedért keresd a rendszergazdát vagy a mentorodat.
-                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 h-2 w-2 rotate-45 bg-gray-800 border-r border-b border-gray-600" />
+                <div className="absolute top-full right-2 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 -mt-1 h-2 w-2 rotate-45 bg-gray-800 border-r border-b border-gray-600" />
               </motion.div>
             )}
           </AnimatePresence>
