@@ -1,5 +1,9 @@
 allowBuilds:
+  core-js: true
+  esbuild: true
   lefthook: true
+  protobufjs: true
+  sharp: true
 
 overrides:
   '@types/react': 19.2.13
