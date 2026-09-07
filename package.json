@@ -46,7 +46,7 @@
     "mongoose": "^9.9.4",
     "motion": "^13.1.1",
     "nanoid": "^6.0.1",
-    "next": "16.3.3",
+    "next": "16.3.4",
     "next-auth": "^4.24.15",
     "pdfmake": "^0.3.11",
     "posthog-js": "^1.421.1",
