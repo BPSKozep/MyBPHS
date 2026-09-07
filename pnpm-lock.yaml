@@ -153,8 +153,8 @@ importers:
         specifier: ^4.8.3
         version: 4.8.3
       stripe:
-        specifier: ^22.6.0
-        version: 22.6.0(@types/node@26.4.0)
+        specifier: ^22.6.1
+        version: 22.6.1(@types/node@26.4.0)
       superjson:
         specifier: ^2.2.6
         version: 2.2.6
@@ -3640,8 +3640,8 @@ packages:
     resolution: {integrity: sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA==}
     engines: {node: '>=4'}
 
-  stripe@22.6.0:
-    resolution: {integrity: sha512-Ezk+WYEEwX2DLxFrKfb6coznlCMZvCaCYMNPXNHFSZkBIEzF5Hgm7RLb38q/0h9Ol5jsUJGJRorvhzAvckgfhw==}
+  stripe@22.6.1:
+    resolution: {integrity: sha512-hAKSkGeVt2u46TRYhmnvwmVHxBNtOCJnPjc+SH5sP2B2ypElYzAAY3Ljx0Ar8C2w8nfpFQiZ95qoDCDsFkXMTA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
@@ -7351,7 +7351,7 @@ snapshots:
 
   strip-bom@3.0.0: {}
 
-  stripe@22.6.0(@types/node@26.4.0):
+  stripe@22.6.1(@types/node@26.4.0):
     optionalDependencies:
       '@types/node': 26.4.0
 
