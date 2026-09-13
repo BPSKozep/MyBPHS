@@ -21,6 +21,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { FaColumns } from "react-icons/fa";
 import { FaCheck, FaX } from "react-icons/fa6";
 import Card from "@/components/Card";
+import { InfoBox } from "@/components/InfoBox";
 import Loading from "@/components/Loading";
 import {
   AlertDialog,
@@ -192,11 +193,6 @@ export default function UsersDataManager() {
     editedUser: UserData | null;
   }>({ open: false, user: null, editedUser: null });
 
-  const visibleColumns = useMemo(
-    () => columns.filter((col) => col.visible),
-    [columns],
-  );
-
   const {
     data: allUsers,
     isLoading,
@@ -204,8 +200,30 @@ export default function UsersDataManager() {
     refetch: refetchUsers,
   } = api.user.getAll.useQuery();
 
-  const { data: adUsers, refetch: refetchAdUsers } =
-    api.ad.listUsers.useQuery();
+  const {
+    data: adUsers,
+    refetch: refetchAdUsers,
+    isError: isAdUsersError,
+  } = api.ad.listUsers.useQuery(undefined, {
+    retry: false,
+  });
+
+  const isPUUnavailable = Boolean(isAdUsersError);
+
+  const visibleColumns = useMemo(
+    () =>
+      columns.filter(
+        (col) =>
+          col.visible && (!isPUUnavailable || col.key !== "hasADAccount"),
+      ),
+    [columns, isPUUnavailable],
+  );
+
+  React.useEffect(() => {
+    if (isPUUnavailable && sortBy === "hasADAccount") {
+      setSortBy("name");
+    }
+  }, [isPUUnavailable, sortBy]);
 
   const updateUserMutation = api.user.update.useMutation({
     onSuccess: () => {
@@ -574,7 +592,7 @@ export default function UsersDataManager() {
   const handleRefreshWithLoading = useCallback(async () => {
     setIsRefreshLoading(true);
     try {
-      await Promise.all([refetchUsers(), refetchAdUsers()]);
+      await Promise.allSettled([refetchUsers(), refetchAdUsers()]);
     } finally {
       setIsRefreshLoading(false);
     }
@@ -653,6 +671,17 @@ export default function UsersDataManager() {
   return (
     <Card>
       <div className="space-y-6">
+        {isPUUnavailable && (
+          <InfoBox
+            variant="warning"
+            icon={TriangleAlertIcon}
+            className="py-2.5 px-3 text-xs sm:text-sm"
+          >
+            A PowerShell Universal nem érhető el, így az AD fiók adatok jelenleg
+            nem láthatók.
+          </InfoBox>
+        )}
+
         {/* Controls Section */}
         <div className="sticky top-0 z-20 flex flex-col items-start justify-between gap-4 bg-[#242424] py-3 lg:flex-row lg:items-center">
           <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
@@ -763,7 +792,11 @@ export default function UsersDataManager() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="border-gray-600 bg-[#242424]">
                   {columns
-                    .filter((column) => column.key !== "select")
+                    .filter(
+                      (column) =>
+                        column.key !== "select" &&
+                        (!isPUUnavailable || column.key !== "hasADAccount"),
+                    )
                     .map((column) => (
                       <DropdownMenuCheckboxItem
                         key={column.key}
@@ -910,7 +943,11 @@ export default function UsersDataManager() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="border-gray-600 bg-[#242424]">
                   {columns
-                    .filter((column) => column.key !== "select")
+                    .filter(
+                      (column) =>
+                        column.key !== "select" &&
+                        (!isPUUnavailable || column.key !== "hasADAccount"),
+                    )
                     .map((column) => (
                       <DropdownMenuCheckboxItem
                         key={column.key}
@@ -1114,42 +1151,46 @@ export default function UsersDataManager() {
                 </div>
 
                 {/* AD Account Status (Read-only) */}
-                <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#454545] p-4">
-                  <Label className="text-white">AD Fiók</Label>
-                  <Badge
-                    variant="default"
-                    className={
-                      mobileEditDialog.editedUser.hasADAccount
-                        ? "bg-green-600 text-white"
-                        : "bg-red-600 text-white"
-                    }
-                  >
-                    {mobileEditDialog.editedUser.hasADAccount ? (
-                      <span className="flex items-center gap-1">
-                        <FaCheck className="size-3" /> Van
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1">
-                        <FaX className="size-3" /> Nincs
-                      </span>
-                    )}
-                  </Badge>
-                </div>
+                {!isPUUnavailable && (
+                  <>
+                    <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#454545] p-4">
+                      <Label className="text-white">AD Fiók</Label>
+                      <Badge
+                        variant="default"
+                        className={
+                          mobileEditDialog.editedUser.hasADAccount
+                            ? "bg-green-600 text-white"
+                            : "bg-red-600 text-white"
+                        }
+                      >
+                        {mobileEditDialog.editedUser.hasADAccount ? (
+                          <span className="flex items-center gap-1">
+                            <FaCheck className="size-3" /> Van
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1">
+                            <FaX className="size-3" /> Nincs
+                          </span>
+                        )}
+                      </Badge>
+                    </div>
 
-                {/* Create AD Account Button */}
-                {!mobileEditDialog.editedUser.hasADAccount && (
-                  <Button
-                    onClick={() => {
-                      if (mobileEditDialog.user) {
-                        handleCreateADUser(mobileEditDialog.user);
-                      }
-                    }}
-                    disabled={createADUserMutation.isPending}
-                    className="w-full border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    <PlusIcon className="mr-2 size-4" />
-                    AD fiók létrehozása
-                  </Button>
+                    {/* Create AD Account Button */}
+                    {!mobileEditDialog.editedUser.hasADAccount && (
+                      <Button
+                        onClick={() => {
+                          if (mobileEditDialog.user) {
+                            handleCreateADUser(mobileEditDialog.user);
+                          }
+                        }}
+                        disabled={createADUserMutation.isPending}
+                        className="w-full border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                        <PlusIcon className="mr-2 size-4" />
+                        AD fiók létrehozása
+                      </Button>
+                    )}
+                  </>
                 )}
 
                 {/* Join Date (Read-only) */}

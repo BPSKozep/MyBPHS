@@ -32,7 +32,7 @@ export default function SchoolPasswordReset() {
 
   const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
-  const [laptopPassResetAvailable, setlaptopAvailable] = useState(true);
+  const [laptopPassResetAvailable, setlaptopAvailable] = useState(false);
 
   const [laptopPassResetShown, setLaptopPassResetShown] = useState(false);
 
@@ -57,23 +57,33 @@ export default function SchoolPasswordReset() {
   ];
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const timer = setTimeout(() => {
       setLaptopPassResetShown(true);
+      controller.abort();
     }, 3000);
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/laptop/ping")
+    fetch("/api/laptop/ping", { signal: controller.signal })
       .then((response) => {
-        if (response.status !== 200) {
+        if (response.status === 200) {
+          setlaptopAvailable(true);
+        } else {
           setlaptopAvailable(false);
         }
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === "AbortError") {
+          return;
+        }
         console.error(error);
+        setlaptopAvailable(false);
       });
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, []);
 
   return (
