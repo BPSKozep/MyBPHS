@@ -7,7 +7,6 @@ import { laptopRouter } from "@/server/routers/laptop.router";
 import { menuRouter } from "@/server/routers/menu.router";
 import { networkingRouter } from "@/server/routers/networking.router";
 import { orderRouter } from "@/server/routers/order.router";
-import { paymentsRouter } from "@/server/routers/payments.router";
 import { profilePictureRouter } from "@/server/routers/profilePicture.router";
 import { userRouter } from "@/server/routers/user.router";
 import { webhookRouter } from "@/server/routers/webhook.router";
@@ -23,7 +22,6 @@ export const appRouter = createTRPCRouter({
   webhook: webhookRouter,
   ad: adRouter,
   kiosk: kioskRouter,
-  payments: paymentsRouter,
   laptop: laptopRouter,
   profilePicture: profilePictureRouter,
   networking: networkingRouter,

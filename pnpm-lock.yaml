@@ -310,9 +310,6 @@ importers:
       socket.io-client:
         specifier: ^4.8.3
         version: 4.8.3
-      stripe:
-        specifier: ^22.6.0
-        version: 22.6.0(@types/node@26.4.0)
       superjson:
         specifier: ^2.2.6
         version: 2.2.6
@@ -3797,15 +3794,6 @@ packages:
   strip-bom@3.0.0:
     resolution: {integrity: sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA==}
     engines: {node: '>=4'}
-
-  stripe@22.6.0:
-    resolution: {integrity: sha512-Ezk+WYEEwX2DLxFrKfb6coznlCMZvCaCYMNPXNHFSZkBIEzF5Hgm7RLb38q/0h9Ol5jsUJGJRorvhzAvckgfhw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@types/node': '>=18'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
 
   stubborn-fs@2.0.0:
     resolution: {integrity: sha512-Y0AvSwDw8y+nlSNFXMm2g6L51rBGdAQT20J3YSOqxC53Lo3bjWRtr2BKcfYoAf352WYpsZSTURrA0tqhfgudPA==}
@@ -7508,10 +7496,6 @@ snapshots:
       character-entities-legacy: 3.0.0
 
   strip-bom@3.0.0: {}
-
-  stripe@22.6.0(@types/node@26.4.0):
-    optionalDependencies:
-      '@types/node': 26.4.0
 
   stubborn-fs@2.0.0:
     dependencies:
