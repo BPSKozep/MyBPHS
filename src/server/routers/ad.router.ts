@@ -19,7 +19,7 @@ export const adRouter = createTRPCRouter({
     }
 
     if (!user.laptopPasswordChanged) {
-      return;
+      return null;
     } else {
       const dateTime = new Intl.DateTimeFormat("hu-HU", {
         dateStyle: "medium",
@@ -129,6 +129,7 @@ export const adRouter = createTRPCRouter({
         headers: {
           Authorization: `Bearer ${puToken}`,
         },
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!response.ok) {

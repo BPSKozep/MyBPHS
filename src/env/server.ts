@@ -43,15 +43,6 @@ export const env = createEnv({
     RESEND_API_KEY: z.string().optional(),
     RESEND_WEBHOOK_SECRET: z.string().optional(),
     GOOGLE_APPSCRIPT_SECRET: z.string().optional(),
-    STRIPE_SECRET_KEY: z.string().optional(),
-    STRIPE_PRICE_ID:
-      process.env.NODE_ENV === "production"
-        ? z.string()
-        : z.string().optional(),
-    STRIPE_WEBHOOK_KEY:
-      process.env.NODE_ENV === "production"
-        ? z.string()
-        : z.string().optional(),
     REDIS_URL:
       process.env.NODE_ENV === "production"
         ? z.string()

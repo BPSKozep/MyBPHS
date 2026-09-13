@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import mongooseConnect from "@/clients/mongoose";
 import { getRedisClient } from "@/clients/redis";
+import { env } from "@/env/server";
 
 const NO_CACHE_HEADERS = {
   "Cache-Control": "no-store, no-cache, must-revalidate",
@@ -28,6 +29,31 @@ export async function GET() {
     checks.redis = { ok: pong === "PONG" };
   } catch (err) {
     checks.redis = {
+      ok: false,
+      error: err instanceof Error ? err.message : "unknown error",
+    };
+  }
+
+  // PowerShell Universal check
+  try {
+    if (!env.PU_URL) {
+      checks.powershell_universal = {
+        ok: false,
+        error: "PU_URL not configured",
+      };
+    } else {
+      const puResponse = await fetch(env.PU_URL, {
+        signal: AbortSignal.timeout(1000),
+      });
+      checks.powershell_universal = {
+        ok: puResponse.status === 200,
+        ...(puResponse.status === 200
+          ? {}
+          : { error: `status code: ${puResponse.status}` }),
+      };
+    }
+  } catch (err) {
+    checks.powershell_universal = {
       ok: false,
       error: err instanceof Error ? err.message : "unknown error",
     };
