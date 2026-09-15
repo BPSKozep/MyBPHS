@@ -126,6 +126,9 @@ export default function KioskPage() {
 
   const loading = orderloading ?? userLoading;
   const error = !loading && (orderError ?? userError ?? socketFailure);
+  const isUserNotFound =
+    orderError?.message?.includes("User not found") ||
+    userError?.message?.includes("User not found");
 
   const isValidNfc = nfcId.length === 8;
 
@@ -334,10 +337,15 @@ export default function KioskPage() {
           {isValidNfc && loading && <Loading />}
 
           {isValidNfc && error && (
-            <h1 className="text-5xl font-bold">Hiba történt.</h1>
+            <h1 className="text-5xl font-bold">
+              {isUserNotFound
+                ? "Hiba, felhasználó nem regisztált a tokennel!"
+                : "Hiba történt."}
+            </h1>
           )}
           {isValidNfc &&
             error &&
+            !isUserNotFound &&
             process.env.MONGODB_DATABASE === "dev-mybphs" && (
               <h1 className="text-5xl font-bold">Hiba történt. Hétvége?</h1>
             )}
