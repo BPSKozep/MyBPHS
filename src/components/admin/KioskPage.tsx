@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCheck, FaUser, FaWrench } from "react-icons/fa";
 import { io } from "socket.io-client";
@@ -14,11 +15,25 @@ import { useKioskErrorLogger } from "@/utils/useKioskErrorLogger";
 const DEFAULT_PROFILE_IMAGE = "https://cdn.bphs.hu/no_picture.png";
 
 export default function KioskPage() {
+  const { status } = useSession();
   const [nfcId, setNfcId] = useState("");
   const [primarySocketFailed, setPrimarySocketFailed] = useState(false);
   const [socketConnected, setSocketConnected] = useState(false);
   const devTags = ["8b2a1345", "4bf41145", "00000000"];
   const [profileImageURL, setProfileImageURL] = useState(DEFAULT_PROFILE_IMAGE);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      try {
+        const savedToken = localStorage.getItem("kiosk_token");
+        if (savedToken) {
+          window.location.href = `/auth/kiosk?token=${encodeURIComponent(savedToken)}`;
+        }
+      } catch (e) {
+        console.error("Failed to read kiosk_token from localStorage:", e);
+      }
+    }
+  }, [status]);
 
   const { logError } = useKioskErrorLogger();
 
