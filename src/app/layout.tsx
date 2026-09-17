@@ -6,9 +6,9 @@ import "./globals.css";
 
 import type { Metadata, Viewport } from "next";
 import Providers from "@/app/providers";
+import DisabledGuard from "@/components/auth/DisabledGuard";
 import IdentifyUser from "@/components/auth/IdentifyUser";
 import ProfilePictureSync from "@/components/auth/ProfilePictureSync";
-import UserDataCaptureGuard from "@/components/auth/UserDataCaptureGuard";
 import MainHeader from "@/components/MainHeader";
 import PageTransition from "@/components/PageTransition";
 import { getServerAuthSession } from "@/server/auth";
@@ -65,16 +65,16 @@ export default async function RootLayout({
           ></script>
         )}
         <Providers>
-          <IdentifyUser>
-            <ProfilePictureSync>
-              {/* <UserDataCaptureGuard> */}
-              <div className="box-border flex h-screen w-full flex-col">
-                <MainHeader />
-                <PageTransition>{children}</PageTransition>
-              </div>
-              {/* </UserDataCaptureGuard> */}
-            </ProfilePictureSync>
-          </IdentifyUser>
+          <DisabledGuard>
+            <IdentifyUser>
+              <ProfilePictureSync>
+                <div className="box-border flex h-screen w-full flex-col">
+                  <MainHeader />
+                  <PageTransition>{children}</PageTransition>
+                </div>
+              </ProfilePictureSync>
+            </IdentifyUser>
+          </DisabledGuard>
         </Providers>
       </body>
     </html>
