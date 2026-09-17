@@ -12,7 +12,7 @@ export default function OnlyRoles({
   const router = useRouter();
   const session = useSession();
   const user = api.user.get.useQuery(session.data?.user?.email ?? "", {
-    enabled: !!session.data,
+    enabled: !!session.data && !session.data.user.disabled,
   });
   const isAllowed = useMemo(
     () => roles.some((role) => user.data?.roles.includes(role)),

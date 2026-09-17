@@ -5,6 +5,7 @@ import "@fontsource/lily-script-one";
 import "./globals.css";
 
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import Providers from "@/app/providers";
 import DisabledGuard from "@/components/auth/DisabledGuard";
 import IdentifyUser from "@/components/auth/IdentifyUser";
@@ -55,14 +56,15 @@ export default async function RootLayout({
     <html lang="hu">
       <body>
         {/* Jira Widget */}
-        {session && (
-          <script
+        {session && !session.user.disabled && (
+          <Script
+            id="jira-widget"
             data-jsd-embedded
             data-key="ade8f754-42e4-4153-bad2-bd4b153ff206"
             data-base-url="https://jsd-widget.atlassian.com"
             src="https://jsd-widget.atlassian.com/assets/embed.js"
-            defer
-          ></script>
+            strategy="lazyOnload"
+          />
         )}
         <Providers>
           <DisabledGuard>

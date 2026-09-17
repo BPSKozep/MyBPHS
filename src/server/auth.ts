@@ -19,6 +19,7 @@ declare module "next-auth" {
     user: {
       id: string;
       googleImage?: string;
+      disabled?: boolean;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -28,6 +29,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     googleImage?: string;
+    disabled?: boolean;
   }
 }
 
@@ -40,11 +42,20 @@ interface GoogleProfile {
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    jwt: ({ token, profile }) => {
+    jwt: async ({ token, user, profile }) => {
       // Capture Google profile picture URL during sign-in
       const googleProfile = profile as GoogleProfile | undefined;
       if (googleProfile?.picture) {
         token.googleImage = googleProfile.picture;
+      }
+      if (user || token.disabled === undefined) {
+        const email = token.email ?? user?.email ?? profile?.email;
+        if (email) {
+          token.email = email;
+          await mongooseConnect();
+          const dbUser = await User.findOne({ email }).select("disabled");
+          token.disabled = dbUser?.disabled ?? false;
+        }
       }
       return token;
     },
@@ -54,6 +65,7 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: token.sub,
         googleImage: token.googleImage,
+        disabled: token.disabled ?? false,
       },
     }),
     async signIn({ profile }) {
@@ -61,7 +73,9 @@ export const authOptions: NextAuthOptions = {
 
       const user = await User.findOne({ email: profile?.email });
 
-      if (user) return true;
+      if (user) {
+        return true;
+      }
 
       const email = profile?.email;
       if (
