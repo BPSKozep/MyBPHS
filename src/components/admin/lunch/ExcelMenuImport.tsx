@@ -17,7 +17,7 @@ import { type ParsedWeekMenu, parseExcelMenu } from "@/utils/parseExcelMenu";
 const DAY_NAMES_DISPLAY = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 const DAY_INITIALS = ["H", "K", "Sz", "Cs", "P"];
 
-type MenuOption = { soup: string; "a-menu": string; "b-menu": string };
+type MenuOption = Record<string, string>;
 
 type ExcelMenuImportProps = {
   onConfirm: (options: MenuOption[]) => Promise<void> | void;
@@ -157,11 +157,21 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
             "b-menu": "",
           };
         }
-        return {
+        const option: Record<string, string> = {
           soup: day.soup,
           "a-menu": day.aMenu ? `A | ${day.aMenu}` : "",
           "b-menu": day.bMenu ? `B | ${day.bMenu}` : "",
         };
+        if (day.vegaMenu) {
+          option.enimölfree = `Vegetáriánus | ${day.vegaMenu}`;
+        }
+        if (day.mindenmentesMenu) {
+          option.everyfree = `Mindenmentes | ${day.mindenmentesMenu}`;
+        }
+        if (day.veganMenu) {
+          option.veghatariannus = `Vegán | ${day.veganMenu}`;
+        }
+        return option;
       },
     );
 

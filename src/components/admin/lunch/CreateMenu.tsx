@@ -27,9 +27,7 @@ export default function CreateMenu() {
 
   const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
-  const handleSaveAndSendEmail = async (
-    options: { soup?: string; "a-menu": string; "b-menu": string }[],
-  ) => {
+  const handleSaveAndSendEmail = async (options: Record<string, string>[]) => {
     await sleep(500);
 
     const date = new Date();
@@ -87,9 +85,7 @@ export default function CreateMenu() {
     return email.trim().split("@")[0];
   };
 
-  const handleExcelConfirm = async (
-    options: { soup: string; "a-menu": string; "b-menu": string }[],
-  ) => {
+  const handleExcelConfirm = async (options: Record<string, string>[]) => {
     await handleSaveAndSendEmail(options);
   };
 
