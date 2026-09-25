@@ -4,6 +4,9 @@ export type ParsedMenu = {
   soup: string;
   aMenu: string;
   bMenu: string;
+  vegaMenu?: string;
+  veganMenu?: string;
+  mindenmentesMenu?: string;
 };
 
 export type ParsedWeekMenu = {
@@ -66,7 +69,7 @@ export function parseExcelMenu(workbook: XLSX.WorkBook): ParsedWeekMenu | null {
   let dateRange = "";
   for (
     let i = headerRowIndex;
-    i < Math.min(headerRowIndex + 15, data.length);
+    i < Math.min(headerRowIndex + 25, data.length);
     i++
   ) {
     const row = data[i];
@@ -87,12 +90,37 @@ export function parseExcelMenu(workbook: XLSX.WorkBook): ParsedWeekMenu | null {
     return String(row[colIndex] ?? "").trim();
   };
 
-  const isStopMarker = (value: string): boolean => {
+  const isVeganHeader = (value: string): boolean => {
     if (!value) return false;
-    const upper = value.toUpperCase();
+    const upper = value.toUpperCase().trim();
+    return upper.startsWith("VEGÁN") || upper.startsWith("VEGAN");
+  };
+
+  const isVegaHeader = (value: string): boolean => {
+    if (!value) return false;
+    const upper = value.toUpperCase().trim();
+    if (isVeganHeader(value)) return false;
     return (
       upper.startsWith("VEGA") ||
-      upper.startsWith("MINDEN MENTES") ||
+      upper.startsWith("VEGETÁRIÁNUS") ||
+      upper.startsWith("VEGETARIANUS")
+    );
+  };
+
+  const isMindenmentesHeader = (value: string): boolean => {
+    if (!value) return false;
+    const upper = value.toUpperCase().trim();
+    return (
+      upper.startsWith("MINDEN MENTES") || upper.startsWith("MINDENMENTES")
+    );
+  };
+
+  const isStopMarker = (value: string): boolean => {
+    if (!value) return false;
+    return (
+      isVegaHeader(value) ||
+      isMindenmentesHeader(value) ||
+      isVeganHeader(value) ||
       /\d{4}\.\d{2}\.\d{2}/.test(value)
     );
   };
@@ -102,25 +130,18 @@ export function parseExcelMenu(workbook: XLSX.WorkBook): ParsedWeekMenu | null {
     return value.length > 0 && !isStopMarker(value);
   };
 
-  let firstDataRow = headerRowIndex + 1;
-  const firstColIndex = dayColumnIndices[0];
-  if (firstColIndex === undefined) return null;
+  const rowHasContent = (rowIndex: number): boolean => {
+    return dayColumnIndices.some((colIndex) => hasContent(rowIndex, colIndex));
+  };
 
-  while (
-    firstDataRow < data.length &&
-    !hasContent(firstDataRow, firstColIndex)
-  ) {
+  let firstDataRow = headerRowIndex + 1;
+  while (firstDataRow < data.length && !rowHasContent(firstDataRow)) {
     firstDataRow++;
   }
 
-  const findNextContentRow = (
-    startRow: number,
-    colIndex: number,
-    maxRows = 10,
-  ): number => {
+  const findNextContentRow = (startRow: number, maxRows = 10): number => {
     for (let i = startRow; i < startRow + maxRows && i < data.length; i++) {
-      const value = getCell(i, colIndex);
-      if (value && !isStopMarker(value)) {
+      if (rowHasContent(i)) {
         return i;
       }
     }
@@ -132,21 +153,75 @@ export function parseExcelMenu(workbook: XLSX.WorkBook): ParsedWeekMenu | null {
     if (!mainDish || isStopMarker(mainDish)) return "";
 
     const sideRow = mainRow + 1;
-    const sideDish = getCell(sideRow, colIndex);
-
-    if (sideDish && !isStopMarker(sideDish)) {
-      return `${mainDish}, ${sideDish}`;
+    if (sideRow < data.length) {
+      const sideDish = getCell(sideRow, colIndex);
+      if (sideDish && !isStopMarker(sideDish)) {
+        return `${mainDish}, ${sideDish}`;
+      }
     }
 
     return mainDish;
   };
 
-  const days: ParsedMenu[] = [];
-  const refColIndex = firstColIndex;
+  const aMenuRow = findNextContentRow(firstDataRow + 1);
+  const bMenuRow = aMenuRow !== -1 ? findNextContentRow(aMenuRow + 2) : -1;
 
-  const aMenuRow = findNextContentRow(firstDataRow + 1, refColIndex);
-  const bMenuRow =
-    aMenuRow !== -1 ? findNextContentRow(aMenuRow + 2, refColIndex) : -1;
+  // Search for Vega section header
+  let vegaHeaderRow = -1;
+  const vegaSearchStart = bMenuRow !== -1 ? bMenuRow + 1 : firstDataRow + 1;
+  for (let i = vegaSearchStart; i < data.length; i++) {
+    const row = data[i];
+    if (!row) continue;
+    const hasVega = row.some((cell) => cell && isVegaHeader(String(cell)));
+    if (hasVega) {
+      vegaHeaderRow = i;
+      break;
+    }
+  }
+  const vegaMainRow =
+    vegaHeaderRow !== -1 ? findNextContentRow(vegaHeaderRow + 1) : -1;
+
+  // Search for Mindenmentes section header
+  let mindenmentesHeaderRow = -1;
+  const mmSearchStart =
+    vegaHeaderRow !== -1 ? vegaHeaderRow + 1 : vegaSearchStart;
+  for (let i = mmSearchStart; i < data.length; i++) {
+    const row = data[i];
+    if (!row) continue;
+    const hasMm = row.some(
+      (cell) => cell && isMindenmentesHeader(String(cell)),
+    );
+    if (hasMm) {
+      mindenmentesHeaderRow = i;
+      break;
+    }
+  }
+  const mindenmentesMainRow =
+    mindenmentesHeaderRow !== -1
+      ? findNextContentRow(mindenmentesHeaderRow + 1)
+      : -1;
+
+  // Search for Vegan section header
+  let veganHeaderRow = -1;
+  const veganSearchStart =
+    mindenmentesHeaderRow !== -1
+      ? mindenmentesHeaderRow + 1
+      : vegaHeaderRow !== -1
+        ? vegaHeaderRow + 1
+        : vegaSearchStart;
+  for (let i = veganSearchStart; i < data.length; i++) {
+    const row = data[i];
+    if (!row) continue;
+    const hasVegan = row.some((cell) => cell && isVeganHeader(String(cell)));
+    if (hasVegan) {
+      veganHeaderRow = i;
+      break;
+    }
+  }
+  const veganMainRow =
+    veganHeaderRow !== -1 ? findNextContentRow(veganHeaderRow + 1) : -1;
+
+  const days: ParsedMenu[] = [];
 
   for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
     const colIndex = dayColumnIndices[dayIndex];
@@ -155,8 +230,23 @@ export function parseExcelMenu(workbook: XLSX.WorkBook): ParsedWeekMenu | null {
     const soup = getCell(firstDataRow, colIndex);
     const aMenu = aMenuRow !== -1 ? getMenuWithSide(aMenuRow, colIndex) : "";
     const bMenu = bMenuRow !== -1 ? getMenuWithSide(bMenuRow, colIndex) : "";
+    const vegaMenu =
+      vegaMainRow !== -1 ? getMenuWithSide(vegaMainRow, colIndex) : "";
+    const mindenmentesMenu =
+      mindenmentesMainRow !== -1
+        ? getMenuWithSide(mindenmentesMainRow, colIndex)
+        : "";
+    const veganMenu =
+      veganMainRow !== -1 ? getMenuWithSide(veganMainRow, colIndex) : "";
 
-    days.push({ soup, aMenu, bMenu });
+    days.push({
+      soup,
+      aMenu,
+      bMenu,
+      vegaMenu,
+      mindenmentesMenu,
+      veganMenu,
+    });
   }
 
   return { dateRange, days };
