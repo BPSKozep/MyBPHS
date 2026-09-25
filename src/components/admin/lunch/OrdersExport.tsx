@@ -205,7 +205,10 @@ export default function OrdersExport({ year, week }: OrdersExportProps) {
       );
       const missingSpecials = SPECIAL_MEALS.filter(
         ({ key }) => !visibleKeys.has(key),
-      );
+      ).map(({ key, label }) => ({
+        key,
+        label: combined[key] ?? label,
+      }));
 
       return {
         dayName,

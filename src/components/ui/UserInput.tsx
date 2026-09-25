@@ -8,7 +8,7 @@ import { api } from "@/trpc/react";
 interface User {
   email: string;
   name: string;
-  blocked?: boolean;
+  disabled?: boolean;
 }
 
 interface UserInputProps {
@@ -60,7 +60,7 @@ export default function UserInput({
     setSelectedUser({
       email: user.email,
       name: user.name,
-      blocked: user.blocked,
+      disabled: user.disabled,
     });
     setIsOpen(false);
     setSearchQuery("");
@@ -68,7 +68,7 @@ export default function UserInput({
       onSelect({
         email: user.email,
         name: user.name,
-        blocked: user.blocked,
+        disabled: user.disabled,
       });
     }
   };
@@ -116,7 +116,7 @@ export default function UserInput({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="max-h-[300px] overflow-auto px-3"
+              className="max-h-75 overflow-auto px-3"
             >
               {showAllOption && (
                 <motion.li
@@ -156,7 +156,7 @@ export default function UserInput({
                   >
                     <div className="flex flex-col items-start">
                       <span className="text-left font-extrabold break-all">
-                        {user.name} {user.blocked && "🚫"}
+                        {user.name} {user.disabled && "🚫"}
                       </span>
 
                       <span className="text-left text-xs font-semibold break-all text-neutral-700">

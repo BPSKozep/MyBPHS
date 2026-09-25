@@ -9,6 +9,7 @@ import "./globals.css";
 import { AlertTriangleIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
+import DisabledComponent from "@/components/auth/DisabledComponent";
 import Button from "@/components/Button";
 import { InfoBox } from "@/components/InfoBox";
 import PageWithHeader from "@/components/PageWithHeader";
@@ -19,9 +20,32 @@ type GlobalErrorProps = {
 };
 
 export default function GlobalError({ error }: GlobalErrorProps) {
+  const isInactiveUser =
+    error?.message?.includes("Ez a felhasználó inaktív") ||
+    error?.digest?.includes("Ez a felhasználó inaktív");
+
   useEffect(() => {
+    if (isInactiveUser) {
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname !== "/disabled"
+      ) {
+        window.location.replace("/disabled");
+      }
+      return;
+    }
     console.error("Global error boundary caught:", error);
-  }, [error]);
+  }, [error, isInactiveUser]);
+
+  if (isInactiveUser) {
+    return (
+      <html lang="hu">
+        <body className="h-screen w-full bg-slate-900">
+          <DisabledComponent />
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html lang="hu">

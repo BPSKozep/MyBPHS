@@ -73,7 +73,7 @@ type SortableColumn =
   | "name"
   | "email"
   | "nfcId"
-  | "blocked"
+  | "disabled"
   | "joinDate"
   | "laptopPasswordChanged"
   | "hasADAccount";
@@ -83,7 +83,7 @@ type UserColumn =
   | "email"
   | "nfcId"
   | "roles"
-  | "blocked"
+  | "disabled"
   | "joinDate"
   | "laptopPasswordChanged"
   | "hasADAccount"
@@ -105,11 +105,11 @@ interface ColumnConfig {
 interface EditableFieldConfig {
   key: keyof UserData;
   editable: boolean;
-  type: "text" | "email" | "select" | "checkbox";
+  type: "text" | "email" | "checkbox" | "select";
   options?: string[];
 }
 
-interface UserData {
+export interface UserData {
   _id: string;
   name: string;
   email: string;
@@ -117,7 +117,7 @@ interface UserData {
   joinDate: Date | null;
   laptopPasswordChanged: Date | null;
   roles: string[];
-  blocked: boolean;
+  disabled: boolean;
   hasADAccount: boolean;
 }
 
@@ -131,7 +131,7 @@ const defaultColumns: ColumnConfig[] = [
   { key: "email", label: "Email", sortable: true, visible: true },
   { key: "nfcId", label: "NFC ID", sortable: true, visible: true },
   { key: "roles", label: "Szerepek", sortable: false, visible: true },
-  { key: "blocked", label: "Blokkolva", sortable: true, visible: true },
+  { key: "disabled", label: "Letiltott", sortable: true, visible: true },
   {
     key: "joinDate",
     label: "Csatlakozás dátuma",
@@ -160,7 +160,7 @@ const editableFields: EditableFieldConfig[] = [
     type: "select",
     options: ["student", "staff", "administrator"],
   },
-  { key: "blocked", editable: true, type: "checkbox" },
+  { key: "disabled", editable: true, type: "checkbox" },
 ];
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
@@ -335,10 +335,10 @@ export default function UsersDataManager() {
           compareResult = aJoin - bJoin;
           break;
         }
-        case "blocked": {
-          const aBlocked = a.blocked ? 1 : 0;
-          const bBlocked = b.blocked ? 1 : 0;
-          compareResult = aBlocked - bBlocked;
+        case "disabled": {
+          const aDisabled = a.disabled ? 1 : 0;
+          const bDisabled = b.disabled ? 1 : 0;
+          compareResult = aDisabled - bDisabled;
           break;
         }
         case "laptopPasswordChanged": {
@@ -488,7 +488,7 @@ export default function UsersDataManager() {
       _id: editingUserData._id,
       nfcId: editingUserData.nfcId,
       roles: editingUserData.roles,
-      blocked: editingUserData.blocked,
+      disabled: editingUserData.disabled,
     });
   };
 
@@ -642,7 +642,7 @@ export default function UsersDataManager() {
         _id: mobileEditDialog.editedUser._id,
         nfcId: mobileEditDialog.editedUser.nfcId,
         roles: mobileEditDialog.editedUser.roles,
-        blocked: mobileEditDialog.editedUser.blocked,
+        disabled: mobileEditDialog.editedUser.disabled,
       },
       {
         onSuccess: () => {
@@ -1002,7 +1002,7 @@ export default function UsersDataManager() {
                   onClick={() => openMobileEditDialog(user)}
                   className={cn(
                     "flex w-full items-center justify-between rounded-lg border border-gray-600 p-4 text-left transition-colors",
-                    user.blocked
+                    user.disabled
                       ? "border-l-4 border-l-red-500 bg-[#2a2020]"
                       : "bg-[#2e2e2e] hover:bg-[#343434]",
                   )}
@@ -1011,13 +1011,13 @@ export default function UsersDataManager() {
                     <div
                       className={cn(
                         "flex h-10 w-10 items-center justify-center rounded-full",
-                        user.blocked ? "bg-red-900/50" : "bg-[#454545]",
+                        user.disabled ? "bg-red-900/50" : "bg-[#454545]",
                       )}
                     >
                       <UserIcon
                         className={cn(
                           "size-5",
-                          user.blocked ? "text-red-400" : "text-gray-300",
+                          user.disabled ? "text-red-400" : "text-gray-300",
                         )}
                       />
                     </div>
@@ -1025,7 +1025,7 @@ export default function UsersDataManager() {
                       <p
                         className={cn(
                           "font-medium",
-                          user.blocked ? "text-red-400" : "text-white",
+                          user.disabled ? "text-red-400" : "text-white",
                         )}
                       >
                         {user.name}
@@ -1135,16 +1135,16 @@ export default function UsersDataManager() {
                   </div>
                 </div>
 
-                {/* Blocked Toggle */}
+                {/* Disabled Toggle */}
                 <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#454545] p-4">
-                  <Label htmlFor="mobile-blocked" className="text-white">
-                    Blokkolva
+                  <Label htmlFor="mobile-disabled" className="text-white">
+                    Letiltott
                   </Label>
                   <Switch
-                    id="mobile-blocked"
-                    checked={mobileEditDialog.editedUser.blocked}
+                    id="mobile-disabled"
+                    checked={mobileEditDialog.editedUser.disabled}
                     onCheckedChange={(checked) =>
-                      updateMobileEditField("blocked", checked)
+                      updateMobileEditField("disabled", checked)
                     }
                     className="data-[state=checked]:bg-red-600"
                   />
@@ -1313,7 +1313,7 @@ export default function UsersDataManager() {
                         index % 2 === 0
                           ? "bg-[#242424] hover:bg-[#2a2a2a]"
                           : "bg-[#2e2e2e] hover:bg-[#343434]",
-                        user.blocked &&
+                        user.disabled &&
                           "border-l-4 border-l-red-500 opacity-80",
                         isEditing && "ring-2 ring-blue-500",
                       )}
@@ -1461,20 +1461,20 @@ export default function UsersDataManager() {
                               )}
                             </div>
                           )}
-                          {column.key === "blocked" && (
+                          {column.key === "disabled" && (
                             <div className="flex items-center justify-center">
                               {isEditing &&
-                              getFieldConfig("blocked")?.editable ? (
+                              getFieldConfig("disabled")?.editable ? (
                                 <Switch
-                                  checked={displayUser.blocked}
+                                  checked={displayUser.disabled}
                                   onCheckedChange={(checked: boolean) =>
-                                    updateEditingField("blocked", checked)
+                                    updateEditingField("disabled", checked)
                                   }
                                   className="data-[state=checked]:bg-red-600"
                                 />
                               ) : (
                                 <Switch
-                                  checked={displayUser.blocked}
+                                  checked={displayUser.disabled}
                                   disabled
                                   className="data-[state=checked]:bg-red-600"
                                 />

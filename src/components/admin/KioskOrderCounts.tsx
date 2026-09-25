@@ -39,7 +39,7 @@ export default function KioskOrderCounts({
         {Object.entries(data).map((dataRow, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: no index
           <tr key={index}>
-            <td className="border-2 border-gray-500 bg-gray-700 px-6 py-3 text-left text-xl font-medium whitespace-nowrap text-gray-100">
+            <td className="border-2 border-gray-500 bg-gray-700 px-6 py-3 text-left text-xl font-medium wrap-break-word max-w-xs md:max-w-md text-gray-100">
               {dataRow[0]}
             </td>
             <td className="flex items-center justify-center border-2 border-gray-500 bg-gray-700 px-6 py-3 text-xl font-medium whitespace-nowrap text-gray-100">

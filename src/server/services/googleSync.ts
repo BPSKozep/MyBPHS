@@ -116,7 +116,7 @@ export async function reconcileGoogleGroupSnapshot(
           email: member.email,
           roles: [inferRoleFromEmail(member.email)],
           groups: [],
-          blocked: false,
+          disabled: false,
           ...(validJoinDate ? { joinDate: validJoinDate } : {}),
         });
         createdEmails.push(member.email);

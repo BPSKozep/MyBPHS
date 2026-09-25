@@ -18,6 +18,7 @@ export default function ProfilePictureSync({ children }: PropsWithChildren) {
       if (
         !session?.user?.googleImage ||
         !session?.user?.email ||
+        session?.user?.disabled ||
         syncAttemptedRef.current === session.user.email
       ) {
         return;

@@ -5,10 +5,11 @@ import "@fontsource/lily-script-one";
 import "./globals.css";
 
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import Providers from "@/app/providers";
+import DisabledGuard from "@/components/auth/DisabledGuard";
 import IdentifyUser from "@/components/auth/IdentifyUser";
 import ProfilePictureSync from "@/components/auth/ProfilePictureSync";
-import UserDataCaptureGuard from "@/components/auth/UserDataCaptureGuard";
 import MainHeader from "@/components/MainHeader";
 import PageTransition from "@/components/PageTransition";
 import { getServerAuthSession } from "@/server/auth";
@@ -55,26 +56,27 @@ export default async function RootLayout({
     <html lang="hu">
       <body>
         {/* Jira Widget */}
-        {session && (
-          <script
+        {session && !session.user.disabled && (
+          <Script
+            id="jira-widget"
             data-jsd-embedded
             data-key="ade8f754-42e4-4153-bad2-bd4b153ff206"
             data-base-url="https://jsd-widget.atlassian.com"
             src="https://jsd-widget.atlassian.com/assets/embed.js"
-            defer
-          ></script>
+            strategy="lazyOnload"
+          />
         )}
         <Providers>
-          <IdentifyUser>
-            <ProfilePictureSync>
-              {/* <UserDataCaptureGuard> */}
-              <div className="box-border flex h-screen w-full flex-col">
-                <MainHeader />
-                <PageTransition>{children}</PageTransition>
-              </div>
-              {/* </UserDataCaptureGuard> */}
-            </ProfilePictureSync>
-          </IdentifyUser>
+          <DisabledGuard>
+            <IdentifyUser>
+              <ProfilePictureSync>
+                <div className="box-border flex h-screen w-full flex-col">
+                  <MainHeader />
+                  <PageTransition>{children}</PageTransition>
+                </div>
+              </ProfilePictureSync>
+            </IdentifyUser>
+          </DisabledGuard>
         </Providers>
       </body>
     </html>
