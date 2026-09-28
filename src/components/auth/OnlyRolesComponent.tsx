@@ -9,6 +9,7 @@ export default async function OnlyRolesComponent({
   children,
 }: { roles: string[]; fallback?: ReactNode } & PropsWithChildren) {
   const session = await getServerSession(authOptions);
+  if (session?.user?.disabled) return fallback;
   const user = await api.user.get(session?.user?.email ?? "");
   const isAllowed = roles.some((role) => user?.roles.includes(role));
 

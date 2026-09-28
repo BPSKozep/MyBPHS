@@ -108,39 +108,71 @@ export default function ExcelImport({ menu, error }: ExcelImportProps) {
                           Időszak: {menu.dateRange}
                         </Text>
                       )}
-                      <table
-                        style={{
-                          width: "100%",
-                          borderCollapse: "collapse",
-                          marginTop: "8px",
-                          marginBottom: "24px",
-                        }}
-                      >
-                        <thead>
-                          <tr>
-                            <th style={thStyle}>Nap</th>
-                            <th style={thStyle}>Leves</th>
-                            <th style={thStyle}>A Menü</th>
-                            <th style={thStyle}>B Menü</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {menu.days.map((day, i) => (
-                            <tr
-                              key={DAY_NAMES[i]}
-                              style={{
-                                backgroundColor:
-                                  i % 2 === 0 ? "#1e293b" : "#0f172a",
-                              }}
-                            >
-                              <td style={tdDayStyle}>{DAY_NAMES[i]}</td>
-                              <td style={tdStyle}>{day.soup}</td>
-                              <td style={tdStyle}>{day.aMenu}</td>
-                              <td style={tdStyle}>{day.bMenu}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      {(() => {
+                        const hasVega = menu.days.some((day) => !!day.vegaMenu);
+                        const hasMindenmentes = menu.days.some(
+                          (day) => !!day.mindenmentesMenu,
+                        );
+                        const hasVegan = menu.days.some(
+                          (day) => !!day.veganMenu,
+                        );
+
+                        return (
+                          <table
+                            style={{
+                              width: "100%",
+                              borderCollapse: "collapse",
+                              marginTop: "8px",
+                              marginBottom: "24px",
+                            }}
+                          >
+                            <thead>
+                              <tr>
+                                <th style={thStyle}>Nap</th>
+                                <th style={thStyle}>Leves</th>
+                                <th style={thStyle}>A Menü</th>
+                                <th style={thStyle}>B Menü</th>
+                                {hasVega && <th style={thStyle}>Vega</th>}
+                                {hasMindenmentes && (
+                                  <th style={thStyle}>Mindenmentes</th>
+                                )}
+                                {hasVegan && <th style={thStyle}>Vegán</th>}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {menu.days.map((day, i) => (
+                                <tr
+                                  key={DAY_NAMES[i]}
+                                  style={{
+                                    backgroundColor:
+                                      i % 2 === 0 ? "#1e293b" : "#0f172a",
+                                  }}
+                                >
+                                  <td style={tdDayStyle}>{DAY_NAMES[i]}</td>
+                                  <td style={tdStyle}>{day.soup}</td>
+                                  <td style={tdStyle}>{day.aMenu}</td>
+                                  <td style={tdStyle}>{day.bMenu}</td>
+                                  {hasVega && (
+                                    <td style={tdStyle}>
+                                      {day.vegaMenu || "-"}
+                                    </td>
+                                  )}
+                                  {hasMindenmentes && (
+                                    <td style={tdStyle}>
+                                      {day.mindenmentesMenu || "-"}
+                                    </td>
+                                  )}
+                                  {hasVegan && (
+                                    <td style={tdStyle}>
+                                      {day.veganMenu || "-"}
+                                    </td>
+                                  )}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        );
+                      })()}
                     </>
                   )}
                 </>

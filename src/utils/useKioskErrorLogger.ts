@@ -7,7 +7,7 @@ export interface KioskErrorContext {
     name?: string;
     email?: string;
     roles?: string[];
-    blocked?: boolean;
+    disabled?: boolean;
   } | null;
   order?: {
     order?: string;
@@ -88,7 +88,7 @@ export function useKioskErrorLogger() {
         errorBody += `• Név: ${context.user.name ?? "N/A"}\n`;
         errorBody += `• Email: ${context.user.email ?? "N/A"}\n`;
         errorBody += `• Szerepkörök: ${context.user.roles?.join(", ") ?? "N/A"}\n`;
-        errorBody += `• Tiltva: ${context.user.blocked ? "❌ Igen" : "✅ Nem"}\n\n`;
+        errorBody += `• Letiltott: ${context.user.disabled ? "❌ Igen" : "✅ Nem"}\n\n`;
       }
 
       if (context?.order) {

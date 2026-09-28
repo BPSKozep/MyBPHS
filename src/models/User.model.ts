@@ -10,7 +10,7 @@ export interface IUser {
   nfcId?: string;
   joinDate?: Date;
   laptopPasswordChanged?: Date;
-  blocked?: boolean;
+  disabled?: boolean;
 }
 
 const userSchema = new Schema<IUser>({
@@ -44,7 +44,7 @@ const userSchema = new Schema<IUser>({
     type: Date,
     required: false,
   },
-  blocked: {
+  disabled: {
     type: Boolean,
     required: false,
   },

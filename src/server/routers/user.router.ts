@@ -30,7 +30,7 @@ export const userRouter = createTRPCRouter({
           name: z.string(),
           email: z.string(),
           roles: z.string().array(),
-          blocked: z.boolean().optional(),
+          disabled: z.boolean().optional(),
           nfcId: z.string().nullable().optional(),
           joinDate: z.date().nullable().optional(),
           laptopPasswordChanged: z.date().nullable().optional(),
@@ -63,7 +63,7 @@ export const userRouter = createTRPCRouter({
           name: z.string(),
           email: z.string(),
           roles: z.string().array(),
-          blocked: z.boolean().optional(),
+          disabled: z.boolean().optional(),
         })
         .nullable(),
     )
@@ -80,9 +80,22 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      return await User.findOne({ nfcId: input })
+      const user = await User.findOne({ nfcId: input })
         .select("-_id -__v")
         .lean<IUser>();
+
+      if (!user) {
+        return null;
+      }
+
+      if (user.disabled) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Ez a felhasználó inaktív",
+        });
+      }
+
+      return user;
     }),
   getTimetable: protectedProcedure
     .input(z.email())
@@ -261,7 +274,7 @@ export const userRouter = createTRPCRouter({
           _id: z.string(),
           email: z.string(),
           name: z.string(),
-          blocked: z.boolean(),
+          disabled: z.boolean(),
           joinDate: z.date().nullable(),
         }),
       ),
@@ -286,14 +299,14 @@ export const userRouter = createTRPCRouter({
       }
 
       const users = await User.find(roleFilter).select(
-        "_id email name blocked joinDate",
+        "_id email name disabled joinDate",
       );
 
       return users.map((user) => ({
         _id: user._id?.toString(),
         email: user.email,
         name: user.name,
-        blocked: user.blocked ?? false,
+        disabled: user.disabled ?? false,
         joinDate: user.joinDate ?? null,
       }));
     }),
@@ -306,7 +319,7 @@ export const userRouter = createTRPCRouter({
       return user?.nfcId ?? "";
     }),
 
-  toggleBlocked: protectedProcedure
+  toggleDisabled: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       const authorized = await checkRoles(ctx.session, ["administrator"]);
@@ -329,7 +342,7 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      user.blocked = !user.blocked;
+      user.disabled = !user.disabled;
 
       await user.save();
 
@@ -342,7 +355,7 @@ export const userRouter = createTRPCRouter({
         _id: z.string(),
         nfcId: z.string().nullable(),
         roles: z.array(z.string()),
-        blocked: z.boolean(),
+        disabled: z.boolean(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -355,7 +368,7 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      const { _id, nfcId, roles, blocked } = input;
+      const { _id, nfcId, roles, disabled } = input;
 
       // Prevent setting an nfcId already used by a different user
       if (nfcId) {
@@ -376,7 +389,7 @@ export const userRouter = createTRPCRouter({
         {
           $set: {
             roles,
-            blocked,
+            disabled,
             ...(nfcId !== null ? { nfcId: nfcId.toLowerCase().trim() } : {}),
           },
           ...(nfcId === null ? { $unset: { nfcId: "" } } : {}),
@@ -397,7 +410,7 @@ export const userRouter = createTRPCRouter({
         email: updatedUser.email,
         nfcId: updatedUser.nfcId ?? null,
         roles: updatedUser.roles,
-        blocked: updatedUser.blocked ?? false,
+        disabled: updatedUser.disabled ?? false,
       };
     }),
 
@@ -464,7 +477,7 @@ export const userRouter = createTRPCRouter({
           joinDate: z.date().nullable(),
           laptopPasswordChanged: z.date().nullable(),
           roles: z.array(z.string()),
-          blocked: z.boolean(),
+          disabled: z.boolean(),
           hasADAccount: z.boolean(),
         }),
       ),
@@ -526,7 +539,7 @@ export const userRouter = createTRPCRouter({
           joinDate: user.joinDate ?? null,
           laptopPasswordChanged: user.laptopPasswordChanged ?? null,
           roles: user.roles,
-          blocked: user.blocked ?? false,
+          disabled: user.disabled ?? false,
           hasADAccount: adUserEmails.has(user.email),
         };
       });
@@ -544,7 +557,7 @@ export const userRouter = createTRPCRouter({
         nfcId: z.string().optional(),
         joinDate: z.date().optional(),
         roles: z.array(z.string()).min(1),
-        blocked: z.boolean().default(false),
+        disabled: z.boolean().default(false),
         sendWelcomeEmail: z.boolean().default(true),
       }),
     )
@@ -583,7 +596,7 @@ export const userRouter = createTRPCRouter({
         ...(normalizedNfcId ? { nfcId: normalizedNfcId } : {}),
         ...(input.joinDate ? { joinDate: input.joinDate } : {}),
         roles: input.roles,
-        blocked: input.blocked,
+        disabled: input.disabled,
         groups: [],
       });
 
@@ -614,7 +627,7 @@ export const userRouter = createTRPCRouter({
         email: newUser.email,
         nfcId: newUser.nfcId ?? null,
         roles: newUser.roles,
-        blocked: newUser.blocked ?? false,
+        disabled: newUser.disabled ?? false,
         laptopPasswordChanged: newUser.laptopPasswordChanged ?? null,
       };
     }),
@@ -839,7 +852,7 @@ export const userRouter = createTRPCRouter({
         email: input.email,
         nfcId: input.nfcId.toLowerCase().trim(),
         roles: [role],
-        blocked: false,
+        disabled: false,
         groups: [],
       });
 

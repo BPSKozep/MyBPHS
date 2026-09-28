@@ -101,7 +101,7 @@ export default function TokenCheck() {
     setCreateOrderError(null);
   }, [user, weekOffset]);
 
-  const toggleBlocked = api.user.toggleBlocked.useMutation();
+  const toggleDisabled = api.user.toggleDisabled.useMutation();
   const adminEditOrder = api.order.adminEdit.useMutation();
   const adminCreateDefaultOrder =
     api.order.adminCreateDefaultOrder.useMutation();
@@ -143,11 +143,11 @@ export default function TokenCheck() {
 
       {user && checkMode === "user" && (
         <div className="my-3 flex items-center space-x-3">
-          <span className="text-white font-medium">Fiók letiltása</span>
+          <span className="text-white font-medium">Letiltott</span>
           <Switch
-            checked={user.blocked}
+            checked={user.disabled}
             onCheckedChange={async () => {
-              await toggleBlocked.mutateAsync(user.email);
+              await toggleDisabled.mutateAsync(user.email);
               await refetchEmailUser();
             }}
             className="data-[state=checked]:bg-red-600"

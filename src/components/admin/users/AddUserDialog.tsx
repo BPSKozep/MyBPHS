@@ -34,7 +34,7 @@ interface NewUser {
   email: string;
   nfcId: string;
   roles: string[];
-  blocked: boolean;
+  disabled: boolean;
   sendWelcomeEmail: boolean;
 }
 
@@ -43,7 +43,7 @@ const initialUserState: NewUser = {
   email: "",
   nfcId: "",
   roles: [],
-  blocked: false,
+  disabled: false,
   sendWelcomeEmail: true,
 };
 
@@ -193,13 +193,13 @@ export default function AddUserDialog({
           </div>
           <div className="flex items-center space-x-2">
             <Switch
-              id="blocked"
-              checked={newUser.blocked}
-              onCheckedChange={(checked) => updateField("blocked", checked)}
+              id="disabled"
+              checked={newUser.disabled}
+              onCheckedChange={(checked) => updateField("disabled", checked)}
               className="data-[state=checked]:bg-red-600"
             />
-            <Label htmlFor="blocked" className="text-white">
-              Blokkolva
+            <Label htmlFor="disabled" className="text-white">
+              Letiltott
             </Label>
           </div>
           <div className="flex items-center space-x-2">

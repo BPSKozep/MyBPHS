@@ -187,9 +187,11 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
-      if (user.blocked) {
-        user.blocked = false;
-        await user.save();
+      if (user.disabled) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Ez a felhasználó inaktív",
+        });
       }
 
       let order = await Order.findOne({
@@ -390,10 +392,10 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
-      if (user.blocked) {
+      if (user.disabled) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "User is blocked",
+          message: "Ez a felhasználó inaktív",
         });
       }
 
@@ -552,10 +554,10 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
-      if (user.blocked) {
+      if (user.disabled) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "User is blocked",
+          message: "Ez a felhasználó inaktív",
         });
       }
 

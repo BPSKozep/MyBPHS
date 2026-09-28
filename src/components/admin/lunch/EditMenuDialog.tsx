@@ -22,6 +22,9 @@ type DayOptions = {
   soup: string;
   "a-menu": string;
   "b-menu": string;
+  enimölfree: string;
+  everyfree: string;
+  veghatariannus: string;
 };
 
 function emptyDays(): DayOptions[] {
@@ -29,6 +32,9 @@ function emptyDays(): DayOptions[] {
     soup: "",
     "a-menu": "",
     "b-menu": "",
+    enimölfree: "",
+    everyfree: "",
+    veghatariannus: "",
   }));
 }
 
@@ -39,6 +45,9 @@ function optionsFromMenu(options: Record<string, string>[]): DayOptions[] {
       soup: day.soup ?? "",
       "a-menu": day["a-menu"] ?? "",
       "b-menu": day["b-menu"] ?? "",
+      enimölfree: day.enimölfree ?? "",
+      everyfree: day.everyfree ?? "",
+      veghatariannus: day.veghatariannus ?? "",
     };
   });
 }
@@ -48,6 +57,10 @@ function dayOptionsToRecord(day: DayOptions): Record<string, string> {
     "a-menu": day["a-menu"].trim(),
     "b-menu": day["b-menu"].trim(),
   };
+  if (day.enimölfree?.trim()) record.enimölfree = day.enimölfree.trim();
+  if (day.everyfree?.trim()) record.everyfree = day.everyfree.trim();
+  if (day.veghatariannus?.trim())
+    record.veghatariannus = day.veghatariannus.trim();
   const soup = day.soup.trim();
   if (soup) record.soup = soup;
   return record;
@@ -161,7 +174,7 @@ export default function EditMenuDialog({ year, week }: Props) {
                     <h3 className="mb-3 text-base font-semibold text-white">
                       {dayName}
                     </h3>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       <div className="flex flex-col gap-1">
                         <Label
                           htmlFor={`soup-${dayIndex}`}
@@ -208,6 +221,61 @@ export default function EditMenuDialog({ year, week }: Props) {
                           value={days[dayIndex]?.["b-menu"] ?? ""}
                           onChange={(e) =>
                             updateDay(dayIndex, "b-menu", e.target.value)
+                          }
+                          rows={2}
+                          className="w-full resize-none rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <Label
+                          htmlFor={`vega-${dayIndex}`}
+                          className="text-sm text-gray-300"
+                        >
+                          Vegetáriánus (Vega)
+                        </Label>
+                        <textarea
+                          id={`vega-${dayIndex}`}
+                          value={days[dayIndex]?.enimölfree ?? ""}
+                          onChange={(e) =>
+                            updateDay(dayIndex, "enimölfree", e.target.value)
+                          }
+                          rows={2}
+                          className="w-full resize-none rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <Label
+                          htmlFor={`mindenmentes-${dayIndex}`}
+                          className="text-sm text-gray-300"
+                        >
+                          Mindenmentes
+                        </Label>
+                        <textarea
+                          id={`mindenmentes-${dayIndex}`}
+                          value={days[dayIndex]?.everyfree ?? ""}
+                          onChange={(e) =>
+                            updateDay(dayIndex, "everyfree", e.target.value)
+                          }
+                          rows={2}
+                          className="w-full resize-none rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <Label
+                          htmlFor={`vegan-${dayIndex}`}
+                          className="text-sm text-gray-300"
+                        >
+                          Vegán
+                        </Label>
+                        <textarea
+                          id={`vegan-${dayIndex}`}
+                          value={days[dayIndex]?.veghatariannus ?? ""}
+                          onChange={(e) =>
+                            updateDay(
+                              dayIndex,
+                              "veghatariannus",
+                              e.target.value,
+                            )
                           }
                           rows={2}
                           className="w-full resize-none rounded-md border-none bg-[#565656] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"

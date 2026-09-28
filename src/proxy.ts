@@ -4,6 +4,7 @@ import { withAuth } from "next-auth/middleware";
 const AUTH_WHITELIST = [
   "/auth",
   "/forbidden",
+  "/disabled",
   "/onboarding",
   "/public",
   "/robots.txt",
@@ -19,6 +20,10 @@ export default withAuth(
 
     if (AUTH_WHITELIST.some((path) => pathname.startsWith(path))) {
       return NextResponse.next();
+    }
+
+    if (req.nextauth.token?.disabled) {
+      return NextResponse.redirect(new URL("/disabled", req.url));
     }
 
     if (!req.nextauth.token) {

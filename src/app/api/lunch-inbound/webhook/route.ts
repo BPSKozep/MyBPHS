@@ -181,11 +181,23 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: true });
       }
 
-      const menuOptions = parsedMenu.days.map((day) => ({
-        soup: day.soup,
-        "a-menu": day.aMenu ? `A | ${day.aMenu}` : "",
-        "b-menu": day.bMenu ? `B | ${day.bMenu}` : "",
-      }));
+      const menuOptions = parsedMenu.days.map((day) => {
+        const option: Record<string, string> = {
+          soup: day.soup,
+          "a-menu": day.aMenu ? `A | ${day.aMenu}` : "",
+          "b-menu": day.bMenu ? `B | ${day.bMenu}` : "",
+        };
+        if (day.vegaMenu) {
+          option.enimölfree = `Vegetáriánus | ${day.vegaMenu}`;
+        }
+        if (day.mindenmentesMenu) {
+          option.everyfree = `Mindenmentes | ${day.mindenmentesMenu}`;
+        }
+        if (day.veganMenu) {
+          option.veghatariannus = `Vegán | ${day.veganMenu}`;
+        }
+        return option;
+      });
 
       await mongooseConnect();
 

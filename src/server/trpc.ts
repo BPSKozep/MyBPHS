@@ -10,6 +10,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { User } from "@/models";
 import type { createTRPCContext } from "@/server/context";
 
 /**
@@ -78,13 +79,34 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 });
 
 /**
+ * Middleware that blocks any tRPC requests from disabled users.
+ */
+const disabledCheckMiddleware = t.middleware(async ({ ctx, next }) => {
+  if (ctx.session?.user?.email) {
+    const user = await User.findOne({ email: ctx.session.user.email }).select(
+      "disabled",
+    );
+    if (user?.disabled) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Ez a felhasználó inaktív",
+      });
+    }
+  }
+
+  return next();
+});
+
+/**
  * Public (unauthenticated) procedure
  *
  * This is the base piece you use to build new queries and mutations on your tRPC API. It does not
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure.use(timingMiddleware);
+export const publicProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(disabledCheckMiddleware);
 
 /**
  * Protected (authenticated) procedure
@@ -96,6 +118,7 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  */
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
+  .use(disabledCheckMiddleware)
   .use(async ({ ctx, next }) => {
     if (!ctx.session?.user?.email) {
       throw new TRPCError({ code: "UNAUTHORIZED" });

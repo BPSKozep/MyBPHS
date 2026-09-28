@@ -294,10 +294,14 @@ function LunchOrder() {
                         const { soup: _soup, ...dayWithoutSoup } =
                           menuDay as Record<string, string>;
                         const menuDayWithoutSoup = dayWithoutSoup;
-                        if (
-                          !menuDayWithoutSoup["a-menu"] &&
-                          !menuDayWithoutSoup["b-menu"]
-                        ) {
+                        const hasAnyDish =
+                          menuDayWithoutSoup["a-menu"] ||
+                          menuDayWithoutSoup["b-menu"] ||
+                          menuDayWithoutSoup.enimölfree ||
+                          menuDayWithoutSoup.everyfree ||
+                          menuDayWithoutSoup.veghatariannus;
+
+                        if (!hasAnyDish) {
                           const newMenuDay = menuCombine(
                             menuDayWithoutSoup,
                             false,

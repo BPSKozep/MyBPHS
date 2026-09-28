@@ -17,7 +17,7 @@ import { type ParsedWeekMenu, parseExcelMenu } from "@/utils/parseExcelMenu";
 const DAY_NAMES_DISPLAY = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];
 const DAY_INITIALS = ["H", "K", "Sz", "Cs", "P"];
 
-type MenuOption = { soup: string; "a-menu": string; "b-menu": string };
+type MenuOption = Record<string, string>;
 
 type ExcelMenuImportProps = {
   onConfirm: (options: MenuOption[]) => Promise<void> | void;
@@ -92,7 +92,13 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
 
   const handleEditParsedMenu = (
     dayIndex: number,
-    field: "soup" | "aMenu" | "bMenu",
+    field:
+      | "soup"
+      | "aMenu"
+      | "bMenu"
+      | "vegaMenu"
+      | "mindenmentesMenu"
+      | "veganMenu",
     value: string,
   ) => {
     if (!editableParsedMenu) return;
@@ -130,6 +136,9 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
           soup: "",
           aMenu: "",
           bMenu: "",
+          vegaMenu: "",
+          mindenmentesMenu: "",
+          veganMenu: "",
         })),
     };
     setEditableParsedMenu(emptyMenu);
@@ -148,11 +157,21 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
             "b-menu": "",
           };
         }
-        return {
+        const option: Record<string, string> = {
           soup: day.soup,
           "a-menu": day.aMenu ? `A | ${day.aMenu}` : "",
           "b-menu": day.bMenu ? `B | ${day.bMenu}` : "",
         };
+        if (day.vegaMenu) {
+          option.enimölfree = `Vegetáriánus | ${day.vegaMenu}`;
+        }
+        if (day.mindenmentesMenu) {
+          option.everyfree = `Mindenmentes | ${day.mindenmentesMenu}`;
+        }
+        if (day.veganMenu) {
+          option.veghatariannus = `Vegán | ${day.veganMenu}`;
+        }
+        return option;
       },
     );
 
@@ -300,7 +319,7 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                           rows={1}
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label
                             htmlFor={`amenu-${index}`}
@@ -344,6 +363,83 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                             disabled={!enabledDays[index]}
                             className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
                             placeholder="B Menü"
+                            rows={2}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor={`vegamenu-${index}`}
+                            className="mb-1 block text-xs font-medium text-gray-400"
+                          >
+                            Vegetáriánus (Vega)
+                          </label>
+                          <textarea
+                            id={`vegamenu-${index}`}
+                            value={
+                              enabledDays[index] ? (day.vegaMenu ?? "") : ""
+                            }
+                            onChange={(e) =>
+                              handleEditParsedMenu(
+                                index,
+                                "vegaMenu",
+                                e.target.value,
+                              )
+                            }
+                            disabled={!enabledDays[index]}
+                            className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+                            placeholder="Vega Menü"
+                            rows={2}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor={`veganmenu-${index}`}
+                            className="mb-1 block text-xs font-medium text-gray-400"
+                          >
+                            Vegán
+                          </label>
+                          <textarea
+                            id={`veganmenu-${index}`}
+                            value={
+                              enabledDays[index] ? (day.veganMenu ?? "") : ""
+                            }
+                            onChange={(e) =>
+                              handleEditParsedMenu(
+                                index,
+                                "veganMenu",
+                                e.target.value,
+                              )
+                            }
+                            disabled={!enabledDays[index]}
+                            className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+                            placeholder="Vegán Menü"
+                            rows={2}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor={`mmmenu-${index}`}
+                            className="mb-1 block text-xs font-medium text-gray-400"
+                          >
+                            Mindenmentes
+                          </label>
+                          <textarea
+                            id={`mmmenu-${index}`}
+                            value={
+                              enabledDays[index]
+                                ? (day.mindenmentesMenu ?? "")
+                                : ""
+                            }
+                            onChange={(e) =>
+                              handleEditParsedMenu(
+                                index,
+                                "mindenmentesMenu",
+                                e.target.value,
+                              )
+                            }
+                            disabled={!enabledDays[index]}
+                            className="w-full resize-none rounded-md border-none bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+                            placeholder="Mindenmentes Menü"
                             rows={2}
                           />
                         </div>
@@ -407,6 +503,27 @@ export default function ExcelMenuImport({ onConfirm }: ExcelMenuImportProps) {
                             <span className="mx-2 text-gray-500">|</span>
                             <span className="text-blue-400">B:</span>{" "}
                             {day.bMenu}
+                            {day.vegaMenu ? (
+                              <>
+                                <span className="mx-2 text-gray-500">|</span>
+                                <span className="text-emerald-400">Vega:</span>{" "}
+                                {day.vegaMenu}
+                              </>
+                            ) : null}
+                            {day.mindenmentesMenu ? (
+                              <>
+                                <span className="mx-2 text-gray-500">|</span>
+                                <span className="text-purple-400">Mentes:</span>{" "}
+                                {day.mindenmentesMenu}
+                              </>
+                            ) : null}
+                            {day.veganMenu ? (
+                              <>
+                                <span className="mx-2 text-gray-500">|</span>
+                                <span className="text-teal-400">Vegán:</span>{" "}
+                                {day.veganMenu}
+                              </>
+                            ) : null}
                           </>
                         )}
                       </div>
