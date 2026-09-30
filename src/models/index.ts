@@ -4,6 +4,8 @@ import GroupOverride from "./GroupOverride.model";
 import Kiosk from "./Kiosk.model";
 import LaptopLogin from "./LaptopLogin.model";
 import Menu from "./Menu.model";
+import OpenDay from "./OpenDay.model";
+import OpenDayRegistration from "./OpenDayRegistration.model";
 import Order from "./Order.model";
 import User from "./User.model";
 
@@ -14,6 +16,8 @@ export {
   Kiosk,
   LaptopLogin,
   Menu,
+  OpenDay,
+  OpenDayRegistration,
   Order,
   User,
 };
