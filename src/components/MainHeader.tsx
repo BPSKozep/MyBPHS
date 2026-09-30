@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import {
@@ -26,6 +27,8 @@ import SmallLoading from "./SmallLoading";
 
 export default function MainHeader() {
   const { data } = useSession();
+  const pathname = usePathname();
+  const isOpendays = pathname.startsWith("/opendays");
   const [imageError, setImageError] = useState(false);
 
   const NfcId = api.user.getNfcId.useQuery(data?.user?.email ?? "", {
@@ -42,11 +45,17 @@ export default function MainHeader() {
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-center bg-slate-800 select-none">
-      <div className="absolute left-10 flex w-10 items-center justify-end">
-        <PWAInstall />
-      </div>
+      {!isOpendays && (
+        <div className="absolute left-10 flex w-10 items-center justify-end">
+          <PWAInstall />
+        </div>
+      )}
       <div className="text-center text-2xl font-bold text-white">
-        {data ? (
+        {isOpendays ? (
+          <h1 className="text-center text-2xl font-black text-white">
+            BPS JPP
+          </h1>
+        ) : data ? (
           <h1 className="text-center text-2xl font-bold text-white">
             <Link href="/">
               <span className="hidden sm:inline">Üdvözlünk a </span>
@@ -64,7 +73,7 @@ export default function MainHeader() {
           </>
         )}
       </div>
-      {data && (
+      {!isOpendays && data && (
         <Sheet>
           <SheetTrigger asChild>
             <div className="absolute right-10 flex w-10 cursor-pointer items-center justify-end">
@@ -98,7 +107,7 @@ export default function MainHeader() {
             </SheetHeader>
 
             {/* Main Content Area */}
-            <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-4 [scrollbar-width:thin] [scrollbar-color:#4b5563_transparent]">
+            <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-4 scrollbar-thin [scrollbar-color:#4b5563_transparent]">
               {/* Profile Header */}
               <div className="mt-2 flex flex-col items-center space-y-2">
                 <div className="relative">

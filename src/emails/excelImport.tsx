@@ -8,7 +8,7 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from "react-email";
 import type { ParsedWeekMenu } from "@/utils/parseExcelMenu";
 
 const DAY_NAMES = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"];

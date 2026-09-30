@@ -18,7 +18,7 @@ export default function Home() {
           disabled
           // statuswebsites={["/api/chat/ping"]}
         />
-        <OnlyRolesComponent roles={["administrator"]}>
+        <OnlyRolesComponent roles={["administrator", "openday-admin"]}>
           <BigLinkButton title="Admin" url="/admin" />
         </OnlyRolesComponent>
         <OnlyRolesComponent roles={["lunch-system", "administrator"]}>

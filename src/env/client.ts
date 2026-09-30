@@ -13,6 +13,7 @@ export const env = createEnv({
     NEXT_PUBLIC_EMAIL_DOMAIN: z.string(),
     NEXT_PUBLIC_TO_EMAILS: z.string(),
     NEXT_PUBLIC_POSTHOG_KEY: z.string(),
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
   },
 
   /**
@@ -25,6 +26,7 @@ export const env = createEnv({
     NEXT_PUBLIC_EMAIL_DOMAIN: process.env.NEXT_PUBLIC_EMAIL_DOMAIN,
     NEXT_PUBLIC_TO_EMAILS: process.env.NEXT_PUBLIC_TO_EMAILS,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
