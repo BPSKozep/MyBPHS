@@ -177,7 +177,7 @@ export const opendaysRouter = createTRPCRouter({
     .input(
       z.object({
         date: z.date(),
-        isPublished: z.boolean().default(true),
+        isPublished: z.boolean().default(false),
       }),
     )
     .mutation(async ({ ctx, input }) => {

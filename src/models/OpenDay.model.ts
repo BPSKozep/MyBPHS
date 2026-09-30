@@ -36,7 +36,7 @@ const OpenDayClassSchema = new Schema<IOpenDayClass>(
 const OpenDaySchema = new Schema<IOpenDay>(
   {
     date: { type: Date, required: true, index: true },
-    isPublished: { type: Boolean, default: true, index: true },
+    isPublished: { type: Boolean, default: false, index: true },
     classes: [OpenDayClassSchema],
   },
   {

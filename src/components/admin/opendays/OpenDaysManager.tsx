@@ -234,21 +234,7 @@ export default function OpenDaysManager() {
               <h3 className="text-lg font-semibold text-white">
                 Még nincsenek meghirdetett nyílt napok
               </h3>
-              <p className="text-sm text-gray-400 mt-1 max-w-md mx-auto">
-                Kattints az &quot;Új nyílt nap&quot; gombra egy új időpont
-                rögzítéséhez, majd vedd fel a látogatható órákat!
-              </p>
             </div>
-            <Button
-              onClick={() => {
-                setEditingOpenDay(null);
-                setOpenDayDialogOpen(true);
-              }}
-              className="bg-blue-600 hover:bg-blue-500 text-white"
-            >
-              <Plus className="mr-1.5 h-4 w-4" />
-              Első nyílt nap felvétele
-            </Button>
           </CardContent>
         </Card>
       ) : (

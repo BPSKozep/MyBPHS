@@ -33,7 +33,7 @@ export default function OpenDayDialog({
   onSave,
 }: OpenDayDialogProps) {
   const [dateStr, setDateStr] = useState("");
-  const [isPublished, setIsPublished] = useState(true);
+  const [isPublished, setIsPublished] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +44,7 @@ export default function OpenDayDialog({
         setIsPublished(initialData.isPublished);
       } else {
         setDateStr("");
-        setIsPublished(true);
+        setIsPublished(false);
       }
       setError(null);
     }
@@ -88,7 +88,7 @@ export default function OpenDayDialog({
             <DialogDescription className="text-gray-400">
               {initialData
                 ? "Módosítsd a nyílt nap dátumát vagy láthatóságát."
-                : "Add meg az új nyílt nap dátumát és beállításait."}
+                : "Add meg az új nyílt nap dátumát. Létrehozás után vázlatként indul, az órák hozzáadása után a szerkesztésnél teheted publikussá."}
             </DialogDescription>
           </DialogHeader>
 
@@ -113,25 +113,28 @@ export default function OpenDayDialog({
               />
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 p-3">
-              <div className="space-y-0.5">
-                <Label
-                  htmlFor="openday-published"
-                  className="text-sm font-medium text-gray-200"
-                >
-                  Publikus a jelentkezési oldalon
-                </Label>
-                <p className="text-xs text-gray-400">
-                  Ha be van kapcsolva, a látogatók láthatják és jelentkezhetnek.
-                </p>
+            {initialData && (
+              <div className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 p-3">
+                <div className="space-y-0.5">
+                  <Label
+                    htmlFor="openday-published"
+                    className="text-sm font-medium text-gray-200"
+                  >
+                    Publikus a jelentkezési oldalon
+                  </Label>
+                  <p className="text-xs text-gray-400">
+                    Ha be van kapcsolva, a látogatók láthatják és
+                    jelentkezhetnek.
+                  </p>
+                </div>
+                <Switch
+                  id="openday-published"
+                  checked={isPublished}
+                  onCheckedChange={setIsPublished}
+                  className="data-[state=checked]:bg-blue-600"
+                />
               </div>
-              <Switch
-                id="openday-published"
-                checked={isPublished}
-                onCheckedChange={setIsPublished}
-                className="data-[state=checked]:bg-blue-600"
-              />
-            </div>
+            )}
           </div>
 
           <DialogFooter className="gap-3 sm:gap-3">
