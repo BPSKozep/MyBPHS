@@ -1,6 +1,15 @@
 "use client";
 
-import { Calendar, Clock, Pencil, Plus, Trash2, Users } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  ExternalLink,
+  Pencil,
+  Plus,
+  Trash2,
+  Users,
+} from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   formatOpenDayDate,
@@ -207,10 +216,21 @@ export default function OpenDaysManager() {
     <div className="space-y-6">
       {/* Top action bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-5">
-        <div>
+        <div className="flex flex-wrap items-center gap-3">
           <h2 className="text-2xl font-bold tracking-tight text-white">
             Nyílt napok
           </h2>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="border-slate-700 bg-slate-800/80 text-gray-200 hover:bg-slate-700 hover:text-white text-xs cursor-pointer"
+          >
+            <Link href="/opendays" target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-1.5 h-3.5 w-3.5 text-blue-400" />
+              Publikus oldal megnyitása
+            </Link>
+          </Button>
         </div>
         <Button
           onClick={() => {
