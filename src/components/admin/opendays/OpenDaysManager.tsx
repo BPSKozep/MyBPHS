@@ -10,7 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   formatOpenDayDate,
   formatTimeRange,
@@ -47,7 +47,11 @@ interface AdminOpenDay {
 export default function OpenDaysManager() {
   const utils = api.useUtils();
   const query = api.opendays.getAdminOpenDays.useQuery();
-  const openDays: AdminOpenDay[] = query.data ?? [];
+  const openDays: AdminOpenDay[] = useMemo(() => {
+    return [...(query.data ?? [])].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+  }, [query.data]);
 
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);
 

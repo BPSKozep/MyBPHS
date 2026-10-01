@@ -2,7 +2,10 @@ import { TRPCError } from "@trpc/server";
 import mongoose from "mongoose";
 import { Resend } from "resend";
 import { z } from "zod";
-import { formatOpenDayDate } from "@/components/opendays/formatters";
+import {
+  formatOpenDayDate,
+  isFutureOpenDay,
+} from "@/components/opendays/formatters";
 import OpenDayRegistrationEmail from "@/emails/openDayRegistration";
 import { env as serverEnv } from "@/env/server";
 import { OpenDay, OpenDayRegistration } from "@/models";
@@ -25,9 +28,11 @@ export const opendaysRouter = createTRPCRouter({
       .sort({ date: 1, createdAt: 1 })
       .lean();
 
-    if (openDays.length === 0) return [];
+    const futureOpenDays = openDays.filter((day) => isFutureOpenDay(day.date));
 
-    const openDayIds = openDays.map((d) => d._id);
+    if (futureOpenDays.length === 0) return [];
+
+    const openDayIds = futureOpenDays.map((d) => d._id);
 
     // Fetch all registrations for these active open days
     const registrations = await OpenDayRegistration.find({
@@ -47,7 +52,7 @@ export const opendaysRouter = createTRPCRouter({
       }
     }
 
-    return openDays.map((day) => ({
+    return futureOpenDays.map((day) => ({
       id: day._id.toString(),
       date: day.date,
       classes: (day.classes || []).map((cls) => {
@@ -77,7 +82,7 @@ export const opendaysRouter = createTRPCRouter({
     }
 
     const openDays = await OpenDay.find()
-      .sort({ date: 1, createdAt: 1 })
+      .sort({ date: -1, createdAt: -1 })
       .lean();
 
     if (openDays.length === 0) return [];
@@ -449,6 +454,13 @@ export const opendaysRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "A kiválasztott nyílt nap nem található vagy már nem aktív.",
+        });
+      }
+
+      if (!isFutureOpenDay(openDay.date)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Erre a nyílt napra már nem lehet jelentkezni.",
         });
       }
 
