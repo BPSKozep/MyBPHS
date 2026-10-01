@@ -5,6 +5,7 @@
 export function formatOpenDayDate(date: Date): string {
   const d = new Date(date);
   return d.toLocaleDateString("hu-HU", {
+    timeZone: "Europe/Budapest",
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -19,6 +20,7 @@ export function formatOpenDayDate(date: Date): string {
 export function formatTime(date: Date): string {
   const d = new Date(date);
   return d.toLocaleTimeString("hu-HU", {
+    timeZone: "Europe/Budapest",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -84,10 +86,47 @@ export function combineDateAndTime(baseDate: Date, timeStr: string): Date {
 export function formatDateTime(date: Date): string {
   const d = new Date(date);
   return d.toLocaleString("hu-HU", {
+    timeZone: "Europe/Budapest",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+/**
+ * Returns the calendar date in "YYYY-MM-DD" format in the "Europe/Budapest" time zone.
+ */
+export function getBudapestDateString(date: Date | string | number): string {
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return "";
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Budapest",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const parts = formatter.formatToParts(d);
+  let year = "";
+  let month = "";
+  let day = "";
+  for (const part of parts) {
+    if (part.type === "year") year = part.value;
+    else if (part.type === "month") month = part.value;
+    else if (part.type === "day") day = part.value;
+  }
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Check if an open day date is strictly in the future (after today in Europe/Budapest).
+ * If the open day is today or in the past, returns false.
+ */
+export function isFutureOpenDay(date: Date | string | number): boolean {
+  const openDayStr = getBudapestDateString(date);
+  if (!openDayStr) return false;
+  const todayStr = getBudapestDateString(new Date());
+  return openDayStr > todayStr;
 }

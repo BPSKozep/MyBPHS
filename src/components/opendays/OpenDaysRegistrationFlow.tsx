@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/trpc/react";
 import ClassSelector from "./ClassSelector";
 import DateSelector from "./DateSelector";
+import { isFutureOpenDay } from "./formatters";
 import type { RegistrationFormData } from "./types";
 
 export default function OpenDaysRegistrationFlow() {
@@ -40,7 +41,9 @@ export default function OpenDaysRegistrationFlow() {
 
   // Fetch open days directly from MongoDB via tRPC public procedure
   const openDaysQuery = api.opendays.getOpenDays.useQuery();
-  const openDays = openDaysQuery.data || [];
+  const openDays = (openDaysQuery.data || []).filter((d) =>
+    isFutureOpenDay(d.date),
+  );
 
   const registerMutation = api.opendays.register.useMutation({
     onSuccess: () => {
@@ -110,7 +113,7 @@ export default function OpenDaysRegistrationFlow() {
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     setSuccessMessage(null);
-    if (!formData.selectedDateId) {
+    if (!formData.selectedDateId || !selectedDate) {
       setErrorMessage("Kérjük, válassz egy időpontot a nyílt naphoz!");
       return;
     }
@@ -126,7 +129,11 @@ export default function OpenDaysRegistrationFlow() {
 
   const handleFinalSubmit = () => {
     if (!turnstileToken) return;
-    if (!formData.selectedDateId || formData.selectedClassIds.length === 0) {
+    if (
+      !formData.selectedDateId ||
+      !selectedDate ||
+      formData.selectedClassIds.length === 0
+    ) {
       setErrorMessage(
         "A jelentkezéshez kötelező egy időpontot és legalább egy órát kiválasztani.",
       );
