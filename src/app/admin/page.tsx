@@ -30,6 +30,10 @@ export default async function AdminPage() {
           {isAdministrator && (
             <>
               <BigLinkButton title="Ebédrendelés" url="/admin/lunch" />
+              <BigLinkButton
+                title="Token használat"
+                url="/admin/lunch-token-usage"
+              />
               <BigLinkButton title="Felhasználók" url="/admin/users" />
               <BigLinkButton title="Hálózat" url="/admin/networking" />
               <BigLinkButton title="Onboarding" url="/admin/onboarding" />

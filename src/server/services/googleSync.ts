@@ -1,8 +1,8 @@
 import mongooseConnect from "@/clients/mongoose";
 import { env } from "@/env/server";
+import { sendSlackNotification } from "@/lib/slack";
 import { GoogleGroup, User } from "@/models";
 import type { IGoogleGroup } from "@/models/GoogleGroup.model";
-import { sendSlackNotification } from "./slack";
 
 async function offboardUsersByEmail(
   emails: string[],

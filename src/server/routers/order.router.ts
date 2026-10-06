@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
+import { calculateLunchTokenUsage } from "@/lib/lunchTokenUsage";
 import { Menu, Order, User } from "@/models";
 import type { IOrder } from "@/models/Order.model";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
@@ -724,5 +724,45 @@ export const orderRouter = createTRPCRouter({
           },
         ],
       }).save();
+    }),
+  getLunchTokenUsageStats: protectedProcedure
+    .input(
+      z
+        .strictObject({
+          email: z.string().optional(),
+        })
+        .optional(),
+    )
+    .query(async ({ ctx, input }) => {
+      const authorized = await checkRoles(ctx.session, [
+        "administrator",
+        "lunch-system",
+      ]);
+
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Access denied to the requested resource",
+        });
+      }
+
+      const userFilter: Record<string, unknown> = {};
+      if (input?.email) {
+        userFilter.email = input.email;
+      }
+
+      const users = await User.find(userFilter)
+        .select("_id name email nfcId disabled roles")
+        .lean();
+
+      const menus = await Menu.find().select("_id year week options").lean();
+
+      const userIds = users.map((u) => u._id);
+      const orders = await Order.find({ user: { $in: userIds } })
+        .select("_id user menu order")
+        .lean();
+
+      const stats = calculateLunchTokenUsage(users, menus, orders, new Date());
+      return stats;
     }),
 });
