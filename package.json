@@ -66,7 +66,7 @@
     "tailwind-merge": "^3.7.0",
     "use-debounce": "^10.1.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
@@ -77,7 +77,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "globals": "^17.11.0",
-    "lefthook": "^2.1.10",
+    "lefthook": "^2.1.16",
     "postcss": "^8.5.28",
     "react-email": "6.11.0",
     "tailwindcss": "^4.3.3",

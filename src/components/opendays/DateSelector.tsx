@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, CheckCircle2, Clock, Users } from "lucide-react";
-import { formatOpenDayDate, getOpenDayTimeRange } from "./formatters";
+import { formatOpenDayDate, getOpenDayStartTime } from "./formatters";
 import type { OpenDayDate } from "./types";
 
 interface DateSelectorProps {
@@ -20,7 +20,7 @@ export default function DateSelector({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {dates.map((item) => {
           const isSelected = item.id === selectedDateId;
-          const timeRange = getOpenDayTimeRange(item.classes);
+          const startTime = getOpenDayStartTime(item.classes);
 
           return (
             <button
@@ -50,11 +50,11 @@ export default function DateSelector({
                   )}
                 </div>
 
-                {timeRange && (
+                {startTime && (
                   <div className="mt-2 text-sm">
                     <p className="flex items-center gap-1.5 text-gray-300">
                       <Clock className="h-3.5 w-3.5 text-gray-400" />
-                      {timeRange}
+                      {startTime}
                     </p>
                   </div>
                 )}

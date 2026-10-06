@@ -50,6 +50,16 @@ export function getOpenDayTimeRange(
 }
 
 /**
+ * Get the start time of an open day based on its earliest class
+ */
+export function getOpenDayStartTime(classes: { startTime: Date }[]): string {
+  if (!classes || classes.length === 0) return "";
+  const startTimes = classes.map((c) => new Date(c.startTime).getTime());
+  const minStart = new Date(Math.min(...startTimes));
+  return formatTime(minStart);
+}
+
+/**
  * Format Date to "YYYY-MM-DD" for HTML date input
  */
 export function toDateInputValue(date: Date): string {

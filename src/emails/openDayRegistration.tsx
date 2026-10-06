@@ -29,6 +29,7 @@ export interface OpenDayRegistrationEmailProps {
 function formatDate(date: Date | string): string {
   const d = new Date(date);
   return d.toLocaleDateString("hu-HU", {
+    timeZone: "Europe/Budapest",
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -39,6 +40,7 @@ function formatDate(date: Date | string): string {
 function formatTime(date: Date | string): string {
   const d = new Date(date);
   return d.toLocaleTimeString("hu-HU", {
+    timeZone: "Europe/Budapest",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
