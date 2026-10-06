@@ -55,19 +55,29 @@ export const opendaysRouter = createTRPCRouter({
     return futureOpenDays.map((day) => ({
       id: day._id.toString(),
       date: day.date,
-      classes: (day.classes || []).map((cls) => {
-        const registeredCount = classRegistrationCounts.get(cls.id) || 0;
-        return {
-          id: cls.id,
-          startTime: cls.startTime,
-          endTime: cls.endTime,
-          title: cls.title,
-          capacity: Math.max(0, cls.capacity - registeredCount),
-          totalCapacity: cls.capacity,
-          registeredCount,
-          description: cls.description || "",
-        };
-      }),
+      classes: (day.classes || [])
+        .map((cls) => {
+          const registeredCount = classRegistrationCounts.get(cls.id) || 0;
+          return {
+            id: cls.id,
+            startTime: cls.startTime,
+            endTime: cls.endTime,
+            title: cls.title,
+            capacity: Math.max(0, cls.capacity - registeredCount),
+            totalCapacity: cls.capacity,
+            registeredCount,
+            description: cls.description || "",
+          };
+        })
+        .sort((a, b) => {
+          const startDiff =
+            new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+          if (startDiff !== 0) return startDiff;
+          const endDiff =
+            new Date(a.endTime).getTime() - new Date(b.endTime).getTime();
+          if (endDiff !== 0) return endDiff;
+          return a.title.localeCompare(b.title);
+        }),
     }));
   }),
 
@@ -115,19 +125,29 @@ export const opendaysRouter = createTRPCRouter({
       date: day.date,
       isPublished: day.isPublished ?? true,
       registrationCount: dayRegistrationCounts.get(day._id.toString()) || 0,
-      classes: (day.classes || []).map((cls) => {
-        const registeredCount = classRegistrationCounts.get(cls.id) || 0;
-        return {
-          id: cls.id,
-          startTime: cls.startTime,
-          endTime: cls.endTime,
-          title: cls.title,
-          capacity: cls.capacity,
-          registeredCount,
-          availableCapacity: Math.max(0, cls.capacity - registeredCount),
-          description: cls.description || "",
-        };
-      }),
+      classes: (day.classes || [])
+        .map((cls) => {
+          const registeredCount = classRegistrationCounts.get(cls.id) || 0;
+          return {
+            id: cls.id,
+            startTime: cls.startTime,
+            endTime: cls.endTime,
+            title: cls.title,
+            capacity: cls.capacity,
+            registeredCount,
+            availableCapacity: Math.max(0, cls.capacity - registeredCount),
+            description: cls.description || "",
+          };
+        })
+        .sort((a, b) => {
+          const startDiff =
+            new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+          if (startDiff !== 0) return startDiff;
+          const endDiff =
+            new Date(a.endTime).getTime() - new Date(b.endTime).getTime();
+          if (endDiff !== 0) return endDiff;
+          return a.title.localeCompare(b.title);
+        }),
     }));
   }),
 
@@ -502,19 +522,46 @@ export const opendaysRouter = createTRPCRouter({
         }
       }
 
+      const classMap = new Map((openDay.classes || []).map((c) => [c.id, c]));
+      const sortedSelectedClassIds = [...input.selectedClassIds].sort(
+        (a, b) => {
+          const clsA = classMap.get(a);
+          const clsB = classMap.get(b);
+          if (!clsA && !clsB) return a.localeCompare(b);
+          if (!clsA) return 1;
+          if (!clsB) return -1;
+          const startDiff =
+            new Date(clsA.startTime).getTime() -
+            new Date(clsB.startTime).getTime();
+          if (startDiff !== 0) return startDiff;
+          const endDiff =
+            new Date(clsA.endTime).getTime() - new Date(clsB.endTime).getTime();
+          if (endDiff !== 0) return endDiff;
+          return clsA.title.localeCompare(clsB.title);
+        },
+      );
+
       const created = await OpenDayRegistration.create({
         openDayId: openDay._id,
         contactName: input.contactName.trim(),
         contactEmail: input.contactEmail.trim().toLowerCase(),
         attendeeName: input.attendeeName.trim(),
         attendeeEmail: input.attendeeEmail.trim().toLowerCase(),
-        selectedClassIds: input.selectedClassIds,
+        selectedClassIds: sortedSelectedClassIds,
       });
 
       // Send confirmation email to both parent and student
-      const selectedClasses = (openDay.classes || []).filter((c) =>
-        input.selectedClassIds.includes(c.id),
-      );
+      const selectedClasses = (openDay.classes || [])
+        .filter((c) => sortedSelectedClassIds.includes(c.id))
+        .sort((a, b) => {
+          const startDiff =
+            new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+          if (startDiff !== 0) return startDiff;
+          const endDiff =
+            new Date(a.endTime).getTime() - new Date(b.endTime).getTime();
+          if (endDiff !== 0) return endDiff;
+          return a.title.localeCompare(b.title);
+        });
 
       const contactEmail = input.contactEmail.trim().toLowerCase();
       const attendeeEmail = input.attendeeEmail.trim().toLowerCase();

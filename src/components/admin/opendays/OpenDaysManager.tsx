@@ -48,9 +48,20 @@ export default function OpenDaysManager() {
   const utils = api.useUtils();
   const query = api.opendays.getAdminOpenDays.useQuery();
   const openDays: AdminOpenDay[] = useMemo(() => {
-    return [...(query.data ?? [])].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
+    return [...(query.data ?? [])]
+      .map((day) => ({
+        ...day,
+        classes: [...(day.classes ?? [])].sort((a, b) => {
+          const startDiff =
+            new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+          if (startDiff !== 0) return startDiff;
+          const endDiff =
+            new Date(a.endTime).getTime() - new Date(b.endTime).getTime();
+          if (endDiff !== 0) return endDiff;
+          return a.title.localeCompare(b.title);
+        }),
+      }))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [query.data]);
 
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);

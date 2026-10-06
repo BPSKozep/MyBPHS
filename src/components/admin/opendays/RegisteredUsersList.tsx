@@ -77,9 +77,38 @@ export default function RegisteredUsersList({
     },
   });
 
-  const classMap = useMemo(() => {
-    return new Map(openDay.classes.map((cls) => [cls.id, cls]));
+  const sortedClasses = useMemo(() => {
+    return [...openDay.classes].sort((a, b) => {
+      const startDiff =
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+      if (startDiff !== 0) return startDiff;
+      const endDiff =
+        new Date(a.endTime).getTime() - new Date(b.endTime).getTime();
+      if (endDiff !== 0) return endDiff;
+      return a.title.localeCompare(b.title);
+    });
   }, [openDay.classes]);
+
+  const classMap = useMemo(() => {
+    return new Map(sortedClasses.map((cls) => [cls.id, cls]));
+  }, [sortedClasses]);
+
+  const getSortedSelectedClassIds = (selectedClassIds: string[] = []) => {
+    return [...selectedClassIds].sort((aId, bId) => {
+      const clsA = classMap.get(aId);
+      const clsB = classMap.get(bId);
+      if (!clsA && !clsB) return aId.localeCompare(bId);
+      if (!clsA) return 1;
+      if (!clsB) return -1;
+      const startDiff =
+        new Date(clsA.startTime).getTime() - new Date(clsB.startTime).getTime();
+      if (startDiff !== 0) return startDiff;
+      const endDiff =
+        new Date(clsA.endTime).getTime() - new Date(clsB.endTime).getTime();
+      if (endDiff !== 0) return endDiff;
+      return clsA.title.localeCompare(clsB.title);
+    });
+  };
 
   const rawRegistrations = query.data ?? [];
 
@@ -106,7 +135,7 @@ export default function RegisteredUsersList({
     if (rawRegistrations.length === 0) return;
 
     const rows = rawRegistrations.map((reg) => {
-      const classNames = (reg.selectedClassIds || [])
+      const classNames = getSortedSelectedClassIds(reg.selectedClassIds || [])
         .map((id) => {
           const cls = classMap.get(id);
           return cls
@@ -195,7 +224,7 @@ export default function RegisteredUsersList({
                   />
                 </div>
 
-                {openDay.classes.length > 0 && (
+                {sortedClasses.length > 0 && (
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-gray-400 shrink-0 hidden sm:block" />
                     <select
@@ -204,7 +233,7 @@ export default function RegisteredUsersList({
                       className="h-9 rounded-md border border-slate-700 bg-slate-800/80 px-3 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="all">Minden óra</option>
-                      {openDay.classes.map((cls) => (
+                      {sortedClasses.map((cls) => (
                         <option key={cls.id} value={cls.id}>
                           {cls.title} (
                           {formatTimeRange(cls.startTime, cls.endTime)})
@@ -280,7 +309,9 @@ export default function RegisteredUsersList({
                                   Nincs kiválasztott óra
                                 </span>
                               ) : (
-                                (reg.selectedClassIds || []).map((clsId) => {
+                                getSortedSelectedClassIds(
+                                  reg.selectedClassIds || [],
+                                ).map((clsId) => {
                                   const cls = classMap.get(clsId);
                                   return (
                                     <Badge
