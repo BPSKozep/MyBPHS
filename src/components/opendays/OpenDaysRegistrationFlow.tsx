@@ -103,13 +103,6 @@ export default function OpenDaysRegistrationFlow() {
     });
   };
 
-  const handleClearClasses = () => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedClassIds: [],
-    }));
-  };
-
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     setSuccessMessage(null);
@@ -317,7 +310,6 @@ export default function OpenDaysRegistrationFlow() {
               selectedDate={selectedDate}
               selectedClassIds={formData.selectedClassIds}
               onToggleClass={handleToggleClass}
-              onClearClasses={handleClearClasses}
             />
           </CardContent>
         </Card>
