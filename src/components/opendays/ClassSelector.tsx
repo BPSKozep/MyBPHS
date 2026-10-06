@@ -132,11 +132,11 @@ export default function ClassSelector({
                       isSelected
                         ? "border-blue-500 bg-slate-800 ring-1 ring-blue-500 cursor-pointer"
                         : isUnavailable
-                          ? "border-slate-800 bg-slate-900/40 opacity-50 cursor-not-allowed"
+                          ? "border-slate-700 bg-slate-900/40 cursor-not-allowed"
                           : "border-slate-700 bg-slate-800/60 hover:border-slate-600 hover:bg-slate-800 cursor-pointer"
                     }`}
                   >
-                    <div>
+                    <div className={isUnavailable ? "opacity-60" : ""}>
                       {/* Header row with time and checkbox */}
                       <div className="flex items-start justify-between gap-3">
                         <span className="flex items-center gap-1 rounded-md bg-slate-700/70 px-2 py-0.5 text-xs font-semibold text-blue-300">
@@ -173,12 +173,12 @@ export default function ClassSelector({
                     {/* Bottom footer: capacity and collision notice */}
                     <div className="mt-4 flex items-center justify-between border-t border-slate-700/60 pt-2.5 text-xs">
                       {isTimeConflict ? (
-                        <span className="flex items-center gap-1 text-[11px] text-amber-400 font-medium">
+                        <span className="flex items-center gap-1 text-xs text-amber-400 font-medium">
                           <AlertTriangle className="h-3 w-3" />
                           Idősáv már foglalt
                         </span>
                       ) : isFull ? (
-                        <span className="flex items-center gap-1 text-[11px] text-rose-400 font-medium">
+                        <span className="flex items-center gap-1 text-xs text-rose-400 font-medium">
                           <AlertTriangle className="h-3 w-3" />
                           Betelt
                         </span>
