@@ -1,4 +1,3 @@
-import GoogleGroupSync from "@/components/admin/onboarding/GoogleGroupSync";
 import LastUsers from "@/components/admin/onboarding/LastUsers";
 import TokenScanner from "@/components/admin/onboarding/TokenScanner";
 import OnlyRoles from "@/components/auth/OnlyRoles";
@@ -17,7 +16,6 @@ export default function Onboarding() {
             <TokenScanner />
           </div>
           <div className="flex flex-col gap-4">
-            <GoogleGroupSync />
             <LastUsers />
           </div>
         </div>

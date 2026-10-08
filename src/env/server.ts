@@ -42,7 +42,7 @@ export const env = createEnv({
     DISABLE_WEBHOOKS: z.string().optional().default("false"),
     RESEND_API_KEY: z.string().optional(),
     RESEND_WEBHOOK_SECRET: z.string().optional(),
-    GOOGLE_APPSCRIPT_SECRET: z.string().optional(),
+    SCIM_BEARER_TOKEN: z.string().min(32).optional(),
     TURNSTILE_SECRET_KEY: z.string().optional(),
     REDIS_URL:
       process.env.NODE_ENV === "production"
