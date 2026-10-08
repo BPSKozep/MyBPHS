@@ -1,9 +1,17 @@
 "use client";
 
-import { LaptopIcon } from "lucide-react";
+import { LaptopIcon, UserIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import Card from "@/components/Card";
 import Loading from "@/components/Loading";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import UserInput from "@/components/ui/UserInput";
 import { cn } from "@/lib/utils";
@@ -15,6 +23,9 @@ export default function LaptopLogins() {
   const [laptopInput, setLaptopInput] = useState<string>("");
   const [range] = useState<number>(50);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false);
+  const [selectedGuestLogin, setSelectedGuestLogin] = useState<
+    NonNullable<typeof logins>[number] | null
+  >(null);
 
   // Extract number from BPHS-XX format
   const laptopNumber = useMemo(() => {
@@ -181,8 +192,10 @@ export default function LaptopLogins() {
             <div className="space-y-2">
               {logins.map((login, index) => {
                 const userName = getUserNameFromUsername(login.user);
+                const isGuest = login.user.trim().toLowerCase() === "guest";
                 return (
                   <div
+                    // biome-ignore lint/suspicious/noArrayIndexKey: logins may have identical timestamps
                     key={`${login.user}-${login.date.toString()}-${index}`}
                     className={cn(
                       "flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-[#2a2a2a]",
@@ -192,9 +205,15 @@ export default function LaptopLogins() {
                     )}
                   >
                     {/* User Avatar */}
-                    <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-bold text-white">
-                      {getUserInitials(userName)}
-                    </div>
+                    {isGuest ? (
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-600 text-gray-200">
+                        <UserIcon className="size-5" />
+                      </div>
+                    ) : (
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-sm font-bold text-white">
+                        {getUserInitials(userName)}
+                      </div>
+                    )}
 
                     {/* Login Info */}
                     <div className="flex-1 space-y-1">
@@ -208,6 +227,19 @@ export default function LaptopLogins() {
                         {formatDate(login.date)}
                       </p>
                     </div>
+
+                    {/* Guest details button */}
+                    {isGuest && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedGuestLogin(login)}
+                        className="text-sm font-medium text-blue-400 hover:bg-blue-500/10 hover:text-blue-300"
+                      >
+                        Részletek
+                      </Button>
+                    )}
                   </div>
                 );
               })}
@@ -221,6 +253,75 @@ export default function LaptopLogins() {
           </p>
         </div>
       </div>
+
+      {/* Guest Details Dialog */}
+      <Dialog
+        open={!!selectedGuestLogin}
+        onOpenChange={(open) => {
+          if (!open) setSelectedGuestLogin(null);
+        }}
+      >
+        <DialogContent className="border-gray-600 bg-[#242424] text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <UserIcon className="size-5 text-gray-400" />
+              Vendég bejelentkezés részletei
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedGuestLogin && (
+            <div className="space-y-4 py-2">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-lg border border-gray-700 bg-[#1e1e1e] p-3">
+                  <span className="mb-1 block text-xs text-gray-400">
+                    Felhasználó
+                  </span>
+                  <span className="font-medium text-white">
+                    {getUserNameFromUsername(selectedGuestLogin.user)}
+                  </span>
+                </div>
+                <div className="rounded-lg border border-gray-700 bg-[#1e1e1e] p-3">
+                  <span className="mb-1 block text-xs text-gray-400">
+                    Laptop
+                  </span>
+                  <span className="font-semibold text-blue-400">
+                    BPHS-{selectedGuestLogin.number}
+                  </span>
+                </div>
+                <div className="col-span-2 rounded-lg border border-gray-700 bg-[#1e1e1e] p-3">
+                  <span className="mb-1 block text-xs text-gray-400">
+                    Időpont
+                  </span>
+                  <span className="font-medium text-white">
+                    {formatDate(selectedGuestLogin.date)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-gray-700 bg-[#1e1e1e] p-3">
+                <span className="mb-1 block text-xs text-gray-400">
+                  Indoklás
+                </span>
+                <p className="text-sm text-gray-200 whitespace-pre-wrap">
+                  {selectedGuestLogin.reason?.trim() ||
+                    "Nincs megadva indoklás."}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setSelectedGuestLogin(null)}
+              className="border-gray-600 bg-transparent text-gray-200 hover:bg-gray-700 hover:text-white"
+            >
+              Bezárás
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

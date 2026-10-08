@@ -6,12 +6,14 @@ export interface ILaptopLogin {
   date: Date;
   user: string;
   number: number;
+  reason?: string;
 }
 
 const laptopLoginSchema = new Schema<ILaptopLogin>({
   date: { type: Date, required: true, index: true },
   user: { type: String, required: true },
   number: { type: Number, required: true },
+  reason: { type: String, required: false },
 });
 
 const LaptopLogin: Model<ILaptopLogin> =

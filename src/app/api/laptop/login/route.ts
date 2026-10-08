@@ -11,9 +11,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as { user: string; number: number };
+    const body = (await request.json()) as {
+      user: string;
+      number: number;
+      reason?: string;
+    };
 
-    const { user, number } = body;
+    const { user, number, reason } = body;
 
     if (!user || typeof user !== "string") {
       return new Response(JSON.stringify({ error: "User field is required" }), {
@@ -34,12 +38,27 @@ export async function POST(request: Request) {
       );
     }
 
+    if (reason !== undefined && reason !== null && typeof reason !== "string") {
+      return new Response(
+        JSON.stringify({
+          error: "Reason must be a string",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
     await mongooseConnect();
 
     await LaptopLogin.create({
       date: new Date(),
       user: user,
       number: number,
+      ...(typeof reason === "string" && reason.trim()
+        ? { reason: reason.trim() }
+        : {}),
     });
 
     return new Response(

@@ -118,6 +118,7 @@ export const laptopRouter = createTRPCRouter({
           date: z.date(),
           user: z.string(),
           number: z.number(),
+          reason: z.string().nullish(),
         }),
       ),
     )
@@ -145,6 +146,7 @@ export const laptopRouter = createTRPCRouter({
               date: z.date(),
               user: z.string(),
               number: z.number(),
+              reason: z.string().nullish(),
             }),
           )
           .parse(logins);
