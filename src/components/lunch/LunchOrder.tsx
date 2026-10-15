@@ -10,9 +10,11 @@ import {
   FaEdit,
   FaEnvelope,
 } from "react-icons/fa";
+import { FaTriangleExclamation } from "react-icons/fa6";
 import Card from "@/components/Card";
 import IconButton from "@/components/IconButton";
 import IconSubmitButton from "@/components/IconSubmitButton";
+import { InfoBox } from "@/components/InfoBox";
 import ClosedOrderForm from "@/components/lunch/ClosedOrderForm";
 import OrderForm from "@/components/lunch/OrderForm";
 import PageWithHeader from "@/components/PageWithHeader";
@@ -87,6 +89,24 @@ function LunchOrder() {
   const [closedMenuShown, setClosedMenuShown] = useState(false);
 
   const session = useSession();
+
+  const user = api.user.get.useQuery(session.data?.user?.email ?? "", {
+    enabled: !!session.data?.user?.email,
+  });
+
+  const NfcId = api.user.getNfcId.useQuery(session.data?.user?.email ?? "", {
+    enabled: !!session.data?.user?.email,
+  });
+
+  const isUserLoading =
+    session.status === "loading" || user.isLoading || NfcId.isLoading;
+  const nfcIdValue = NfcId.data || user.data?.nfcId || "";
+  const hasNfcId = nfcIdValue.trim().length > 0;
+  const showNfcWarning =
+    session.status === "authenticated" &&
+    !isUserLoading &&
+    (user.isSuccess || NfcId.isSuccess) &&
+    !hasNfcId;
 
   return (
     <PageWithHeader title="Ebédrendelés">
@@ -283,6 +303,17 @@ function LunchOrder() {
                       className="cursor-pointer"
                     />
                   </motion.div>
+
+                  {showNfcWarning && (
+                    <InfoBox
+                      variant="warning"
+                      icon={FaTriangleExclamation}
+                      className="w-full max-w-240 font-semibold"
+                    >
+                      Nincs beállítva token azonosító. Állíts be egyet a
+                      profilodban!
+                    </InfoBox>
+                  )}
 
                   {(() => {
                     const optionsWithSoup = menu.data?.options ?? [];

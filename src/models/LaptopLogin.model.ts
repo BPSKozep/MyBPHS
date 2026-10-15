@@ -17,6 +17,7 @@ const laptopLoginSchema = new Schema<ILaptopLogin>({
 });
 
 const LaptopLogin: Model<ILaptopLogin> =
-  mongoose.models.LaptopLogin ?? model("LaptopLogin", laptopLoginSchema);
+  mongoose.models.LaptopLogin ??
+  model<ILaptopLogin>("LaptopLogin", laptopLoginSchema);
 
 export default LaptopLogin;

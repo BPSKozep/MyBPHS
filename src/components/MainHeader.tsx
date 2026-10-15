@@ -23,6 +23,7 @@ import {
 import rolesJson from "@/data/roles.json";
 import { api } from "@/trpc/react";
 import sleep from "@/utils/sleep";
+import SetNfcIdDialog from "./SetNfcIdDialog";
 import SmallLoading from "./SmallLoading";
 
 export default function MainHeader() {
@@ -30,6 +31,7 @@ export default function MainHeader() {
   const pathname = usePathname();
   const isOpendays = pathname.startsWith("/opendays");
   const [imageError, setImageError] = useState(false);
+  const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
 
   const NfcId = api.user.getNfcId.useQuery(data?.user?.email ?? "", {
     enabled: !!data?.user?.email,
@@ -42,6 +44,10 @@ export default function MainHeader() {
   const [signOutLoading, setSignOutLoading] = useState(false);
 
   const userInitial = data?.user?.name?.charAt(0)?.toUpperCase() ?? "U";
+
+  const isNfcLoading = NfcId.isLoading;
+  const nfcIdValue = NfcId.data || userDetails.data?.nfcId || "";
+  const hasNfcId = nfcIdValue.trim().length > 0;
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-center bg-slate-800 select-none">
@@ -58,191 +64,226 @@ export default function MainHeader() {
         ) : data ? (
           <h1 className="text-center text-2xl font-bold text-white">
             <Link href="/">
-              <span className="hidden sm:inline">Üdvözlünk a </span>
               <span className="font-handwriting text-amber-400">My</span>
               <span className="font-black">BPHS</span>
-              <span className="hidden sm:inline">-ben!</span>
             </Link>
           </h1>
         ) : (
-          <>
-            <span className="hidden sm:inline">Üdvözlünk a </span>
+          <h1 className="text-center text-2xl font-bold text-white">
             <span className="font-handwriting text-amber-400">My</span>
             <span className="font-black">BPHS</span>
-            <span className="hidden sm:inline">-ben!</span>
-          </>
+          </h1>
         )}
       </div>
       {!isOpendays && data && (
-        <Sheet>
-          <SheetTrigger asChild>
-            <div className="absolute right-10 flex w-10 cursor-pointer items-center justify-end">
-              {data?.user?.image && !imageError ? (
-                <Image
-                  src={data.user.image}
-                  alt="Profile picture"
-                  className="cursor-pointer rounded-full"
-                  draggable="false"
-                  unoptimized
-                  width={40}
-                  height={40}
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-lg font-bold text-white">
-                  {userInitial}
-                </div>
-              )}
-            </div>
-          </SheetTrigger>
-          <SheetContent
-            side="right"
-            className="flex flex-col border-gray-700 bg-slate-800 px-5"
-          >
-            <SheetHeader>
-              <SheetTitle className="text-2xl font-bold text-white">
-                Profil
-              </SheetTitle>
-              <SheetDescription />
-            </SheetHeader>
-
-            {/* Main Content Area */}
-            <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-4 scrollbar-thin [scrollbar-color:#4b5563_transparent]">
-              {/* Profile Header */}
-              <div className="mt-2 flex flex-col items-center space-y-2">
+        <>
+          <Sheet>
+            <SheetTrigger asChild>
+              <div className="absolute right-10 flex w-10 cursor-pointer items-center justify-end">
                 <div className="relative">
                   {data?.user?.image && !imageError ? (
                     <Image
                       src={data.user.image}
                       alt="Profile picture"
-                      className="rounded-full ring-4 ring-blue-500/20"
+                      className="cursor-pointer rounded-full"
                       draggable="false"
                       unoptimized
-                      width={80}
-                      height={80}
+                      width={40}
+                      height={40}
                       onError={() => setImageError(true)}
                     />
                   ) : (
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-2xl font-bold text-white ring-4 ring-blue-500/20">
+                    <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-lg font-bold text-white">
                       {userInitial}
                     </div>
                   )}
+                  {!isNfcLoading && !hasNfcId && (
+                    <span className="pointer-events-none absolute bottom-0 right-0 h-3 w-3 rounded-full bg-orange-500 ring-2 ring-slate-800" />
+                  )}
                 </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold text-white">
-                    {data?.user?.name ?? "-"}
-                  </h3>
+              </div>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="flex flex-col border-gray-700 bg-slate-800 px-5"
+            >
+              <SheetHeader>
+                <SheetTitle className="text-2xl font-bold text-white">
+                  Profil
+                </SheetTitle>
+                <SheetDescription />
+              </SheetHeader>
+
+              {/* Main Content Area */}
+              <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-4 scrollbar-thin [scrollbar-color:#4b5563_transparent]">
+                {/* Profile Header */}
+                <div className="mt-2 flex flex-col items-center space-y-2">
+                  <div className="relative">
+                    {data?.user?.image && !imageError ? (
+                      <Image
+                        src={data.user.image}
+                        alt="Profile picture"
+                        className="rounded-full ring-4 ring-blue-500/20"
+                        draggable="false"
+                        unoptimized
+                        width={80}
+                        height={80}
+                        onError={() => setImageError(true)}
+                      />
+                    ) : (
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-2xl font-bold text-white ring-4 ring-blue-500/20">
+                        {userInitial}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-white">
+                      {data?.user?.name ?? "-"}
+                    </h3>
+                  </div>
+                  {userDetails.data?.roles &&
+                    userDetails.data.roles.length > 0 && (
+                      <div className="text-xs font-medium text-gray-400">
+                        {userDetails.data.roles
+                          .map(
+                            (role) =>
+                              (rolesJson as Record<string, string>)[role] ??
+                              role,
+                          )
+                          .join(", ")}
+                      </div>
+                    )}
                 </div>
-                {userDetails.data?.roles &&
-                  userDetails.data.roles.length > 0 && (
-                    <div className="text-xs font-medium text-gray-400">
-                      {userDetails.data.roles
-                        .map(
-                          (role) =>
-                            (rolesJson as Record<string, string>)[role] ?? role,
-                        )
-                        .join(", ")}
+
+                {/* User Details */}
+                <div className="mt-4 space-y-4">
+                  {/* Email Section */}
+                  <div className="rounded-xl bg-slate-700/50 p-4 backdrop-blur-sm">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
+                        <FaEnvelope className="text-green-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-400">
+                          Email cím
+                        </p>
+                        <p className="text-sm font-semibold break-all text-white">
+                          {data?.user?.email ?? "Nincs adat"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* NFC Token Section */}
+                  {isNfcLoading ? (
+                    <div className="rounded-xl bg-slate-700/50 p-4 backdrop-blur-sm">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/20">
+                          <FaIdCard className="text-purple-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-400">
+                            Token azonosító
+                          </p>
+                          <div className="mt-1">
+                            <SmallLoading />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : hasNfcId ? (
+                    <div className="rounded-xl bg-slate-700/50 p-4 backdrop-blur-sm">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/20">
+                          <FaIdCard className="text-purple-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-400">
+                            Token azonosító
+                          </p>
+                          <p className="font-semibold text-white">
+                            {nfcIdValue}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setTokenDialogOpen(true)}
+                      className="group flex w-full cursor-pointer items-center justify-center space-x-2.5 rounded-xl border border-purple-400/30 bg-purple-600 p-4 font-semibold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:bg-purple-500 hover:shadow-purple-900/50 active:scale-[0.98] focus:ring-offset-slate-800"
+                    >
+                      <FaIdCard className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
+                      <span>Token azonosító beállítása</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="mb-4 flex flex-col items-center justify-center space-y-2 rounded-xl bg-slate-700/50 p-4 text-center backdrop-blur-sm">
+                <h1 className="text-2xl font-bold text-white">
+                  <span className="font-handwriting text-amber-400">My</span>
+                  <span className="font-black">BPHS</span>
+                </h1>
+
+                <p className="text-sm text-gray-400">
+                  <Link
+                    href="mailto:support@bphs.hu"
+                    className="transition-colors hover:text-white"
+                  >
+                    support@bphs.hu
+                  </Link>
+                </p>
+                <div className="flex items-center space-x-2">
+                  <p className="text-[10px] text-gray-400">
+                    Build: {process.env.NEXT_PUBLIC_BUILD_DATE ?? "Unknown"}
+                  </p>
+                  <Link
+                    href="https://github.com/BPSKozep/MyBPHS"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 transition-colors hover:text-white"
+                  >
+                    <FaGithub size={20} />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Sign Out Button - Fixed at bottom */}
+              <div className="mb-6 mt-2">
+                <button
+                  className="w-full cursor-pointer rounded-xl bg-red-600/20 p-4 text-white transition-all duration-200 hover:bg-red-600/30 focus:ring-2 focus:ring-red-500/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  type="button"
+                  onClick={async () => {
+                    setSignOutLoading(true);
+                    await sleep(1500);
+                    setSignOutLoading(false);
+                    await signOut({
+                      callbackUrl: "/",
+                    });
+                  }}
+                  disabled={signOutLoading}
+                >
+                  {!signOutLoading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <FaRightFromBracket className="text-red-400" />
+                      <span className="font-semibold">Kijelentkezés</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <SmallLoading />
                     </div>
                   )}
+                </button>
               </div>
-
-              {/* User Details */}
-              <div className="mt-4 space-y-4">
-                {/* Email Section */}
-                <div className="rounded-xl bg-slate-700/50 p-4 backdrop-blur-sm">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
-                      <FaEnvelope className="text-green-400" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-400">
-                        Email cím
-                      </p>
-                      <p className="text-sm font-semibold break-all text-white">
-                        {data?.user?.email ?? "Nincs adat"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* NFC Token Section */}
-                <div className="rounded-xl bg-slate-700/50 p-4 backdrop-blur-sm">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/20">
-                      <FaIdCard className="text-purple-400" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-400">
-                        Token azonosító
-                      </p>
-                      <p className="font-semibold text-white">
-                        {NfcId.data ?? "Nincs adat"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="mb-4 flex flex-col items-center justify-center space-y-2 rounded-xl bg-slate-700/50 p-4 text-center backdrop-blur-sm">
-              <h1 className="text-2xl font-bold text-white">
-                <span className="font-handwriting text-amber-400">My</span>
-                <span className="font-black">BPHS</span>
-              </h1>
-
-              <p className="text-sm text-gray-400">
-                <Link
-                  href="mailto:support@bphs.hu"
-                  className="transition-colors hover:text-white"
-                >
-                  support@bphs.hu
-                </Link>
-              </p>
-              <div className="flex items-center space-x-2">
-                <p className="text-[10px] text-gray-400">
-                  Build: {process.env.NEXT_PUBLIC_BUILD_DATE ?? "Unknown"}
-                </p>
-                <Link
-                  href="https://github.com/BPSKozep/MyBPHS"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 transition-colors hover:text-white"
-                >
-                  <FaGithub size={20} />
-                </Link>
-              </div>
-            </div>
-
-            {/* Sign Out Button - Fixed at bottom */}
-            <div className="mb-6 mt-2">
-              <button
-                className="w-full cursor-pointer rounded-xl bg-red-600/20 p-4 text-white transition-all duration-200 hover:bg-red-600/30 focus:ring-2 focus:ring-red-500/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                type="button"
-                onClick={async () => {
-                  setSignOutLoading(true);
-                  await sleep(1500);
-                  setSignOutLoading(false);
-                  await signOut({
-                    callbackUrl: "/",
-                  });
-                }}
-                disabled={signOutLoading}
-              >
-                {!signOutLoading ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <FaRightFromBracket className="text-red-400" />
-                    <span className="font-semibold">Kijelentkezés</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <SmallLoading />
-                  </div>
-                )}
-              </button>
-            </div>
-          </SheetContent>
-        </Sheet>
+            </SheetContent>
+          </Sheet>
+          <SetNfcIdDialog
+            open={tokenDialogOpen}
+            onOpenChange={setTokenDialogOpen}
+          />
+        </>
       )}
     </header>
   );

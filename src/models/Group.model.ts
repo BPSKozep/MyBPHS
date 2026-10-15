@@ -35,6 +35,6 @@ groupSchema.virtual("overrides", {
 });
 
 const Group: Model<IGroup> =
-  mongoose.models.Group ?? model("Group", groupSchema);
+  mongoose.models.Group ?? model<IGroup>("Group", groupSchema);
 
 export default Group;
