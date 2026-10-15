@@ -29,6 +29,7 @@ const groupOverrideSchema = new Schema<IGroupOverride>({
 });
 
 const GroupOverride: Model<IGroupOverride> =
-  mongoose.models.GroupOverride ?? model("GroupOverride", groupOverrideSchema);
+  mongoose.models.GroupOverride ??
+  model<IGroupOverride>("GroupOverride", groupOverrideSchema);
 
 export default GroupOverride;
