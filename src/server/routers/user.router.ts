@@ -435,7 +435,25 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      const normalizedNfcId = input.nfcId.toLowerCase();
+      const currentUser = await User.findOne({ email });
+
+      if (!currentUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      const isAdmin = await checkRoles(ctx.session, ["administrator"]);
+      if (currentUser.nfcId && currentUser.nfcId.trim() !== "" && !isAdmin) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "A token azonosító már be van állítva. Módosítást csak a rendszergazda végezhet.",
+        });
+      }
+
+      const normalizedNfcId = input.nfcId.toLowerCase().trim();
 
       const conflict = await User.findOne({
         nfcId: normalizedNfcId,
