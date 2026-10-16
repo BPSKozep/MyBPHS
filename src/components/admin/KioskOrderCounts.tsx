@@ -16,7 +16,7 @@ export default function KioskOrderCounts({
 
   const handleButtonClick = async (key: string) => {
     setLoadingStates((prevState) => ({ ...prevState, [key]: true }));
-    await saveKiosk.mutateAsync(key);
+    await saveKiosk.mutateAsync(key.replace(/\./g, ""));
     await kioskCounts.refetch();
     setLoadingStates((prevState) => ({ ...prevState, [key]: false }));
   };

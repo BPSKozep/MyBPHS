@@ -289,7 +289,7 @@ export default function KioskPage() {
       // Save kiosk data and refresh counts
       void (async () => {
         try {
-          await saveKiosk.mutateAsync(order.order);
+          await saveKiosk.mutateAsync(order.order.replace(/\./g, ""));
           await kioskCounts.refetch();
         } catch (error) {
           await logErrorOnce(

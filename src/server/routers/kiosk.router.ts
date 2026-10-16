@@ -7,7 +7,7 @@ import { checkRoles } from "@/utils/authorization";
 
 export const kioskRouter = createTRPCRouter({
   save: protectedProcedure
-    .input(z.string())
+    .input(z.string().transform((val) => val.replace(/\./g, "")))
     .mutation(async ({ ctx, input }) => {
       const authorized = await checkRoles(ctx.session, [
         "administrator",
@@ -34,7 +34,8 @@ export const kioskRouter = createTRPCRouter({
       }).save();
 
       // add data
-      kiosk.options.set(input, (kiosk.options.get(input) ?? 0) + 1);
+      const key = input.replace(/\./g, "");
+      kiosk.options.set(key, (kiosk.options.get(key) ?? 0) + 1);
       await kiosk.save();
     }),
   get: protectedProcedure
