@@ -11,6 +11,7 @@ import type { IGroup } from "@/models/Group.model";
 import Group from "@/models/Group.model";
 import type { IGroupOverride } from "@/models/GroupOverride.model";
 import type { IUser } from "@/models/User.model";
+import { createAdUser, updateAdUser } from "@/server/services/adUsers";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -403,6 +404,16 @@ export const userRouter = createTRPCRouter({
           message: "User not found",
         });
       }
+
+      // Sync active/disabled status to AD (best-effort)
+      void updateAdUser(updatedUser.email, { enabled: !disabled }).catch(
+        (err) => {
+          console.warn(
+            `Failed to sync AD status for ${updatedUser.email}:`,
+            err,
+          );
+        },
+      );
 
       return {
         _id: updatedUser._id?.toString() ?? "",
@@ -874,38 +885,21 @@ export const userRouter = createTRPCRouter({
         groups: [],
       });
 
-      try {
-        const puToken = env.PU_TOKEN;
-        const request = await fetch(
-          `${env.PU_URL}/ad/create-user/${input.email}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${puToken}`,
-            },
-            body: JSON.stringify({
-              password: input.password,
-              name: input.name,
-            }),
-          },
-        );
+      const createResult = await createAdUser(
+        input.email,
+        input.name,
+        input.password,
+      );
 
-        if (request.status !== 200) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Failed to create AD user: ${request.statusText}`,
-          });
-        }
-
-        newUser.laptopPasswordChanged = new Date();
-        await newUser.save();
-      } catch (error) {
+      if (!createResult.success) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: `Failed to create AD user: ${(error as Error).message}`,
+          message: createResult.error ?? "Failed to create AD user",
         });
       }
+
+      newUser.laptopPasswordChanged = new Date();
+      await newUser.save();
 
       // Send welcome email for onboarding
       try {

@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "@/env/server";
 import { User } from "@/models";
+import { createAdUser, updateAdUser } from "@/server/services/adUsers";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
 const puToken = env.PU_TOKEN;
@@ -71,25 +72,11 @@ export const adRouter = createTRPCRouter({
 
       // If user doesn't exist in AD, create them first
       if (!userExistsInAD) {
-        const createUserResponse = await fetch(
-          `${env.PU_URL}/ad/create-user/${encodeURIComponent(user.email ?? "")}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${puToken}`,
-            },
-            body: JSON.stringify({
-              password: "xr6CjrFz@mMD",
-              name: user.name,
-            }),
-          },
-        );
-
-        if (!createUserResponse.ok) {
+        const createResult = await createAdUser(user.email ?? "", user.name);
+        if (!createResult.success) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create AD user",
+            message: createResult.error ?? "Failed to create AD user",
           });
         }
       }
@@ -160,30 +147,70 @@ export const adRouter = createTRPCRouter({
       z.object({
         email: z.string(),
         name: z.string(),
+        password: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {
-      const response = await fetch(
-        `${env.PU_URL}/ad/create-user/${input.email}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${puToken}`,
-          },
-          body: JSON.stringify({
-            password: "xr6CjrFz@mMD",
-            name: input.name,
-          }),
-        },
+      const result = await createAdUser(
+        input.email,
+        input.name,
+        input.password,
       );
-
-      if (!response.ok) {
+      if (!result.success) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create AD user",
+          message: result.error ?? "Failed to create AD user",
         });
       }
+    }),
+
+  updateUser: protectedProcedure
+    .input(
+      z.object({
+        email: z.string().optional(),
+        name: z.string().optional(),
+        enabled: z.boolean().optional(),
+        newEmail: z.string().optional(),
+        password: z.string().optional(),
+        Name: z.string().optional(),
+        DisplayName: z.string().optional(),
+        UserPrincipalName: z.string().optional(),
+        SamAccountName: z.string().optional(),
+        Enabled: z.boolean().optional(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const targetEmail =
+        input.email ?? input.UserPrincipalName ?? input.newEmail;
+
+      if (!targetEmail) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Missing required identifier: provide email or UserPrincipalName",
+        });
+      }
+
+      const result = await updateAdUser(targetEmail, {
+        name: input.name ?? input.DisplayName ?? input.Name,
+        enabled: input.enabled ?? input.Enabled,
+        newEmail: input.newEmail ?? input.UserPrincipalName,
+        password: input.password,
+        Name: input.Name,
+        DisplayName: input.DisplayName,
+        UserPrincipalName: input.UserPrincipalName,
+        SamAccountName: input.SamAccountName,
+        Enabled: input.Enabled,
+      });
+
+      if (!result.success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: result.error ?? "Failed to update AD user",
+        });
+      }
+
+      return result.data ?? { success: true };
     }),
 
   deleteUsers: protectedProcedure

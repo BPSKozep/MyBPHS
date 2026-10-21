@@ -13,6 +13,7 @@ import { sendSlackNotification } from "@/lib/slack";
 import { User } from "@/models";
 import type { IUser } from "@/models/User.model";
 import { inferRoleFromEmail } from "@/utils/inferRole";
+import { ensureAdUser, syncAdUser } from "./adUsers";
 import { offboardUsersByEmail } from "./offboarding";
 
 type UserDoc = HydratedDocument<IUser>;
@@ -170,7 +171,20 @@ export async function provisionUser(
 
   const existing = await findExisting(email, state.externalId);
   if (existing) {
-    return { user: await saveScimState(existing, normalized), created: false };
+    const user = await saveScimState(existing, normalized);
+    const adResult = await syncAdUser(user.email, {
+      name: user.name,
+      enabled: !user.disabled,
+    });
+    if (!adResult.success && !adResult.skipped) {
+      console.error(`[scim] AD sync failed for ${user.email}:`, adResult.error);
+      await sendSlackNotification({
+        title: "SCIM: AD felhasználó frissítési hiba",
+        body: `Hiba a(z) ${user.email} AD fiókjának frissítésekor:\n${adResult.error}`,
+        color: "danger",
+      });
+    }
+    return { user, created: false };
   }
 
   try {
@@ -190,6 +204,20 @@ export async function provisionUser(
         lastSyncedAt: new Date(),
       },
     });
+
+    const adResult = await ensureAdUser(user.email, user.name, !user.disabled);
+    if (!adResult.success && !adResult.skipped) {
+      console.error(
+        `[scim] AD creation failed for ${user.email}:`,
+        adResult.error,
+      );
+      await sendSlackNotification({
+        title: "SCIM: AD felhasználó létrehozási hiba",
+        body: `Hiba a(z) ${user.email} AD fiókjának létrehozásakor:\n${adResult.error}`,
+        color: "danger",
+      });
+    }
+
     return { user, created: true };
   } catch (error) {
     if (!isDuplicateKeyError(error)) throw error;
@@ -203,14 +231,50 @@ export async function provisionUser(
         "uniqueness",
       );
     }
-    return { user: await saveScimState(winner, normalized), created: false };
+    const user = await saveScimState(winner, normalized);
+    const adResult = await syncAdUser(user.email, {
+      name: user.name,
+      enabled: !user.disabled,
+    });
+    if (!adResult.success && !adResult.skipped) {
+      console.error(`[scim] AD sync failed for ${user.email}:`, adResult.error);
+      await sendSlackNotification({
+        title: "SCIM: AD felhasználó frissítési hiba",
+        body: `Hiba a(z) ${user.email} AD fiókjának frissítésekor:\n${adResult.error}`,
+        color: "danger",
+      });
+    }
+    return { user, created: false };
   }
 }
 
 export async function patchUser(id: string, body: unknown): Promise<UserDoc> {
   const user = await requireUser(id);
+  const oldEmail = user.email;
   const next = applyPatchOperations(stateFromUser(user), body);
-  return saveScimState(user, next);
+  const updatedUser = await saveScimState(user, next);
+
+  const adResult = await syncAdUser(oldEmail, {
+    name: updatedUser.name,
+    enabled: !updatedUser.disabled,
+    ...(updatedUser.email.toLowerCase() !== oldEmail.toLowerCase()
+      ? { newEmail: updatedUser.email }
+      : {}),
+  });
+
+  if (!adResult.success && !adResult.skipped) {
+    console.error(
+      `[scim] AD patch failed for ${updatedUser.email}:`,
+      adResult.error,
+    );
+    await sendSlackNotification({
+      title: "SCIM: AD felhasználó frissítési hiba",
+      body: `Hiba a(z) ${updatedUser.email} AD fiókjának frissítésekor:\n${adResult.error}`,
+      color: "danger",
+    });
+  }
+
+  return updatedUser;
 }
 
 /** Hard delete: removes the AD account (best-effort) and the user document. */
