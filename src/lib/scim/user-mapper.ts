@@ -141,13 +141,29 @@ export function parseScimUser(body: unknown): ScimUserState {
 }
 
 /**
- * Builds the single `name` string: displayName → name.formatted →
- * "familyName givenName" (Hungarian order). Empty string if nothing is known.
+ * Builds the name string:
+ * 1. If familyName and givenName are both present (sure about first and last name):
+ *    compose in Hungarian format: "familyName givenName" (e.g. "Gyóni Márk").
+ * 2. If only one is present: whichever is provided.
+ * 3. If only displayName/formatted is provided: use that directly as-is.
  */
 export function composeName(state: ScimUserState): string {
-  if (state.displayName) return state.displayName;
-  if (state.formatted) return state.formatted;
-  return [state.familyName, state.givenName].filter(Boolean).join(" ");
+  const family = state.familyName?.trim();
+  const given = state.givenName?.trim();
+
+  // Only swap when we are sure about both first and last name
+  if (family && given) {
+    return `${family} ${given}`;
+  }
+
+  if (family) return family;
+  if (given) return given;
+
+  // If only displayName or formatted is provided, use as-is without guessing
+  if (state.displayName) return state.displayName.trim();
+  if (state.formatted) return state.formatted.trim();
+
+  return "";
 }
 
 /** Serializes a stored user as a SCIM User resource. */
