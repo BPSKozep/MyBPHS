@@ -369,7 +369,7 @@ importers:
         specifier: ^4.3.3
         version: 4.3.3
       ts-migrate-mongoose:
-        specifier: 5.3.3
+        specifier: ^5.3.3
         version: 5.3.3(mongoose@9.11.2)
       tw-animate-css:
         specifier: ^1.4.0
