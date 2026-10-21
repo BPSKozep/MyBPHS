@@ -409,7 +409,7 @@ export default function SendEmail() {
                         : groupEmail === "jpp-students-only@budapestschool.org"
                           ? "Kedves diákok!"
                           : "Kedves tanárok!"
-                    : `Kedves ${selectedUserName}!`}
+                    : `Kedves ${user.data?.givenName || selectedUserName}!`}
                 </div>
               )}
             </div>

@@ -7,7 +7,9 @@ import Loading from "@/components/Loading";
 import { api } from "@/trpc/react";
 
 interface LoadingStepProps {
-  name: string;
+  familyName?: string;
+  givenName?: string;
+  displayName?: string;
   email: string;
   password: string;
   nfcId: string;
@@ -16,7 +18,9 @@ interface LoadingStepProps {
 }
 
 export default function LoadingStep({
-  name,
+  familyName,
+  givenName,
+  displayName,
   email,
   password,
   nfcId,
@@ -52,7 +56,9 @@ export default function LoadingStep({
       hasStarted.current = true;
       setTimeout(() => {
         createUser.mutate({
-          name,
+          familyName: familyName || undefined,
+          givenName: givenName || undefined,
+          displayName: displayName || undefined,
           email,
           password,
           nfcId,
@@ -60,7 +66,15 @@ export default function LoadingStep({
         });
       }, 500);
     }
-  }, [name, email, password, nfcId, verificationCode]);
+  }, [
+    familyName,
+    givenName,
+    displayName,
+    email,
+    password,
+    nfcId,
+    verificationCode,
+  ]);
 
   if (step === "creating") {
     return (

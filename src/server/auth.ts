@@ -8,6 +8,7 @@ import GoogleProvider from "next-auth/providers/google";
 import mongooseConnect from "@/clients/mongoose";
 import { env } from "@/env/server";
 import { User } from "@/models";
+import { formatName } from "@/utils/personName";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -31,6 +32,8 @@ declare module "next-auth/jwt" {
   interface JWT {
     googleImage?: string;
     disabled?: boolean;
+    /** True once `name` holds the formatted name from the database instead of Google's. */
+    nameFromDb?: boolean;
   }
 }
 
@@ -39,6 +42,8 @@ interface GoogleProfile {
   picture?: string;
   email?: string;
   name?: string;
+  given_name?: string;
+  family_name?: string;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -49,13 +54,21 @@ export const authOptions: NextAuthOptions = {
       if (googleProfile?.picture) {
         token.googleImage = googleProfile.picture;
       }
-      if (user || token.disabled === undefined) {
+      // Runs on sign-in, and once for sessions created before these fields existed.
+      if (user || token.disabled === undefined || !token.nameFromDb) {
         const email = token.email ?? user?.email ?? profile?.email;
         if (email) {
           token.email = email;
           await mongooseConnect();
-          const dbUser = await User.findOne({ email }).select("disabled");
+          const dbUser = await User.findOne({ email })
+            .select("disabled familyName givenName displayName")
+            .lean();
           token.disabled = dbUser?.disabled ?? false;
+          // Show the app's (Hungarian-formatted) name, not Google's.
+          if (dbUser) {
+            token.name = formatName(dbUser) || token.name;
+          }
+          token.nameFromDb = true;
         }
       }
       return token;
@@ -84,10 +97,15 @@ export const authOptions: NextAuthOptions = {
         email?.endsWith("@budapestschool.org")
       ) {
         // Redirect to onboarding with user info as search params
-        const params = new URLSearchParams({
-          name: profile?.name ?? user?.name ?? "",
-          email: email,
-        });
+        // Name parts only when Google is sure about both; otherwise the full name as-is.
+        const googleProfile = profile as GoogleProfile | undefined;
+        const familyName = googleProfile?.family_name?.trim();
+        const givenName = googleProfile?.given_name?.trim();
+        const params = new URLSearchParams(
+          familyName && givenName
+            ? { familyName, givenName, email }
+            : { name: profile?.name ?? user?.name ?? "", email },
+        );
         return `/onboarding?${params.toString()}`;
       }
 
@@ -123,7 +141,7 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: kioskUser._id?.toString() ?? "",
-          name: kioskUser.name,
+          name: formatName(kioskUser),
           email: kioskUser.email,
         };
       },

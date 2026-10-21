@@ -8,11 +8,20 @@ export default async function Onboarding({
   searchParams,
 }: {
   searchParams: Promise<{
+    familyName?: string;
+    givenName?: string;
     name?: string;
     email?: string;
   }>;
 }) {
-  const { name, email } = await searchParams;
+  const { familyName, givenName, name, email } = await searchParams;
 
-  return <OnboardingFlow name={name} email={email} />;
+  return (
+    <OnboardingFlow
+      familyName={familyName}
+      givenName={givenName}
+      displayName={name}
+      email={email}
+    />
+  );
 }

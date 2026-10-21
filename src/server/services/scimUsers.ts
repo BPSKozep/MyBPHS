@@ -4,15 +4,16 @@ import { ScimError } from "@/lib/scim/errors";
 import type { ScimFilter } from "@/lib/scim/filter";
 import { applyPatchOperations } from "@/lib/scim/patch";
 import {
-  composeName,
   normalizeEmail,
   resolveEmail,
+  resolveNameParts,
   type ScimUserState,
 } from "@/lib/scim/user-mapper";
 import { sendSlackNotification } from "@/lib/slack";
 import { User } from "@/models";
 import type { IUser } from "@/models/User.model";
 import { inferRoleFromEmail } from "@/utils/inferRole";
+import { formatName } from "@/utils/personName";
 import { ensureAdUser, syncAdUser } from "./adUsers";
 import { offboardUsersByEmail } from "./offboarding";
 
@@ -35,9 +36,9 @@ function stateFromUser(user: UserDoc): ScimUserState {
     userName: user.scim?.userName ?? user.email,
     externalId: user.scim?.externalId,
     email: user.email,
-    givenName: user.scim?.givenName,
-    familyName: user.scim?.familyName,
-    displayName: user.scim?.displayName,
+    givenName: user.givenName,
+    familyName: user.familyName,
+    displayName: user.displayName,
     active: !user.disabled,
   };
 }
@@ -73,7 +74,13 @@ async function saveScimState(user: UserDoc, state: ScimUserState) {
     user.email = email;
   }
 
-  user.name = composeName(state) || user.name;
+  // Keep the stored name when the request carries no name attributes.
+  const nameParts = resolveNameParts(state);
+  if (nameParts) {
+    user.familyName = nameParts.familyName;
+    user.givenName = nameParts.givenName;
+    user.displayName = nameParts.displayName;
+  }
   if (state.active !== undefined) {
     user.disabled = !state.active;
   }
@@ -81,9 +88,6 @@ async function saveScimState(user: UserDoc, state: ScimUserState) {
   user.scim = {
     externalId: state.externalId,
     userName: state.userName,
-    givenName: state.givenName,
-    familyName: state.familyName,
-    displayName: state.displayName,
     lastSyncedAt: new Date(),
   };
 
@@ -189,7 +193,7 @@ export async function provisionUser(
   if (existing) {
     const user = await saveScimState(existing, normalized);
     const adResult = await syncAdUser(user.email, {
-      name: user.name,
+      name: formatName(user),
       enabled: resolveAdEnabled(user),
     });
     if (!adResult.success && !adResult.skipped) {
@@ -205,7 +209,9 @@ export async function provisionUser(
 
   try {
     const user = await User.create({
-      name: composeName(normalized) || normalizeEmail(email).split("@")[0],
+      ...(resolveNameParts(normalized) ?? {
+        displayName: normalizeEmail(email).split("@")[0],
+      }),
       email,
       roles: [inferRoleFromEmail(email)],
       groups: [],
@@ -216,16 +222,13 @@ export async function provisionUser(
       scim: {
         externalId: normalized.externalId,
         userName: normalized.userName,
-        givenName: normalized.givenName,
-        familyName: normalized.familyName,
-        displayName: normalized.displayName,
         lastSyncedAt: new Date(),
       },
     });
 
     const adResult = await ensureAdUser(
       user.email,
-      user.name,
+      formatName(user),
       resolveAdEnabled(user),
     );
     if (!adResult.success && !adResult.skipped) {
@@ -255,7 +258,7 @@ export async function provisionUser(
     }
     const user = await saveScimState(winner, normalized);
     const adResult = await syncAdUser(user.email, {
-      name: user.name,
+      name: formatName(user),
       enabled: resolveAdEnabled(user),
     });
     if (!adResult.success && !adResult.skipped) {
@@ -277,7 +280,7 @@ export async function patchUser(id: string, body: unknown): Promise<UserDoc> {
   const updatedUser = await saveScimState(user, next);
 
   const adResult = await syncAdUser(oldEmail, {
-    name: updatedUser.name,
+    name: formatName(updatedUser),
     enabled: resolveAdEnabled(updatedUser),
     ...(updatedUser.email.toLowerCase() !== oldEmail.toLowerCase()
       ? { newEmail: updatedUser.email }

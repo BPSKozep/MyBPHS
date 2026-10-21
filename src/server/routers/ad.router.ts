@@ -4,6 +4,7 @@ import { env } from "@/env/server";
 import { User } from "@/models";
 import { createAdUser, updateAdUser } from "@/server/services/adUsers";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
+import { formatName } from "@/utils/personName";
 
 const puToken = env.PU_TOKEN;
 export const adRouter = createTRPCRouter({
@@ -72,7 +73,10 @@ export const adRouter = createTRPCRouter({
 
       // If user doesn't exist in AD, create them first
       if (!userExistsInAD) {
-        const createResult = await createAdUser(user.email ?? "", user.name);
+        const createResult = await createAdUser(
+          user.email ?? "",
+          formatName(user),
+        );
         if (!createResult.success) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",

@@ -30,7 +30,8 @@ interface AddUserDialogProps {
 }
 
 interface NewUser {
-  name: string;
+  familyName: string;
+  givenName: string;
   email: string;
   nfcId: string;
   roles: string[];
@@ -39,7 +40,8 @@ interface NewUser {
 }
 
 const initialUserState: NewUser = {
-  name: "",
+  familyName: "",
+  givenName: "",
   email: "",
   nfcId: "",
   roles: [],
@@ -69,7 +71,12 @@ export default function AddUserDialog({
   });
 
   const handleCreateUser = () => {
-    if (!newUser.name || !newUser.email || newUser.roles.length === 0) {
+    if (
+      !newUser.familyName.trim() ||
+      !newUser.givenName.trim() ||
+      !newUser.email ||
+      newUser.roles.length === 0
+    ) {
       onError(
         "Hiányzó adatok",
         "Kérlek tölts ki minden kötelező mezőt és válassz legalább egy szerepet.",
@@ -124,17 +131,31 @@ export default function AddUserDialog({
           <DialogDescription />
         </DialogHeader>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-white">
-              Név*
-            </Label>
-            <Input
-              id="name"
-              value={newUser.name}
-              onChange={(e) => updateField("name", e.target.value)}
-              className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
-              placeholder="Teljes név"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="familyName" className="text-white">
+                Vezetéknév*
+              </Label>
+              <Input
+                id="familyName"
+                value={newUser.familyName}
+                onChange={(e) => updateField("familyName", e.target.value)}
+                className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
+                placeholder="Kovács"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="givenName" className="text-white">
+                Keresztnév*
+              </Label>
+              <Input
+                id="givenName"
+                value={newUser.givenName}
+                onChange={(e) => updateField("givenName", e.target.value)}
+                className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
+                placeholder="Anna"
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-white">

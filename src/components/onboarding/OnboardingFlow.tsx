@@ -6,6 +6,7 @@ import { useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import Card from "@/components/Card";
 import { InfoBox } from "@/components/InfoBox";
+import { firstName, formatName } from "@/utils/personName";
 import WelcomeStep from "./steps/1_Welcome";
 import EmailVerificationStep from "./steps/2_EmailVerification";
 import NFCStep from "./steps/3_NFC";
@@ -13,7 +14,10 @@ import PasswordStep from "./steps/4_Password";
 import LoadingStep from "./steps/5_Create";
 
 interface OnboardingFlowProps {
-  name?: string;
+  familyName?: string;
+  givenName?: string;
+  /** Full name, only passed when the family and given names are not both known. */
+  displayName?: string;
   email?: string;
 }
 
@@ -25,7 +29,13 @@ export type OnboardingStep =
   | "loading"
   | "complete";
 
-export default function OnboardingFlow({ name, email }: OnboardingFlowProps) {
+export default function OnboardingFlow({
+  familyName,
+  givenName,
+  displayName,
+  email,
+}: OnboardingFlowProps) {
+  const name = formatName({ familyName, givenName, displayName });
   const [currentStep, setCurrentStep] = useState<OnboardingStep>("welcome");
   const [password, setPassword] = useState("");
   const [nfcId, setNfcId] = useState("");
@@ -101,7 +111,7 @@ export default function OnboardingFlow({ name, email }: OnboardingFlowProps) {
               )}
               {currentStep === "verification" && (
                 <EmailVerificationStep
-                  name={name}
+                  name={firstName({ familyName, givenName, displayName })}
                   email={email}
                   verificationCode={verificationCode}
                   setVerificationCode={setVerificationCode}
@@ -129,7 +139,9 @@ export default function OnboardingFlow({ name, email }: OnboardingFlowProps) {
               )}
               {currentStep === "loading" && (
                 <LoadingStep
-                  name={name}
+                  familyName={familyName}
+                  givenName={givenName}
+                  displayName={displayName}
                   email={email}
                   password={password}
                   nfcId={nfcId}

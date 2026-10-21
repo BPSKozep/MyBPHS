@@ -1,4 +1,5 @@
 import type { Types } from "mongoose";
+import { formatName } from "@/utils/personName";
 
 export const HUNGARIAN_DAY_NAMES = [
   "Hétfő",
@@ -41,7 +42,9 @@ export interface RawOrderDoc {
 
 export interface RawUserDoc {
   _id: Types.ObjectId | string;
-  name: string;
+  familyName?: string;
+  givenName?: string;
+  displayName?: string;
   email: string;
   nfcId?: string | null;
   disabled?: boolean;
@@ -168,7 +171,7 @@ export function calculateLunchTokenUsage(
 
     results.push({
       userId: userIdStr,
-      userName: user.name,
+      userName: formatName(user),
       userEmail: user.email,
       disabled: user.disabled ?? false,
       roles: user.roles ?? [],
