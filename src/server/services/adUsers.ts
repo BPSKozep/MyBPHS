@@ -160,12 +160,12 @@ export async function updateAdUser(
 export async function ensureAdUser(
   email: string,
   name: string,
-  enabled = true,
+  enabled?: boolean,
   password?: string,
 ): Promise<AdOperationResult> {
   const createResult = await createAdUser(email, name, password);
   if (createResult.success || createResult.skipped) {
-    if (!enabled) {
+    if (enabled === false) {
       return updateAdUser(email, { enabled: false });
     }
     return createResult;
