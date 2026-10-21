@@ -30,7 +30,7 @@ interface AddUserDialogProps {
 }
 
 interface NewUser {
-  name: string;
+  displayName: string;
   email: string;
   nfcId: string;
   roles: string[];
@@ -39,7 +39,7 @@ interface NewUser {
 }
 
 const initialUserState: NewUser = {
-  name: "",
+  displayName: "",
   email: "",
   nfcId: "",
   roles: [],
@@ -69,7 +69,7 @@ export default function AddUserDialog({
   });
 
   const handleCreateUser = () => {
-    if (!newUser.name || !newUser.email || newUser.roles.length === 0) {
+    if (!newUser.displayName || !newUser.email || newUser.roles.length === 0) {
       onError(
         "Hiányzó adatok",
         "Kérlek tölts ki minden kötelező mezőt és válassz legalább egy szerepet.",
@@ -130,8 +130,8 @@ export default function AddUserDialog({
             </Label>
             <Input
               id="name"
-              value={newUser.name}
-              onChange={(e) => updateField("name", e.target.value)}
+              value={newUser.displayName}
+              onChange={(e) => updateField("displayName", e.target.value)}
               className="border-gray-600 bg-[#565656] text-white placeholder:text-gray-300"
               placeholder="Teljes név"
             />

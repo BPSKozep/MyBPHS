@@ -66,7 +66,7 @@ export default function TokenScanner() {
           id: nfcId,
           timestamp: new Date(),
           isAssociated,
-          userName: user?.name,
+          userName: user?.displayName,
         };
 
         setScannedTokens((prev) => [newToken, ...prev]);

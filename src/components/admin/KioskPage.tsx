@@ -395,7 +395,7 @@ export default function KioskPage() {
                 }}
               />
 
-              <h1 className="text-bold text-7xl">{user?.name}</h1>
+              <h1 className="text-bold text-7xl">{user?.displayName}</h1>
               <h2
                 className={`text-bold text-5xl ${
                   order?.orderError && "bg-red-800"

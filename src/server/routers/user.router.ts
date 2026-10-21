@@ -28,7 +28,9 @@ export const userRouter = createTRPCRouter({
     .output(
       z
         .object({
-          name: z.string(),
+          displayName: z.string(),
+          givenName: z.string().optional(),
+          familyName: z.string().optional(),
           email: z.string(),
           roles: z.string().array(),
           disabled: z.boolean().optional(),
@@ -61,7 +63,9 @@ export const userRouter = createTRPCRouter({
     .output(
       z
         .object({
-          name: z.string(),
+          displayName: z.string(),
+          givenName: z.string().optional(),
+          familyName: z.string().optional(),
           email: z.string(),
           roles: z.string().array(),
           disabled: z.boolean().optional(),
@@ -274,7 +278,7 @@ export const userRouter = createTRPCRouter({
         z.object({
           _id: z.string(),
           email: z.string(),
-          name: z.string(),
+          displayName: z.string(),
           disabled: z.boolean(),
           joinDate: z.date().nullable(),
         }),
@@ -300,13 +304,13 @@ export const userRouter = createTRPCRouter({
       }
 
       const users = await User.find(roleFilter).select(
-        "_id email name disabled joinDate",
+        "_id email displayName disabled joinDate",
       );
 
       return users.map((user) => ({
         _id: user._id?.toString(),
         email: user.email,
-        name: user.name,
+        displayName: user.displayName,
         disabled: user.disabled ?? false,
         joinDate: user.joinDate ?? null,
       }));
@@ -417,7 +421,7 @@ export const userRouter = createTRPCRouter({
 
       return {
         _id: updatedUser._id?.toString() ?? "",
-        name: updatedUser.name,
+        displayName: updatedUser.displayName,
         email: updatedUser.email,
         nfcId: updatedUser.nfcId ?? null,
         roles: updatedUser.roles,
@@ -500,7 +504,7 @@ export const userRouter = createTRPCRouter({
       z.array(
         z.object({
           _id: z.string(),
-          name: z.string(),
+          displayName: z.string(),
           email: z.string(),
           nfcId: z.string().nullable(),
           joinDate: z.date().nullable(),
@@ -562,7 +566,7 @@ export const userRouter = createTRPCRouter({
       const mappedUsers = users.map((user) => {
         return {
           _id: user._id?.toString() ?? "",
-          name: user.name,
+          displayName: user.displayName,
           email: user.email,
           nfcId: user.nfcId ?? null,
           joinDate: user.joinDate ?? null,
@@ -574,14 +578,14 @@ export const userRouter = createTRPCRouter({
       });
 
       // Sort by name using Hungarian collation
-      return sortByPropertyHungarian(mappedUsers, (user) => user.name);
+      return sortByPropertyHungarian(mappedUsers, (user) => user.displayName);
     }),
 
   // Create a single user
   create: protectedProcedure
     .input(
       z.object({
-        name: z.string().min(1),
+        displayName: z.string().min(1),
         email: z.email(),
         nfcId: z.string().optional(),
         joinDate: z.date().optional(),
@@ -620,7 +624,7 @@ export const userRouter = createTRPCRouter({
       }
 
       const newUser = await User.create({
-        name: input.name,
+        displayName: input.displayName,
         email: input.email,
         ...(normalizedNfcId ? { nfcId: normalizedNfcId } : {}),
         ...(input.joinDate ? { joinDate: input.joinDate } : {}),
@@ -637,7 +641,7 @@ export const userRouter = createTRPCRouter({
             to: newUser.email,
             subject: "Üdvözlünk a MyBPHS rendszerben!",
             react: Welcome({
-              name: newUser.name,
+              name: newUser.displayName,
               isOnboarding: false,
             }),
           });
@@ -652,7 +656,7 @@ export const userRouter = createTRPCRouter({
 
       return {
         _id: newUser._id?.toString() ?? "",
-        name: newUser.name,
+        displayName: newUser.displayName,
         email: newUser.email,
         nfcId: newUser.nfcId ?? null,
         roles: newUser.roles,
@@ -811,7 +815,7 @@ export const userRouter = createTRPCRouter({
   onboard: publicProcedure
     .input(
       z.object({
-        name: z.string(),
+        displayName: z.string(),
         email: z.email(),
         password: z.string(),
         nfcId: z.string(),
@@ -877,7 +881,7 @@ export const userRouter = createTRPCRouter({
         : "student";
 
       const newUser = await User.create({
-        name: input.name,
+        displayName: input.displayName,
         email: input.email,
         nfcId: input.nfcId.toLowerCase().trim(),
         roles: [role],
@@ -887,7 +891,7 @@ export const userRouter = createTRPCRouter({
 
       const createResult = await createAdUser(
         input.email,
-        input.name,
+        input.displayName,
         input.password,
       );
 
@@ -908,7 +912,7 @@ export const userRouter = createTRPCRouter({
           to: newUser.email,
           subject: "Üdvözlünk a MyBPHS rendszerben!",
           react: Welcome({
-            name: newUser.name,
+            name: newUser.displayName,
             isOnboarding: true,
           }),
         });
@@ -919,7 +923,7 @@ export const userRouter = createTRPCRouter({
 
       return {
         _id: newUser._id?.toString() ?? "",
-        name: newUser.name,
+        displayName: newUser.displayName,
         email: newUser.email,
         nfcId: newUser.nfcId,
       };

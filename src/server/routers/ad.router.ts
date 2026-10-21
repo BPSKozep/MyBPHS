@@ -72,7 +72,10 @@ export const adRouter = createTRPCRouter({
 
       // If user doesn't exist in AD, create them first
       if (!userExistsInAD) {
-        const createResult = await createAdUser(user.email ?? "", user.name);
+        const createResult = await createAdUser(
+          user.email ?? "",
+          user.displayName,
+        );
         if (!createResult.success) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",

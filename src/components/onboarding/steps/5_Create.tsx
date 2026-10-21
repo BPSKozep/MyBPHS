@@ -52,7 +52,7 @@ export default function LoadingStep({
       hasStarted.current = true;
       setTimeout(() => {
         createUser.mutate({
-          name,
+          displayName: name,
           email,
           password,
           nfcId,

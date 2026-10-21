@@ -752,7 +752,7 @@ export const orderRouter = createTRPCRouter({
       }
 
       const users = await User.find(userFilter)
-        .select("_id name email nfcId disabled roles")
+        .select("_id displayName email nfcId disabled roles")
         .lean();
 
       const menus = await Menu.find().select("_id year week options").lean();

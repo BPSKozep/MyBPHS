@@ -122,14 +122,14 @@ export default function LastUsers() {
                         )}
                       >
                         <div className="flex size-10 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-sm font-bold text-white">
-                          {getUserInitials(user.name)}
+                          {getUserInitials(user.displayName)}
                         </div>
 
                         <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
                           <div className="min-w-0 space-y-1">
                             <div className="flex items-center gap-2">
                               <h3 className="font-medium text-white">
-                                {user.name}
+                                {user.displayName}
                               </h3>
                             </div>
                             <p className="break-all text-sm text-gray-300">

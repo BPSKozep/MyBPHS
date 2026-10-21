@@ -70,7 +70,7 @@ import AddUserDialog from "./AddUserDialog";
 
 type SortDirection = "asc" | "desc";
 type SortableColumn =
-  | "name"
+  | "displayName"
   | "email"
   | "nfcId"
   | "disabled"
@@ -79,7 +79,7 @@ type SortableColumn =
   | "hasADAccount";
 type UserColumn =
   | "select"
-  | "name"
+  | "displayName"
   | "email"
   | "nfcId"
   | "roles"
@@ -111,7 +111,7 @@ interface EditableFieldConfig {
 
 export interface UserData {
   _id: string;
-  name: string;
+  displayName: string;
   email: string;
   nfcId: string | null;
   joinDate: Date | null;
@@ -127,7 +127,7 @@ interface EditingUser extends UserData {
 
 const defaultColumns: ColumnConfig[] = [
   { key: "select", label: "", sortable: false, visible: true },
-  { key: "name", label: "Név", sortable: true, visible: true },
+  { key: "displayName", label: "Név", sortable: true, visible: true },
   { key: "email", label: "Email", sortable: true, visible: true },
   { key: "nfcId", label: "NFC ID", sortable: true, visible: true },
   { key: "roles", label: "Szerepek", sortable: false, visible: true },
@@ -149,7 +149,7 @@ const defaultColumns: ColumnConfig[] = [
 ];
 
 const editableFields: EditableFieldConfig[] = [
-  { key: "name", editable: false, type: "text" },
+  { key: "displayName", editable: false, type: "text" },
   { key: "email", editable: false, type: "email" },
   { key: "nfcId", editable: true, type: "text" },
   { key: "joinDate", editable: false, type: "text" },
@@ -169,7 +169,7 @@ export default function UsersDataManager() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<SortableColumn>("name");
+  const [sortBy, setSortBy] = useState<SortableColumn>("displayName");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
@@ -221,7 +221,7 @@ export default function UsersDataManager() {
 
   React.useEffect(() => {
     if (isPUUnavailable && sortBy === "hasADAccount") {
-      setSortBy("name");
+      setSortBy("displayName");
     }
   }, [isPUUnavailable, sortBy]);
 
@@ -304,7 +304,7 @@ export default function UsersDataManager() {
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(
         (user) =>
-          user.name.toLowerCase().includes(searchLower) ||
+          user.displayName.toLowerCase().includes(searchLower) ||
           user.email.toLowerCase().includes(searchLower) ||
           (user.nfcId ?? "").toLowerCase().includes(searchLower),
       );
@@ -315,9 +315,12 @@ export default function UsersDataManager() {
       let compareResult = 0;
 
       switch (sortBy) {
-        case "name":
+        case "displayName":
           // Use Hungarian collation for names
-          compareResult = compareHungarianIgnoreCase(a.name, b.name);
+          compareResult = compareHungarianIgnoreCase(
+            a.displayName,
+            b.displayName,
+          );
           break;
         case "email":
           // Use Hungarian collation for emails too (in case they contain Hungarian characters)
@@ -537,7 +540,7 @@ export default function UsersDataManager() {
     const selectedUsers = paginatedUsers.filter((user) =>
       selectedRows.has(user._id),
     );
-    const userNames = selectedUsers.map((user) => user.name).join(", ");
+    const userNames = selectedUsers.map((user) => user.displayName).join(", ");
 
     setAlertDialog({
       open: true,
@@ -602,7 +605,7 @@ export default function UsersDataManager() {
     (user: UserData) => {
       createADUserMutation.mutate({
         email: user.email,
-        name: user.name,
+        name: user.displayName,
       });
     },
     [createADUserMutation],
@@ -1028,7 +1031,7 @@ export default function UsersDataManager() {
                           user.disabled ? "text-red-400" : "text-white",
                         )}
                       >
-                        {user.name}
+                        {user.displayName}
                       </p>
                       <p className="text-sm text-gray-400">{user.email}</p>
                     </div>
@@ -1067,7 +1070,7 @@ export default function UsersDataManager() {
                   </Label>
                   <Input
                     id="mobile-name"
-                    value={mobileEditDialog.editedUser.name}
+                    value={mobileEditDialog.editedUser.displayName}
                     readOnly
                     className="border-gray-600 bg-[#3a3a3a] text-gray-300 cursor-default"
                   />
@@ -1326,23 +1329,27 @@ export default function UsersDataManager() {
                               onCheckedChange={() =>
                                 toggleRowSelection(user._id)
                               }
-                              aria-label={`${user.name} kiválasztása`}
+                              aria-label={`${user.displayName} kiválasztása`}
                               className="border-gray-400 data-[state=checked]:bg-white data-[state=checked]:text-gray-900"
                             />
                           )}
-                          {column.key === "name" && (
+                          {column.key === "displayName" && (
                             <div className="flex flex-col">
-                              {isEditing && getFieldConfig("name")?.editable ? (
+                              {isEditing &&
+                              getFieldConfig("displayName")?.editable ? (
                                 <Input
-                                  value={displayUser.name}
+                                  value={displayUser.displayName}
                                   onChange={(e) =>
-                                    updateEditingField("name", e.target.value)
+                                    updateEditingField(
+                                      "displayName",
+                                      e.target.value,
+                                    )
                                   }
                                   className="h-8 border-gray-600 bg-[#565656] text-white"
                                 />
                               ) : (
                                 <span className="font-medium text-white">
-                                  {displayUser.name}
+                                  {displayUser.displayName}
                                 </span>
                               )}
                             </div>

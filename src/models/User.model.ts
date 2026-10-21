@@ -6,15 +6,15 @@ export interface IUserScim {
   externalId?: string;
   /** `userName` as sent by Entra (usually the UPN). */
   userName?: string;
-  givenName?: string;
-  familyName?: string;
-  displayName?: string;
   lastSyncedAt?: Date;
 }
 
 export interface IUser {
   _id?: Types.ObjectId;
-  name: string;
+  /** Full name in Hungarian order ("Family Given"); the name shown everywhere. */
+  displayName: string;
+  givenName?: string;
+  familyName?: string;
   email: string;
   roles: string[];
   groups: Types.ObjectId[];
@@ -29,18 +29,23 @@ const userScimSchema = new Schema<IUserScim>(
   {
     externalId: { type: String, required: false },
     userName: { type: String, required: false },
-    givenName: { type: String, required: false },
-    familyName: { type: String, required: false },
-    displayName: { type: String, required: false },
     lastSyncedAt: { type: Date, required: false },
   },
   { _id: false },
 );
 
 const userSchema = new Schema<IUser>({
-  name: {
+  displayName: {
     type: String,
     required: true,
+  },
+  givenName: {
+    type: String,
+    required: false,
+  },
+  familyName: {
+    type: String,
+    required: false,
   },
   email: {
     type: String,

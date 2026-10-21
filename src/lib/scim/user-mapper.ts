@@ -16,15 +16,14 @@ export interface ScimUserState {
 /** The subset of a stored user that is needed to serialize a SCIM resource. */
 export interface ScimSerializableUser {
   _id?: { toString(): string; getTimestamp?: () => Date } | null;
-  name: string;
+  displayName: string;
+  givenName?: string;
+  familyName?: string;
   email: string;
   disabled?: boolean;
   scim?: {
     externalId?: string;
     userName?: string;
-    givenName?: string;
-    familyName?: string;
-    displayName?: string;
     lastSyncedAt?: Date;
   };
 }
@@ -178,11 +177,11 @@ export function toScimUser(user: ScimSerializableUser, baseUrl: string) {
     ...(user.scim?.externalId ? { externalId: user.scim.externalId } : {}),
     userName: user.scim?.userName ?? user.email,
     name: {
-      formatted: user.name,
-      ...(user.scim?.givenName ? { givenName: user.scim.givenName } : {}),
-      ...(user.scim?.familyName ? { familyName: user.scim.familyName } : {}),
+      formatted: user.displayName,
+      ...(user.givenName ? { givenName: user.givenName } : {}),
+      ...(user.familyName ? { familyName: user.familyName } : {}),
     },
-    displayName: user.scim?.displayName ?? user.name,
+    displayName: user.displayName,
     emails: [{ value: user.email, type: "work", primary: true }],
     active: !user.disabled,
     meta: {

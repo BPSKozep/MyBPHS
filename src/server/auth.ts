@@ -123,7 +123,7 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: kioskUser._id?.toString() ?? "",
-          name: kioskUser.name,
+          name: kioskUser.displayName,
           email: kioskUser.email,
         };
       },

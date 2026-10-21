@@ -82,7 +82,7 @@ export default function LaptopLogins() {
 
   const getUserNameFromUsername = (username: string): string => {
     const user = usernameToUserMap.get(username) as IUser;
-    return user?.name ?? username;
+    return user?.displayName ?? username;
   };
 
   const formatDate = (date: Date) => {
