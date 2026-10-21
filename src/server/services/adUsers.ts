@@ -94,25 +94,31 @@ export async function updateAdUser(
   }
 
   try {
-    const payload = {
-      ...updates,
-      ...(updates.name || updates.DisplayName
-        ? {
-            DisplayName: updates.DisplayName ?? updates.name,
-            Name: updates.Name ?? updates.name ?? updates.DisplayName,
-          }
-        : {}),
-      ...(updates.enabled !== undefined || updates.Enabled !== undefined
-        ? {
-            Enabled: updates.Enabled ?? updates.enabled,
-          }
-        : {}),
-      ...(updates.newEmail || updates.UserPrincipalName
-        ? {
-            UserPrincipalName: updates.UserPrincipalName ?? updates.newEmail,
-          }
-        : {}),
-    };
+    const payload: Record<string, unknown> = {};
+
+    const nameValue = updates.DisplayName ?? updates.Name ?? updates.name;
+    if (nameValue !== undefined) {
+      payload.DisplayName = nameValue;
+    }
+
+    const enabledValue =
+      updates.Enabled !== undefined ? updates.Enabled : updates.enabled;
+    if (enabledValue !== undefined) {
+      payload.Enabled = enabledValue;
+    }
+
+    const emailValue = updates.UserPrincipalName ?? updates.newEmail;
+    if (emailValue !== undefined) {
+      payload.UserPrincipalName = emailValue;
+    }
+
+    if (updates.SamAccountName !== undefined) {
+      payload.SamAccountName = updates.SamAccountName;
+    }
+
+    if (updates.password !== undefined) {
+      payload.password = updates.password;
+    }
 
     const response = await fetch(
       `${env.PU_URL}/ad/update-user/${encodeURIComponent(email)}`,
