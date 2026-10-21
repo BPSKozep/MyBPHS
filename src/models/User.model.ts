@@ -11,10 +11,11 @@ export interface IUserScim {
 
 export interface IUser {
   _id?: Types.ObjectId;
-  /** Full name in Hungarian order ("Family Given"); the name shown everywhere. */
-  displayName: string;
-  givenName?: string;
+  // Always display names with `formatName` from `@/utils/personName`.
   familyName?: string;
+  givenName?: string;
+  /** Full name as received; stored only when familyName and givenName are not both known. */
+  displayName?: string;
   email: string;
   roles: string[];
   groups: Types.ObjectId[];
@@ -35,15 +36,15 @@ const userScimSchema = new Schema<IUserScim>(
 );
 
 const userSchema = new Schema<IUser>({
-  displayName: {
+  familyName: {
     type: String,
-    required: true,
+    required: false,
   },
   givenName: {
     type: String,
     required: false,
   },
-  familyName: {
+  displayName: {
     type: String,
     required: false,
   },

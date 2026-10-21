@@ -15,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import UserInput from "@/components/ui/UserInput";
 import { cn } from "@/lib/utils";
-import type { IUser } from "@/models/User.model";
 import { api } from "@/trpc/react";
 
 export default function LaptopLogins() {
@@ -63,12 +62,8 @@ export default function LaptopLogins() {
 
   // Create a map of username (email part before @) to user for quick lookups
   const usernameToUserMap = useMemo(() => {
-    if (!users) return new Map();
     return new Map(
-      users.map((u) => {
-        const username = u.email.split("@")[0];
-        return [username, u];
-      }),
+      (users ?? []).map((u) => [u.email.split("@")[0] ?? "", u] as const),
     );
   }, [users]);
 
@@ -81,8 +76,7 @@ export default function LaptopLogins() {
   };
 
   const getUserNameFromUsername = (username: string): string => {
-    const user = usernameToUserMap.get(username) as IUser;
-    return user?.displayName ?? username;
+    return usernameToUserMap.get(username)?.name ?? username;
   };
 
   const formatDate = (date: Date) => {

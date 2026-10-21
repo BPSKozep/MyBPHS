@@ -1,3 +1,4 @@
+import { formatName } from "@/utils/personName";
 import { SCHEMA_USER } from "./constants";
 import { ScimError } from "./errors";
 
@@ -13,12 +14,19 @@ export interface ScimUserState {
   active?: boolean;
 }
 
+/** Name fields as stored on a user; `undefined` clears a field on save. */
+export interface StoredName {
+  familyName: string | undefined;
+  givenName: string | undefined;
+  displayName: string | undefined;
+}
+
 /** The subset of a stored user that is needed to serialize a SCIM resource. */
 export interface ScimSerializableUser {
   _id?: { toString(): string; getTimestamp?: () => Date } | null;
-  displayName: string;
-  givenName?: string;
   familyName?: string;
+  givenName?: string;
+  displayName?: string;
   email: string;
   disabled?: boolean;
   scim?: {
@@ -140,29 +148,23 @@ export function parseScimUser(body: unknown): ScimUserState {
 }
 
 /**
- * Builds the name string:
- * 1. If familyName and givenName are both present (sure about first and last name):
- *    compose in Hungarian format: "familyName givenName" (e.g. "Gyóni Márk").
- * 2. If only one is present: whichever is provided.
- * 3. If only displayName/formatted is provided: use that directly as-is.
+ * Resolves the name fields to store from SCIM attributes. With both familyName
+ * and givenName, the full name is dropped (it is formatted from the parts).
+ * Otherwise displayName / name.formatted is kept as-is, never split.
+ * Every key is present so a save also clears stale fields. Returns null when
+ * no name attribute is present.
  */
-export function composeName(state: ScimUserState): string {
-  const family = state.familyName?.trim();
-  const given = state.givenName?.trim();
-
-  // Only swap when we are sure about both first and last name
-  if (family && given) {
-    return `${family} ${given}`;
+export function resolveNameParts(state: ScimUserState): StoredName | null {
+  const familyName = state.familyName?.trim() || undefined;
+  const givenName = state.givenName?.trim() || undefined;
+  if (familyName && givenName) {
+    return { familyName, givenName, displayName: undefined };
   }
 
-  if (family) return family;
-  if (given) return given;
-
-  // If only displayName or formatted is provided, use as-is without guessing
-  if (state.displayName) return state.displayName.trim();
-  if (state.formatted) return state.formatted.trim();
-
-  return "";
+  const displayName =
+    state.displayName?.trim() || state.formatted?.trim() || undefined;
+  if (!familyName && !givenName && !displayName) return null;
+  return { familyName, givenName, displayName };
 }
 
 /** Serializes a stored user as a SCIM User resource. */
@@ -177,11 +179,11 @@ export function toScimUser(user: ScimSerializableUser, baseUrl: string) {
     ...(user.scim?.externalId ? { externalId: user.scim.externalId } : {}),
     userName: user.scim?.userName ?? user.email,
     name: {
-      formatted: user.displayName,
+      formatted: formatName(user),
       ...(user.givenName ? { givenName: user.givenName } : {}),
       ...(user.familyName ? { familyName: user.familyName } : {}),
     },
-    displayName: user.displayName,
+    displayName: formatName(user),
     emails: [{ value: user.email, type: "work", primary: true }],
     active: !user.disabled,
     meta: {

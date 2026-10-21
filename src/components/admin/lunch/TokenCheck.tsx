@@ -211,7 +211,7 @@ export default function TokenCheck() {
 
           {checkMode === "token" && (
             <h2 className="mb-4 text-white font-semibold text-lg">
-              {user.displayName}
+              {user.name}
             </h2>
           )}
           <div className="overflow-auto rounded-lg">
@@ -344,7 +344,7 @@ export default function TokenCheck() {
           <h1 className="mt-5 text-xl text-white">
             Nincs rendelés erre a hétre
           </h1>
-          {NFCUser && <h2 className="text-white">{user.displayName}</h2>}
+          {NFCUser && <h2 className="text-white">{user.name}</h2>}
           <div className="mt-6 flex justify-center">
             <motion.button
               whileHover={{ scale: 1.02 }}

@@ -12,12 +12,14 @@ import Verification from "@/emails/verification";
 import Welcome from "@/emails/welcome";
 import { env as clientEnv } from "@/env/client";
 import { env as serverEnv } from "@/env/server";
+import { User } from "@/models";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "@/server/trpc";
 import { checkRoles } from "@/utils/authorization";
+import { firstName } from "@/utils/personName";
 
 const resend = new Resend(serverEnv.RESEND_API_KEY);
 
@@ -108,8 +110,15 @@ export const emailRouter = createTRPCRouter({
                 })
               : Important({ html: input.emailHtml, recipients });
       } else {
-        // User email logic
-        const userName = input.user ?? "Felhasználó";
+        // User email logic: greet the recipient by first name
+        const recipient =
+          typeof input.emailTo === "string"
+            ? await User.findOne({ email: input.emailTo })
+                .select("familyName givenName displayName")
+                .lean()
+            : null;
+        const userName =
+          (recipient && firstName(recipient)) || input.user || "Felhasználó";
 
         emailComponent =
           input.emailFormat === "general"

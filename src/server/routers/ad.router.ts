@@ -4,6 +4,7 @@ import { env } from "@/env/server";
 import { User } from "@/models";
 import { createAdUser, updateAdUser } from "@/server/services/adUsers";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
+import { formatName } from "@/utils/personName";
 
 const puToken = env.PU_TOKEN;
 export const adRouter = createTRPCRouter({
@@ -74,7 +75,7 @@ export const adRouter = createTRPCRouter({
       if (!userExistsInAD) {
         const createResult = await createAdUser(
           user.email ?? "",
-          user.displayName,
+          formatName(user),
         );
         if (!createResult.success) {
           throw new TRPCError({

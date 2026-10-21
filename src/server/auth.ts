@@ -8,6 +8,7 @@ import GoogleProvider from "next-auth/providers/google";
 import mongooseConnect from "@/clients/mongoose";
 import { env } from "@/env/server";
 import { User } from "@/models";
+import { formatName } from "@/utils/personName";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -39,6 +40,8 @@ interface GoogleProfile {
   picture?: string;
   email?: string;
   name?: string;
+  given_name?: string;
+  family_name?: string;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -84,10 +87,15 @@ export const authOptions: NextAuthOptions = {
         email?.endsWith("@budapestschool.org")
       ) {
         // Redirect to onboarding with user info as search params
-        const params = new URLSearchParams({
-          name: profile?.name ?? user?.name ?? "",
-          email: email,
-        });
+        // Name parts only when Google is sure about both; otherwise the full name as-is.
+        const googleProfile = profile as GoogleProfile | undefined;
+        const familyName = googleProfile?.family_name?.trim();
+        const givenName = googleProfile?.given_name?.trim();
+        const params = new URLSearchParams(
+          familyName && givenName
+            ? { familyName, givenName, email }
+            : { name: profile?.name ?? user?.name ?? "", email },
+        );
         return `/onboarding?${params.toString()}`;
       }
 
@@ -123,7 +131,7 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: kioskUser._id?.toString() ?? "",
-          name: kioskUser.displayName,
+          name: formatName(kioskUser),
           email: kioskUser.email,
         };
       },

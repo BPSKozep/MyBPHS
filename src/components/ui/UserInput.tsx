@@ -7,7 +7,7 @@ import { api } from "@/trpc/react";
 
 interface User {
   email: string;
-  displayName: string;
+  name: string;
   disabled?: boolean;
 }
 
@@ -23,7 +23,7 @@ export default function UserInput({
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(
-    showAllOption ? { email: "all", displayName: "Összes felhasználó" } : null,
+    showAllOption ? { email: "all", name: "Összes felhasználó" } : null,
   );
   const userInputRef = useRef<HTMLDivElement>(null);
 
@@ -31,7 +31,7 @@ export default function UserInput({
 
   const filteredUsers = (usersData.data ?? []).filter(
     (user) =>
-      user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
@@ -59,7 +59,7 @@ export default function UserInput({
   const handleSelectUser = (user: User) => {
     setSelectedUser({
       email: user.email,
-      displayName: user.displayName,
+      name: user.name,
       disabled: user.disabled,
     });
     setIsOpen(false);
@@ -67,7 +67,7 @@ export default function UserInput({
     if (onSelect) {
       onSelect({
         email: user.email,
-        displayName: user.displayName,
+        name: user.name,
         disabled: user.disabled,
       });
     }
@@ -81,7 +81,7 @@ export default function UserInput({
         className="flex w-full items-center justify-between rounded-md bg-white px-3 py-2 text-sm font-bold text-black"
       >
         <span>
-          {selectedUser ? selectedUser.displayName : "Válassz felhasználót..."}
+          {selectedUser ? selectedUser.name : "Válassz felhasználót..."}
         </span>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
@@ -129,7 +129,7 @@ export default function UserInput({
                     onClick={() =>
                       handleSelectUser({
                         email: "all",
-                        displayName: "Összes felhasználó",
+                        name: "Összes felhasználó",
                       })
                     }
                     className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-black hover:bg-neutral-100"
@@ -156,7 +156,7 @@ export default function UserInput({
                   >
                     <div className="flex flex-col items-start">
                       <span className="text-left font-extrabold break-all">
-                        {user.displayName} {user.disabled && "🚫"}
+                        {user.name} {user.disabled && "🚫"}
                       </span>
 
                       <span className="text-left text-xs font-semibold break-all text-neutral-700">

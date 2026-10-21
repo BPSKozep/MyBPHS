@@ -154,10 +154,10 @@ export default function SendEmail() {
 
   // Update selected user name when user data loads
   useEffect(() => {
-    if (user.data?.displayName) {
-      setSelectedUserName(user.data.displayName);
+    if (user.data?.name) {
+      setSelectedUserName(user.data.name);
     }
-  }, [user.data?.displayName]);
+  }, [user.data?.name]);
 
   // Auto-adjust preset based on group/user mode
   useEffect(() => {
@@ -392,7 +392,7 @@ export default function SendEmail() {
                   <UserInput
                     onSelect={(user) => {
                       setSelectedUserEmail(user.email);
-                      setSelectedUserName(user.displayName);
+                      setSelectedUserName(user.name);
                     }}
                   />
                 </div>
@@ -409,7 +409,7 @@ export default function SendEmail() {
                         : groupEmail === "jpp-students-only@budapestschool.org"
                           ? "Kedves diákok!"
                           : "Kedves tanárok!"
-                    : `Kedves ${selectedUserName}!`}
+                    : `Kedves ${user.data?.givenName || selectedUserName}!`}
                 </div>
               )}
             </div>
