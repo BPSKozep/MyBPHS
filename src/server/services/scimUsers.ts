@@ -43,6 +43,22 @@ function stateFromUser(user: UserDoc): ScimUserState {
 }
 
 /**
+ * Resolves the target AD account enabled state:
+ * - If user is disabled in Entra/MongoDB -> false (disable in AD).
+ * - If user is active but has never set a laptop password -> undefined (leave as-is in AD to prevent password policy errors).
+ * - If user is active and has set a laptop password -> true (enable in AD).
+ */
+function resolveAdEnabled(user: UserDoc): boolean | undefined {
+  if (user.disabled) {
+    return false;
+  }
+  if (!user.laptopPasswordChanged) {
+    return undefined;
+  }
+  return true;
+}
+
+/**
  * Writes the SCIM state onto a user document. Application-owned fields
  * (roles, groups, nfcId, joinDate, laptopPasswordChanged) are never touched.
  */
@@ -174,7 +190,7 @@ export async function provisionUser(
     const user = await saveScimState(existing, normalized);
     const adResult = await syncAdUser(user.email, {
       name: user.name,
-      enabled: !user.disabled,
+      enabled: resolveAdEnabled(user),
     });
     if (!adResult.success && !adResult.skipped) {
       console.error(`[scim] AD sync failed for ${user.email}:`, adResult.error);
@@ -207,7 +223,11 @@ export async function provisionUser(
       },
     });
 
-    const adResult = await ensureAdUser(user.email, user.name, !user.disabled);
+    const adResult = await ensureAdUser(
+      user.email,
+      user.name,
+      resolveAdEnabled(user),
+    );
     if (!adResult.success && !adResult.skipped) {
       console.error(
         `[scim] AD creation failed for ${user.email}:`,
@@ -236,7 +256,7 @@ export async function provisionUser(
     const user = await saveScimState(winner, normalized);
     const adResult = await syncAdUser(user.email, {
       name: user.name,
-      enabled: !user.disabled,
+      enabled: resolveAdEnabled(user),
     });
     if (!adResult.success && !adResult.skipped) {
       console.error(`[scim] AD sync failed for ${user.email}:`, adResult.error);
@@ -258,7 +278,7 @@ export async function patchUser(id: string, body: unknown): Promise<UserDoc> {
 
   const adResult = await syncAdUser(oldEmail, {
     name: updatedUser.name,
-    enabled: !updatedUser.disabled,
+    enabled: resolveAdEnabled(updatedUser),
     ...(updatedUser.email.toLowerCase() !== oldEmail.toLowerCase()
       ? { newEmail: updatedUser.email }
       : {}),
