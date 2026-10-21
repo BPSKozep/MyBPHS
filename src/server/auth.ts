@@ -32,6 +32,8 @@ declare module "next-auth/jwt" {
   interface JWT {
     googleImage?: string;
     disabled?: boolean;
+    /** True once `name` holds the formatted name from the database instead of Google's. */
+    nameFromDb?: boolean;
   }
 }
 
@@ -52,13 +54,21 @@ export const authOptions: NextAuthOptions = {
       if (googleProfile?.picture) {
         token.googleImage = googleProfile.picture;
       }
-      if (user || token.disabled === undefined) {
+      // Runs on sign-in, and once for sessions created before these fields existed.
+      if (user || token.disabled === undefined || !token.nameFromDb) {
         const email = token.email ?? user?.email ?? profile?.email;
         if (email) {
           token.email = email;
           await mongooseConnect();
-          const dbUser = await User.findOne({ email }).select("disabled");
+          const dbUser = await User.findOne({ email })
+            .select("disabled familyName givenName displayName")
+            .lean();
           token.disabled = dbUser?.disabled ?? false;
+          // Show the app's (Hungarian-formatted) name, not Google's.
+          if (dbUser) {
+            token.name = formatName(dbUser) || token.name;
+          }
+          token.nameFromDb = true;
         }
       }
       return token;
