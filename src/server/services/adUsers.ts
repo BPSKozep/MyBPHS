@@ -26,7 +26,7 @@ export interface AdOperationResult {
 export async function createAdUser(
   email: string,
   name: string,
-  password = "xr6CjrFz@mMD",
+  password?: string,
 ): Promise<AdOperationResult> {
   if (env.NODE_ENV === "development") {
     return { success: true, skipped: true };
@@ -40,6 +40,11 @@ export async function createAdUser(
   }
 
   try {
+    const payload: { name: string; password?: string } = { name };
+    if (password) {
+      payload.password = password;
+    }
+
     const response = await fetch(
       `${env.PU_URL}/ad/create-user/${encodeURIComponent(email)}`,
       {
@@ -48,10 +53,7 @@ export async function createAdUser(
           "Content-Type": "application/json",
           Authorization: `Bearer ${env.PU_TOKEN}`,
         },
-        body: JSON.stringify({
-          password,
-          name,
-        }),
+        body: JSON.stringify(payload),
       },
     );
 
@@ -153,8 +155,9 @@ export async function ensureAdUser(
   email: string,
   name: string,
   enabled = true,
+  password?: string,
 ): Promise<AdOperationResult> {
-  const createResult = await createAdUser(email, name);
+  const createResult = await createAdUser(email, name, password);
   if (createResult.success || createResult.skipped) {
     if (!enabled) {
       return updateAdUser(email, { enabled: false });

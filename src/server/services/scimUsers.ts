@@ -195,6 +195,8 @@ export async function provisionUser(
       groups: [],
       disabled: normalized.active === false,
       joinDate: new Date(),
+      // User sets their school/laptop password themselves on the portal; remains unset on SCIM provisioning
+      laptopPasswordChanged: undefined,
       scim: {
         externalId: normalized.externalId,
         userName: normalized.userName,
