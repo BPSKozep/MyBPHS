@@ -7,6 +7,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import mongooseConnect from "@/clients/mongoose";
 import { env } from "@/env/server";
+import { verifyApiKey } from "@/lib/apiKeys";
 import { User } from "@/models";
 import { formatName } from "@/utils/personName";
 
@@ -123,12 +124,17 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         token: { label: "Kiosk Token", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        const forwardedFor = req.headers?.["x-forwarded-for"] as
+          | string
+          | undefined;
         if (
-          !credentials?.token ||
-          !env.KIOSK_SECRET ||
           !env.KIOSK_EMAIL ||
-          credentials.token !== env.KIOSK_SECRET
+          !(await verifyApiKey(
+            credentials?.token,
+            "kiosk:login",
+            forwardedFor?.split(",")[0]?.trim(),
+          ))
         ) {
           return null;
         }

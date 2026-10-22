@@ -48,10 +48,8 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
-    LAPTOP_SECRET:
-      process.env.NODE_ENV === "production"
-        ? z.string()
-        : z.string().optional(),
+    // Legacy incoming secrets, replaced by managed API keys (see src/lib/apiKeys)
+    LAPTOP_SECRET: z.string().optional(),
     KIOSK_SECRET: z.string().optional(),
     KIOSK_EMAIL: z.string().optional(),
     MONGODB_URI: z.string(),
@@ -60,7 +58,8 @@ export const env = createEnv({
     NEXTAUTH_URL: z.string(),
     GOOGLE_ID: z.string(),
     GOOGLE_SECRET: z.string(),
-    PING_SECRET: z.string(),
+    PING_SECRET: z.string().optional(),
+    CRON_SECRET: z.string().optional(),
     S3_ENDPOINT:
       process.env.NODE_ENV === "production"
         ? z.string()

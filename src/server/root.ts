@@ -1,4 +1,5 @@
 import { adRouter } from "@/server/routers/ad.router";
+import { apiKeyRouter } from "@/server/routers/apiKey.router";
 import { emailRouter } from "@/server/routers/email.router";
 import { groupRouter } from "@/server/routers/group.router";
 import { kioskRouter } from "@/server/routers/kiosk.router";
@@ -25,6 +26,7 @@ export const appRouter = createTRPCRouter({
   profilePicture: profilePictureRouter,
   networking: networkingRouter,
   opendays: opendaysRouter,
+  apiKey: apiKeyRouter,
 });
 
 // export type definition of API

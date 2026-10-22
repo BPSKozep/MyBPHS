@@ -1,5 +1,6 @@
 import { createClient } from "redis";
 import { env } from "@/env/server";
+import { getBearerToken, safeEqual } from "@/lib/apiKeys";
 import { getServerAuthSession } from "@/server/auth";
 
 export type RedisClient = ReturnType<typeof createClient>;
@@ -39,12 +40,12 @@ async function getRedisClient(): Promise<RedisClient> {
 }
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
   const session = await getServerAuthSession();
 
   if (!session?.user?.name) {
-    const expectedAuth = `Bearer ${process.env.CRON_SECRET}`;
-    if (!authHeader || authHeader !== expectedAuth) {
+    // CRON_SECRET is injected by Vercel Cron, so it stays an env secret
+    const token = getBearerToken(request);
+    if (!env.CRON_SECRET || !token || !safeEqual(token, env.CRON_SECRET)) {
       return new Response("Unauthorized", { status: 401 });
     }
   }

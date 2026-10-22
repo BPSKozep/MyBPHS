@@ -1,12 +1,9 @@
 import mongooseConnect from "@/clients/mongoose";
-import { env } from "@/env/server";
+import { verifyApiKeyRequest } from "@/lib/apiKeys";
 import LaptopLogin from "@/models/LaptopLogin.model";
 
 export async function POST(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  const expectedAuth = `Bearer ${env.LAPTOP_SECRET}`;
-
-  if (!authHeader || authHeader !== expectedAuth) {
+  if (!(await verifyApiKeyRequest(request, "laptop:login"))) {
     return new Response("Unauthorized", { status: 401 });
   }
 

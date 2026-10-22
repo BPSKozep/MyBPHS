@@ -1,6 +1,5 @@
-import { createHash, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
-import { env } from "@/env/server";
+import { verifyApiKeyRequest } from "@/lib/apiKeys";
 import { SCIM_CONTENT_TYPE } from "./constants";
 import { ScimError, scimErrorBody } from "./errors";
 
@@ -17,28 +16,6 @@ export function scimResponse(
 
 export function scimEmpty(status = 204): Response {
   return new Response(null, { status });
-}
-
-function sha256(value: string): Buffer {
-  return createHash("sha256").update(value).digest();
-}
-
-/** Constant-time comparison of the bearer token against SCIM_BEARER_TOKEN. */
-export function isAuthorizedScimRequest(request: Request): boolean {
-  const expected = env.SCIM_BEARER_TOKEN;
-  if (!expected) {
-    console.error(
-      "[scim] SCIM_BEARER_TOKEN is not configured; rejecting request",
-    );
-    return false;
-  }
-
-  const header = request.headers.get("authorization") ?? "";
-  const match = /^Bearer\s+(.+)$/i.exec(header);
-  const provided = match?.[1]?.trim();
-  if (!provided) return false;
-
-  return timingSafeEqual(sha256(provided), sha256(expected));
 }
 
 /** Public base URL (scheme + host) used for `meta.location`. */
@@ -66,7 +43,7 @@ type Handler<C> = (request: NextRequest, context: C) => Promise<Response>;
 /** Wraps a handler with bearer auth and SCIM error mapping. */
 export function withScim<C>(handler: Handler<C>): Handler<C> {
   return async (request, context) => {
-    if (!isAuthorizedScimRequest(request)) {
+    if (!(await verifyApiKeyRequest(request, "scim"))) {
       return scimResponse(
         scimErrorBody(401, "Invalid or missing bearer token"),
         401,

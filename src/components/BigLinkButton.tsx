@@ -12,11 +12,12 @@ async function checkSiteStatus(url: string, baseUrl: string): Promise<boolean> {
       method: "GET",
       signal: controller.signal,
       cache: "no-store",
-      headers: url.startsWith("/")
-        ? {
-            Authorization: `Bearer ${env.PING_SECRET}`,
-          }
-        : undefined,
+      headers:
+        url.startsWith("/") && env.PING_SECRET
+          ? {
+              Authorization: `Bearer ${env.PING_SECRET}`,
+            }
+          : undefined,
     });
 
     clearTimeout(timeoutId);
