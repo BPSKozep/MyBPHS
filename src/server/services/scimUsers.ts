@@ -106,6 +106,15 @@ async function saveScimState(user: UserDoc, state: ScimUserState) {
   return user;
 }
 
+async function notifyIfDisabled(user: UserDoc, wasDisabled: boolean) {
+  if (wasDisabled || !user.disabled) return;
+  await sendSlackNotification({
+    title: "SCIM: Felhasználó letiltva",
+    body: `${formatName(user)} (${user.email}) le lett tiltva.`,
+    color: "warning",
+  });
+}
+
 export async function findUserByScimId(id: string): Promise<UserDoc | null> {
   await mongooseConnect();
   if (OBJECT_ID_RE.test(id)) {
@@ -191,7 +200,9 @@ export async function provisionUser(
 
   const existing = await findExisting(email, state.externalId);
   if (existing) {
+    const wasDisabled = existing.disabled === true;
     const user = await saveScimState(existing, normalized);
+    await notifyIfDisabled(user, wasDisabled);
     const adResult = await syncAdUser(user.email, {
       name: formatName(user),
       enabled: resolveAdEnabled(user),
@@ -243,6 +254,12 @@ export async function provisionUser(
       });
     }
 
+    await sendSlackNotification({
+      title: "SCIM: Új felhasználó létrehozva",
+      body: `${formatName(user)} (${user.email}) létrejött.`,
+      color: "good",
+    });
+
     return { user, created: true };
   } catch (error) {
     if (!isDuplicateKeyError(error)) throw error;
@@ -256,7 +273,9 @@ export async function provisionUser(
         "uniqueness",
       );
     }
+    const wasDisabled = winner.disabled === true;
     const user = await saveScimState(winner, normalized);
+    await notifyIfDisabled(user, wasDisabled);
     const adResult = await syncAdUser(user.email, {
       name: formatName(user),
       enabled: resolveAdEnabled(user),
@@ -277,7 +296,9 @@ export async function patchUser(id: string, body: unknown): Promise<UserDoc> {
   const user = await requireUser(id);
   const oldEmail = user.email;
   const next = applyPatchOperations(stateFromUser(user), body);
+  const wasDisabled = user.disabled === true;
   const updatedUser = await saveScimState(user, next);
+  await notifyIfDisabled(updatedUser, wasDisabled);
 
   const adResult = await syncAdUser(oldEmail, {
     name: formatName(updatedUser),
