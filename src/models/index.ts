@@ -1,3 +1,4 @@
+import ApiKey from "./ApiKey.model";
 import Group from "./Group.model";
 import GroupOverride from "./GroupOverride.model";
 import Kiosk from "./Kiosk.model";
@@ -9,6 +10,7 @@ import Order from "./Order.model";
 import User from "./User.model";
 
 export {
+  ApiKey,
   Group,
   GroupOverride,
   Kiosk,
