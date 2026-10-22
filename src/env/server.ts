@@ -42,15 +42,11 @@ export const env = createEnv({
     DISABLE_WEBHOOKS: z.string().optional().default("false"),
     RESEND_API_KEY: z.string().optional(),
     RESEND_WEBHOOK_SECRET: z.string().optional(),
-    SCIM_BEARER_TOKEN: z.string().min(32).optional(),
     TURNSTILE_SECRET_KEY: z.string().optional(),
     REDIS_URL:
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
-    // Legacy incoming secrets, replaced by managed API keys (see src/lib/apiKeys)
-    LAPTOP_SECRET: z.string().optional(),
-    KIOSK_SECRET: z.string().optional(),
     KIOSK_EMAIL: z.string().optional(),
     MONGODB_URI: z.string(),
     MONGODB_DATABASE: z.string(),
