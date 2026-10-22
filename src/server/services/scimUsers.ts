@@ -110,7 +110,7 @@ async function notifyIfDisabled(user: UserDoc, wasDisabled: boolean) {
   if (wasDisabled || !user.disabled) return;
   await sendSlackNotification({
     title: "SCIM: Felhasználó letiltva",
-    body: `${user.name} (${user.email}) le lett tiltva az Entra ID-ból.`,
+    body: `${formatName(user)} (${user.email}) le lett tiltva az Entra ID-ból.`,
     color: "warning",
   });
 }
@@ -256,7 +256,7 @@ export async function provisionUser(
 
     await sendSlackNotification({
       title: "SCIM: Új felhasználó létrehozva",
-      body: `${user.name} (${user.email}) létrejött az Entra ID-ból.`,
+      body: `${formatName(user)} (${user.email}) létrejött az Entra ID-ból.`,
       color: "good",
     });
 
