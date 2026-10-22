@@ -30,7 +30,6 @@ const LAST_USED_THROTTLE_MS = 60_000;
 const LEGACY_SECRETS: Record<ApiScope, string | undefined> = {
   scim: env.SCIM_BEARER_TOKEN,
   "laptop:login": env.LAPTOP_SECRET,
-  ping: env.PING_SECRET,
   "kiosk:login": env.KIOSK_SECRET,
 };
 

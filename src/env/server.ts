@@ -58,7 +58,6 @@ export const env = createEnv({
     NEXTAUTH_URL: z.string(),
     GOOGLE_ID: z.string(),
     GOOGLE_SECRET: z.string(),
-    PING_SECRET: z.string().optional(),
     CRON_SECRET: z.string().optional(),
     S3_ENDPOINT:
       process.env.NODE_ENV === "production"
