@@ -8,6 +8,19 @@ import { formatName } from "@/utils/personName";
 
 const puToken = env.PU_TOKEN;
 export const adRouter = createTRPCRouter({
+  isAvailable: protectedProcedure.query(async () => {
+    if (!env.PU_URL) return false;
+
+    try {
+      const response = await fetch(env.PU_URL, {
+        signal: AbortSignal.timeout(3000),
+        cache: "no-store",
+      });
+      return response.status === 200;
+    } catch {
+      return false;
+    }
+  }),
   getPasswordLastChanged: protectedProcedure.query(async ({ ctx }) => {
     const user = await User.findOne({
       email: ctx.session?.user?.email,

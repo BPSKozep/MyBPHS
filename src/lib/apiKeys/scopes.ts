@@ -9,11 +9,6 @@ export const API_SCOPES = {
     description: "Laptop bejelentkezések rögzítése",
     endpoints: ["POST /api/laptop/login"],
   },
-  ping: {
-    label: "Ping",
-    description: "Szolgáltatások állapotának ellenőrzése",
-    endpoints: ["/api/laptop/ping", "/api/chat/ping"],
-  },
   "kiosk:login": {
     label: "Kiosk bejelentkezés",
     description: "Kiosk eszközök automatikus bejelentkezése",

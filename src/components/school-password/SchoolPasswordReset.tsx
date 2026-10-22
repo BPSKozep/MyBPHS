@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FaChevronDown,
   FaCircleExclamation,
@@ -32,9 +32,10 @@ export default function SchoolPasswordReset() {
 
   const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
-  const [laptopPassResetAvailable, setlaptopAvailable] = useState(false);
-
-  const [laptopPassResetShown, setLaptopPassResetShown] = useState(false);
+  const puAvailable = api.ad.isAvailable.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
 
   const session = useSession();
 
@@ -56,39 +57,9 @@ export default function SchoolPasswordReset() {
     },
   ];
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const timer = setTimeout(() => {
-      setLaptopPassResetShown(true);
-      controller.abort();
-    }, 3000);
-
-    fetch("/api/laptop/ping", { signal: controller.signal })
-      .then((response) => {
-        if (response.status === 200) {
-          setlaptopAvailable(true);
-        } else {
-          setlaptopAvailable(false);
-        }
-      })
-      .catch((error: unknown) => {
-        if (error instanceof Error && error.name === "AbortError") {
-          return;
-        }
-        console.error(error);
-        setlaptopAvailable(false);
-      });
-
-    return () => {
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, []);
-
   return (
     <>
-      {!laptopPassResetShown && (
+      {puAvailable.isPending && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -101,7 +72,7 @@ export default function SchoolPasswordReset() {
           </h2>
         </motion.div>
       )}
-      {!laptopPassResetAvailable && laptopPassResetShown && (
+      {!puAvailable.isPending && !puAvailable.data && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -120,7 +91,7 @@ export default function SchoolPasswordReset() {
           </p>
         </motion.div>
       )}
-      {laptopPassResetAvailable && laptopPassResetShown && (
+      {puAvailable.data && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

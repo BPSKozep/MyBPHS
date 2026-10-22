@@ -1,75 +1,54 @@
-import { BigLinkButtonClient } from "@/components/BigLinkButtonClient";
-import { env } from "@/env/server";
+"use client";
 
-async function checkSiteStatus(url: string, baseUrl: string): Promise<boolean> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-    const fullUrl = url.startsWith("/") ? `${baseUrl}${url}` : url;
-
-    const response = await fetch(fullUrl, {
-      method: "GET",
-      signal: controller.signal,
-      cache: "no-store",
-      headers:
-        url.startsWith("/") && env.PING_SECRET
-          ? {
-              Authorization: `Bearer ${env.PING_SECRET}`,
-            }
-          : undefined,
-    });
-
-    clearTimeout(timeoutId);
-
-    const isSuccess =
-      response.ok && response.status >= 200 && response.status < 300;
-
-    return isSuccess;
-  } catch {
-    return false;
-  }
-}
-
-async function checkAllSites(
-  statuswebsites: string[],
-  baseUrl: string,
-): Promise<boolean> {
-  try {
-    const results = await Promise.all(
-      statuswebsites.map((url) => checkSiteStatus(url, baseUrl)),
-    );
-    const allUp =
-      results.length > 0 && results.every((result) => result === true);
-    return allUp;
-  } catch {
-    return false;
-  }
-}
-
-export default async function BigLinkButton({
+export default function BigLinkButton({
   title,
   url,
   disabled,
-  statuswebsites,
 }: {
   title: string;
   url: string;
   disabled?: boolean;
-  statuswebsites?: string[];
 }) {
-  let allSitesUp: boolean | null = null;
+  const router = useRouter();
+  const [clicked, setClicked] = useState(false);
 
-  if (statuswebsites && statuswebsites.length > 0) {
-    allSitesUp = await checkAllSites(statuswebsites, env.NEXTAUTH_URL);
+  if (disabled) {
+    return (
+      <motion.button
+        whileHover={{ rotateZ: [null, 0.5, -0.5, 0] }}
+        transition={{
+          duration: 0.5,
+          times: [0, 0.33, 0.66, 1],
+        }}
+        className="relative flex cursor-not-allowed rounded-md border border-gray-400 bg-slate-700 p-7 text-gray-300"
+        disabled
+      >
+        <span className="w-full text-center text-xl font-bold">{title}</span>
+      </motion.button>
+    );
   }
 
   return (
-    <BigLinkButtonClient
-      title={title}
-      url={url}
-      disabled={disabled}
-      allSitesUp={allSitesUp}
-    />
+    <motion.button
+      whileHover={{ scale: clicked ? 1 : 1.1 }}
+      whileFocus={{ scale: clicked ? 1 : 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{
+        type: "spring",
+        stiffness: 500,
+        damping: 20,
+      }}
+      onClick={() => {
+        setClicked(true);
+        setTimeout(() => router.push(url), 150);
+      }}
+      className="relative flex cursor-pointer rounded-md border-2 bg-slate-700 p-7"
+    >
+      <span className="w-full text-center text-xl font-bold">{title}</span>
+    </motion.button>
   );
 }
