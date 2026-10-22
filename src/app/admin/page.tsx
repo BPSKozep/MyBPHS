@@ -35,10 +35,10 @@ export default async function AdminPage() {
                 url="/admin/lunch-token-usage"
               />
               <BigLinkButton title="Felhasználók" url="/admin/users" />
-              <BigLinkButton title="Hálózat" url="/admin/networking" />
               <BigLinkButton title="Onboarding" url="/admin/onboarding" />
               <BigLinkButton title="Email" url="/admin/email" />
               <BigLinkButton title="Laptopok" url="/admin/laptops" />
+              <BigLinkButton title="API kulcsok" url="/admin/api-keys" />
             </>
           )}
           <BigLinkButton title="Nyílt napok" url="/admin/opendays" />
