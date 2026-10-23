@@ -23,6 +23,8 @@ export interface IUser {
   joinDate?: Date;
   laptopPasswordChanged?: Date;
   disabled?: boolean;
+  /** Last time the user answered "I have my token" in the order reminder. */
+  tokenReminderAnsweredAt?: Date;
   scim?: IUserScim;
 }
 
@@ -76,6 +78,10 @@ const userSchema = new Schema<IUser>({
   },
   disabled: {
     type: Boolean,
+    required: false,
+  },
+  tokenReminderAnsweredAt: {
+    type: Date,
     required: false,
   },
   scim: {

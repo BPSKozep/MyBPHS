@@ -1,7 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { customAlphabet } from "nanoid";
 import mongooseConnect from "@/clients/mongoose";
-import { env } from "@/env/server";
 import ApiKey from "@/models/ApiKey.model";
 import type { ApiScope } from "./scopes";
 
@@ -22,16 +21,6 @@ const generateSecret = customAlphabet(BASE62, SECRET_LENGTH);
 
 /** Only write lastUsedAt/lastUsedIp once per this interval per key. */
 const LAST_USED_THROTTLE_MS = 60_000;
-
-/**
- * Env secrets still accepted while callers migrate to managed keys.
- * TODO: remove once the "[api-keys] legacy secret used" warning stops showing up.
- */
-const LEGACY_SECRETS: Record<ApiScope, string | undefined> = {
-  scim: env.SCIM_BEARER_TOKEN,
-  "laptop:login": env.LAPTOP_SECRET,
-  "kiosk:login": env.KIOSK_SECRET,
-};
 
 function sha256(value: string): Buffer {
   return createHash("sha256").update(value).digest();
@@ -71,7 +60,7 @@ export function getClientIp(headers: Headers): string | undefined {
   );
 }
 
-/** Checks a raw token against managed keys (and the legacy env secret) for a scope. */
+/** Checks a raw token against managed keys for a scope. */
 export async function verifyApiKey(
   token: string | undefined,
   scope: ApiScope,
@@ -80,14 +69,7 @@ export async function verifyApiKey(
   if (!token) return false;
 
   const match = KEY_PATTERN.exec(token);
-  if (!match) {
-    const legacy = LEGACY_SECRETS[scope];
-    if (legacy && safeEqual(token, legacy)) {
-      console.warn(`[api-keys] legacy secret used for ${scope}`);
-      return true;
-    }
-    return false;
-  }
+  if (!match) return false;
 
   await mongooseConnect();
   const apiKey = await ApiKey.findOne({ keyId: match[1] });

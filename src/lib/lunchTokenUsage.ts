@@ -9,7 +9,21 @@ export const HUNGARIAN_DAY_NAMES = [
   "Péntek",
 ] as const;
 
-export type UserLunchState = "RULE_BREAKER" | "COMPLIANT" | "INSUFFICIENT_DATA";
+export type UserLunchState =
+  | "NON_COMPLIANT"
+  | "COMPLIANT"
+  | "INSUFFICIENT_DATA";
+
+export const EVALUATED_MEALS = 10;
+export const MIN_TOKEN_USAGE_PERCENTAGE = 50;
+// A user needs at least EVALUATED_MEALS meals within the last 30 school days
+export const ACTIVITY_WINDOW_SCHOOL_DAYS = 30;
+
+export interface RecentMeal {
+  date: string; // YYYY-MM-DD
+  meal: string; // Ordered meal description (falls back to the option key)
+  completed: boolean; // Token used
+}
 
 export interface UserTokenUsageStats {
   userId: string;
@@ -17,13 +31,14 @@ export interface UserTokenUsageStats {
   userEmail: string;
   disabled: boolean;
   roles: string[];
-  totalEligibleMeals: number; // Evaluated meal orders count (up to 20)
+  totalEligibleMeals: number; // Evaluated meals count (up to 10)
   usedCount: number; // Token used (completed: true)
   unusedCount: number; // Token not used (completed: false)
   tokenUsagePercentage: number; // 0..100 % of meals where token was used
-  hasSufficientData: boolean; // Evaluated >= 20 meal orders
-  isRuleBreaker: boolean; // hasSufficientData && unusedCount >= 10
+  hasSufficientData: boolean; // Evaluated 10 meals
+  isNonCompliant: boolean; // hasSufficientData && usage < 50%
   state: UserLunchState;
+  recentMeals: RecentMeal[]; // Evaluated meals, oldest first
 }
 
 export interface RawMenuDoc {
@@ -87,12 +102,26 @@ export function calculateLunchTokenUsage(
   todayStart.setHours(0, 0, 0, 0);
   const todayStartTime = todayStart.getTime();
 
+  // Start of the activity window: the 30th most recent weekday (today included)
+  const windowStart = new Date(todayStart);
+  for (let counted = 0; ; ) {
+    const weekday = windowStart.getDay();
+    if (weekday !== 0 && weekday !== 6) counted++;
+    if (counted >= ACTIVITY_WINDOW_SCHOOL_DAYS) break;
+    windowStart.setDate(windowStart.getDate() - 1);
+  }
+  const windowStartTime = windowStart.getTime();
+
   // Create menu lookup map by ID
-  const menuMap = new Map<string, { year: number; week: number }>();
+  const menuMap = new Map<
+    string,
+    { year: number; week: number; options: Record<string, string>[] }
+  >();
   for (const menu of menus) {
     menuMap.set(menu._id.toString(), {
       year: menu.year,
       week: menu.week,
+      options: menu.options ?? [],
     });
   }
 
@@ -114,7 +143,12 @@ export function calculateLunchTokenUsage(
     const userIdStr = user._id.toString();
     const userOrders = ordersByUser.get(userIdStr) ?? [];
 
-    const allMeals: { timestamp: number; completed: boolean }[] = [];
+    const allMeals: {
+      timestamp: number;
+      date: string;
+      meal: string;
+      completed: boolean;
+    }[] = [];
 
     for (const orderDoc of userOrders) {
       const menu = menuMap.get(orderDoc.menu.toString());
@@ -140,8 +174,11 @@ export function calculateLunchTokenUsage(
           return;
         }
 
+        const pad = (n: number) => String(n).padStart(2, "0");
         allMeals.push({
           timestamp: mealTime,
+          date: `${mealDate.getFullYear()}-${pad(mealDate.getMonth() + 1)}-${pad(mealDate.getDate())}`,
+          meal: menu.options[dayIndex]?.[dayOrder.chosen] ?? dayOrder.chosen,
           completed: dayOrder.completed,
         });
       });
@@ -150,24 +187,32 @@ export function calculateLunchTokenUsage(
     // Sort descending (most recent first)
     allMeals.sort((a, b) => b.timestamp - a.timestamp);
 
-    // Evaluate last 20 meal orders
-    const recentMealsRaw = allMeals.slice(0, 20);
+    // Evaluate last 10 meals (not orders: a 5-day order is 5 meals)
+    const recentMealsRaw = allMeals
+      .filter((m) => m.timestamp >= windowStartTime)
+      .slice(0, EVALUATED_MEALS);
     const totalEligibleMeals = recentMealsRaw.length;
     const usedCount = recentMealsRaw.filter((m) => m.completed).length;
     const unusedCount = recentMealsRaw.filter((m) => !m.completed).length;
 
-    const hasSufficientData = totalEligibleMeals >= 20;
-    const isRuleBreaker = hasSufficientData && unusedCount >= 10;
-
-    let state: UserLunchState = "INSUFFICIENT_DATA";
-    if (hasSufficientData) {
-      state = isRuleBreaker ? "RULE_BREAKER" : "COMPLIANT";
-    }
+    const hasSufficientData = totalEligibleMeals >= EVALUATED_MEALS;
 
     const tokenUsagePercentage =
       totalEligibleMeals > 0
         ? Math.round((usedCount / totalEligibleMeals) * 100)
         : 0;
+
+    const isNonCompliant =
+      hasSufficientData && tokenUsagePercentage < MIN_TOKEN_USAGE_PERCENTAGE;
+
+    let state: UserLunchState = "INSUFFICIENT_DATA";
+    if (hasSufficientData) {
+      state = isNonCompliant ? "NON_COMPLIANT" : "COMPLIANT";
+    }
+
+    const recentMeals: RecentMeal[] = recentMealsRaw
+      .map(({ date, meal, completed }) => ({ date, meal, completed }))
+      .reverse();
 
     results.push({
       userId: userIdStr,
@@ -180,8 +225,9 @@ export function calculateLunchTokenUsage(
       unusedCount,
       tokenUsagePercentage,
       hasSufficientData,
-      isRuleBreaker,
+      isNonCompliant,
       state,
+      recentMeals,
     });
   }
 

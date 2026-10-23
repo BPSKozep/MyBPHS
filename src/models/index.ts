@@ -7,6 +7,7 @@ import Menu from "./Menu.model";
 import OpenDay from "./OpenDay.model";
 import OpenDayRegistration from "./OpenDayRegistration.model";
 import Order from "./Order.model";
+import TokenRequest from "./TokenRequest.model";
 import User from "./User.model";
 
 export {
@@ -19,5 +20,6 @@ export {
   OpenDay,
   OpenDayRegistration,
   Order,
+  TokenRequest,
   User,
 };

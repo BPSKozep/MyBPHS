@@ -10,6 +10,7 @@ import {
   FaGithub,
   FaIdCard,
   FaRightFromBracket,
+  FaRotate,
 } from "react-icons/fa6";
 import PWAInstall from "@/components/PWAInstall";
 import {
@@ -23,6 +24,7 @@ import {
 import rolesJson from "@/data/roles.json";
 import { api } from "@/trpc/react";
 import sleep from "@/utils/sleep";
+import RequestTokenDialog from "./RequestTokenDialog";
 import SetNfcIdDialog from "./SetNfcIdDialog";
 import SmallLoading from "./SmallLoading";
 
@@ -32,6 +34,7 @@ export default function MainHeader() {
   const isOpendays = pathname.startsWith("/opendays");
   const [imageError, setImageError] = useState(false);
   const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
+  const [requestDialogOpen, setRequestDialogOpen] = useState(false);
 
   const NfcId = api.user.getNfcId.useQuery(data?.user?.email ?? "", {
     enabled: !!data?.user?.email,
@@ -205,6 +208,15 @@ export default function MainHeader() {
                             {nfcIdValue}
                           </p>
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => setRequestDialogOpen(true)}
+                          title="Új token igénylése"
+                          className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-purple-500/20 px-2.5 py-1.5 text-xs font-semibold text-purple-300 transition-colors hover:bg-purple-500/30"
+                        >
+                          <FaRotate className="h-3 w-3" />
+                          Új kérése
+                        </button>
                       </div>
                     </div>
                   ) : (
@@ -279,6 +291,10 @@ export default function MainHeader() {
               </div>
             </SheetContent>
           </Sheet>
+          <RequestTokenDialog
+            open={requestDialogOpen}
+            onOpenChange={setRequestDialogOpen}
+          />
           <SetNfcIdDialog
             open={tokenDialogOpen}
             onOpenChange={setTokenDialogOpen}
