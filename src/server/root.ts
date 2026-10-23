@@ -9,6 +9,7 @@ import { networkingRouter } from "@/server/routers/networking.router";
 import { opendaysRouter } from "@/server/routers/opendays.router";
 import { orderRouter } from "@/server/routers/order.router";
 import { profilePictureRouter } from "@/server/routers/profilePicture.router";
+import { tokenRouter } from "@/server/routers/token.router";
 import { userRouter } from "@/server/routers/user.router";
 import { webhookRouter } from "@/server/routers/webhook.router";
 import { createCallerFactory, createTRPCRouter } from "@/server/trpc";
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   group: groupRouter,
   menu: menuRouter,
   order: orderRouter,
+  token: tokenRouter,
   email: emailRouter,
   webhook: webhookRouter,
   ad: adRouter,

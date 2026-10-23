@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useSession } from "next-auth/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -17,6 +17,9 @@ import IconSubmitButton from "@/components/IconSubmitButton";
 import { InfoBox } from "@/components/InfoBox";
 import ClosedOrderForm from "@/components/lunch/ClosedOrderForm";
 import OrderForm from "@/components/lunch/OrderForm";
+import TokenReminderDialog, {
+  type TokenReminderAnswer,
+} from "@/components/lunch/TokenReminderDialog";
 import PageWithHeader from "@/components/PageWithHeader";
 import { api } from "@/trpc/react";
 import { getWeek, getWeekYear } from "@/utils/isoweek";
@@ -72,6 +75,29 @@ function LunchOrder() {
 
   const sendSlackWebhook = api.webhook.sendSlackWebhook.useMutation();
 
+  const utils = api.useUtils();
+  const answerReminder = api.token.answerReminder.useMutation();
+  const [reminderPrice, setReminderPrice] = useState<number | null>(null);
+  const reminderResolver = useRef<(() => void) | null>(null);
+
+  // Resolves once the user has answered the token reminder dialog.
+  const askTokenReminder = (price: number) =>
+    new Promise<void>((resolve) => {
+      reminderResolver.current = resolve;
+      setReminderPrice(price);
+    });
+
+  const handleReminderAnswer = async (answer: TokenReminderAnswer) => {
+    try {
+      await answerReminder.mutateAsync({ answer });
+    } catch (error) {
+      console.error(error);
+    }
+    setReminderPrice(null);
+    reminderResolver.current?.();
+    reminderResolver.current = null;
+  };
+
   const showMenu =
     menu.data &&
     menu.data.options.length > 0 &&
@@ -110,6 +136,12 @@ function LunchOrder() {
 
   return (
     <PageWithHeader title="Ebédrendelés">
+      <TokenReminderDialog
+        open={reminderPrice !== null}
+        price={reminderPrice ?? 0}
+        disabled={answerReminder.isPending}
+        onAnswer={handleReminderAnswer}
+      />
       <div className="flex w-full justify-center text-white">
         <div className="m-auto">
           {showText && (
@@ -385,6 +417,17 @@ function LunchOrder() {
                           icon={<FaEnvelope />}
                           onClick={async () => {
                             try {
+                              // The reminder is a nudge: never block ordering if the check fails.
+                              try {
+                                const reminder =
+                                  await utils.token.shouldShowReminder.fetch();
+                                if (reminder.show) {
+                                  await askTokenReminder(reminder.price);
+                                }
+                              } catch (error) {
+                                console.error(error);
+                              }
+
                               await sleep(500);
 
                               await createOrder.mutateAsync({
