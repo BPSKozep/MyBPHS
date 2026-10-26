@@ -48,7 +48,7 @@
     "input-otp": "^1.5.0",
     "lucide-react": "^1.60.0",
     "mongoose": "^9.11.2",
-    "motion": "^14.4.0",
+    "motion": "^14.6.0",
     "nanoid": "^6.0.2",
     "next": "16.4.2",
     "next-auth": "^4.24.15",
