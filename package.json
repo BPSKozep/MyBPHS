@@ -52,7 +52,7 @@
     "nanoid": "^6.0.2",
     "next": "16.4.2",
     "next-auth": "^4.24.15",
-    "pdfmake": "^0.3.12",
+    "pdfmake": "^0.3.13",
     "posthog-js": "^1.438.19",
     "prettier": "^3.9.10",
     "react": "19.3.1",
