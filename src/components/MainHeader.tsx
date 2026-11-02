@@ -252,7 +252,7 @@ export default function MainHeader() {
                     Build: {process.env.NEXT_PUBLIC_BUILD_DATE ?? "Unknown"}
                   </p>
                   <Link
-                    href="https://github.com/BPSKozep/MyBPHS"
+                    href="https://github.com/BPSJPP/MyBPHS"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 transition-colors hover:text-white"
