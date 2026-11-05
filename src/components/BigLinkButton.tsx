@@ -3,15 +3,18 @@
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function BigLinkButton({
   title,
   url,
   disabled,
+  className,
 }: {
   title: string;
   url: string;
   disabled?: boolean;
+  className?: string;
 }) {
   const router = useRouter();
   const [clicked, setClicked] = useState(false);
@@ -24,10 +27,13 @@ export default function BigLinkButton({
           duration: 0.5,
           times: [0, 0.33, 0.66, 1],
         }}
-        className="relative flex cursor-not-allowed rounded-md border border-gray-400 bg-slate-700 p-7 text-gray-300"
+        className={cn(
+          "relative flex cursor-not-allowed rounded-md border border-gray-400 bg-slate-700 p-7 text-gray-300 text-xl",
+          className,
+        )}
         disabled
       >
-        <span className="w-full text-center text-xl font-bold">{title}</span>
+        <span className="w-full text-center font-bold">{title}</span>
       </motion.button>
     );
   }
@@ -46,9 +52,12 @@ export default function BigLinkButton({
         setClicked(true);
         setTimeout(() => router.push(url), 150);
       }}
-      className="relative flex cursor-pointer rounded-md border-2 bg-slate-700 p-7"
+      className={cn(
+        "relative flex cursor-pointer rounded-md border-2 bg-slate-700 p-7 text-xl",
+        className,
+      )}
     >
-      <span className="w-full text-center text-xl font-bold">{title}</span>
+      <span className="w-full text-center font-bold">{title}</span>
     </motion.button>
   );
 }

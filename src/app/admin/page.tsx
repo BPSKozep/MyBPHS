@@ -9,6 +9,8 @@ export const metadata = {
   title: "Admin",
 };
 
+const buttonClass = "items-center p-4 text-base sm:p-7 sm:text-xl";
+
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
   if (!session || session.user?.disabled) {
@@ -25,23 +27,52 @@ export default async function AdminPage() {
 
   return (
     <PageWithHeader title="Admin">
-      <div className="flex h-full w-full items-center justify-center text-white">
-        <div className="m-3 inline-grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="flex min-h-full w-full items-center justify-center p-3 text-white">
+        <div className="grid w-full max-w-md grid-cols-2 gap-3 sm:inline-grid sm:w-auto sm:max-w-none sm:gap-4">
           {isAdministrator && (
             <>
-              <BigLinkButton title="Ebédrendelés" url="/admin/lunch" />
               <BigLinkButton
+                className={buttonClass}
+                title="Ebédrendelés"
+                url="/admin/lunch"
+              />
+              <BigLinkButton
+                className={buttonClass}
                 title="Token használat"
                 url="/admin/lunch-token-usage"
               />
-              <BigLinkButton title="Felhasználók" url="/admin/users" />
-              <BigLinkButton title="Onboarding" url="/admin/onboarding" />
-              <BigLinkButton title="Email" url="/admin/email" />
-              <BigLinkButton title="Laptopok" url="/admin/laptops" />
-              <BigLinkButton title="API kulcsok" url="/admin/api-keys" />
+              <BigLinkButton
+                className={buttonClass}
+                title="Felhasználók"
+                url="/admin/users"
+              />
+              <BigLinkButton
+                className={buttonClass}
+                title="Onboarding"
+                url="/admin/onboarding"
+              />
+              <BigLinkButton
+                className={buttonClass}
+                title="Email"
+                url="/admin/email"
+              />
+              <BigLinkButton
+                className={buttonClass}
+                title="Laptopok"
+                url="/admin/laptops"
+              />
+              <BigLinkButton
+                className={buttonClass}
+                title="API kulcsok"
+                url="/admin/api-keys"
+              />
             </>
           )}
-          <BigLinkButton title="Nyílt napok" url="/admin/opendays" />
+          <BigLinkButton
+            className={buttonClass}
+            title="Nyílt napok"
+            url="/admin/opendays"
+          />
         </div>
       </div>
     </PageWithHeader>
