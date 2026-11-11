@@ -28,6 +28,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface AnalyticsUserDoc extends RawUserDoc {
   groups?: (Types.ObjectId | string)[];
+  /** Placeholder for a deleted user whose orders are still in the database. */
+  deleted?: boolean;
 }
 
 export interface AnalyticsGroupDoc {
@@ -588,7 +590,7 @@ export function calculateLunchTokenAnalytics(
     const delta = currentPct - previousPct;
     if (delta >= 0) continue;
     const user = userById.get(userId);
-    if (!user) continue;
+    if (!user || user.deleted) continue;
     drops.push({
       userId,
       userName: formatName(user),
