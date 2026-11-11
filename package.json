@@ -63,7 +63,7 @@
     "recharts": "^3.10.1",
     "redis": "^6.3.0",
     "remark-gfm": "^4.0.1",
-    "resend": "^6.34.1",
+    "resend": "^6.37.0",
     "socket.io-client": "^4.8.4",
     "superjson": "^2.2.6",
     "tailwind-merge": "^3.7.0",
