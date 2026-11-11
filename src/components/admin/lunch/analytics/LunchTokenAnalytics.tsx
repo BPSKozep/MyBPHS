@@ -431,7 +431,7 @@ export default function LunchTokenAnalytics() {
               htmlFor="analytics-include-inactive"
               className="text-sm text-gray-300"
             >
-              Inaktívak is
+              Inaktívak és töröltek
             </Label>
           </div>
           <div className="flex items-center gap-3 text-xs text-gray-400 lg:ml-auto">
