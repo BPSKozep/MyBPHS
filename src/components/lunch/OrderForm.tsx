@@ -77,6 +77,7 @@ export default function OrderForm({
               !option ? (
                 <div
                   className="hidden lg:block"
+                  // biome-ignore lint/suspicious/noArrayIndexKey: days are fixed weekday positions
                   key={`option-${dayIndex + id}`}
                 ></div>
               ) : (
@@ -94,6 +95,7 @@ export default function OrderForm({
 
                     onChange(newOptions);
                   }}
+                  // biome-ignore lint/suspicious/noArrayIndexKey: days are fixed weekday positions
                   key={`option-${dayIndex + id}`}
                 >
                   {option}

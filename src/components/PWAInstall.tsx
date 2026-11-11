@@ -6,7 +6,7 @@ export default function PWAInstall() {
   const [PWAPrompt, setPWAPrompt] = useState<BeforeInstallPromptEvent>();
 
   useEffect(() => {
-    const PWAHandler = (e: BeforeInstallPromptEvent) => {
+    const handleInstallPrompt = (e: BeforeInstallPromptEvent) => {
       e.preventDefault();
       setSupportsPWA(true);
       setPWAPrompt(e);
@@ -14,13 +14,13 @@ export default function PWAInstall() {
 
     window.addEventListener(
       "beforeinstallprompt",
-      PWAHandler as EventListenerOrEventListenerObject,
+      handleInstallPrompt as EventListenerOrEventListenerObject,
     );
 
     return () =>
       window.removeEventListener(
         "beforeinstallprompt",
-        PWAHandler as EventListenerOrEventListenerObject,
+        handleInstallPrompt as EventListenerOrEventListenerObject,
       );
   }, []);
 
