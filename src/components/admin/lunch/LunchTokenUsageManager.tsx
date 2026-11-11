@@ -2,12 +2,14 @@
 
 import {
   ArrowUpDownIcon,
+  ChartLineIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsLeftIcon,
   ChevronsRightIcon,
 } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import TokenRequestsDialog from "@/components/admin/lunch/TokenRequestsDialog";
 import Card from "@/components/Card";
@@ -45,14 +47,18 @@ type SortDirection = "asc" | "desc";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
-export default function LunchTokenUsageManager() {
+export default function LunchTokenUsageManager({
+  initialSearch = "",
+}: {
+  initialSearch?: string;
+}) {
   const { data, isLoading, isError, refetch } =
     api.order.getLunchTokenUsageStats.useQuery(undefined, {
       staleTime: 60 * 1000,
     });
 
   // Search and filter state
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [stateFilter, setStateFilter] = useState<UserLunchState | "ALL">("ALL");
 
   // Sorting state
@@ -248,15 +254,27 @@ export default function LunchTokenUsageManager() {
 
           {/* Search Controls */}
           <div className="flex flex-col items-start justify-between gap-4 py-1 sm:flex-row sm:items-center">
-            <Input
-              placeholder="Felhasználók keresése..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full border-gray-600 bg-[#565656] font-bold text-white placeholder:text-gray-300 focus:border-gray-400 sm:w-64"
-            />
+            <div className="flex w-full items-center gap-2 sm:w-auto">
+              <Input
+                placeholder="Felhasználók keresése..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full border-gray-600 bg-[#565656] font-bold text-white placeholder:text-gray-300 focus:border-gray-400 sm:w-64"
+              />
+              <Button
+                asChild
+                variant="outline"
+                className="shrink-0 border-gray-600 bg-[#565656] text-white hover:bg-[#454545] hover:text-white"
+              >
+                <Link href="/admin/lunch-token-usage/analytics">
+                  <ChartLineIcon className="size-4" />
+                  Statisztikák
+                </Link>
+              </Button>
+            </div>
             <TokenRequestsDialog />
           </div>
 
