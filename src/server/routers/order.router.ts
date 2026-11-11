@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
+  type AnalyticsUserDoc,
   calculateLunchTokenAnalytics,
   earliestMealDate,
   filterUsersByAudience,
@@ -809,17 +810,43 @@ export const orderRouter = createTRPCRouter({
       const activeUsers = input.includeInactive
         ? allUsers
         : allUsers.filter((u) => !u.disabled);
-      const users = filterUsersByAudience(activeUsers, input.audience);
+      const users: AnalyticsUserDoc[] = filterUsersByAudience(
+        activeUsers,
+        input.audience,
+      );
 
-      const userIds = users.map((u) => u._id);
+      // Orders of deleted users are kept in the database. Their roles are gone,
+      // so they only count when no audience filter is active.
+      const includeDeleted = input.includeInactive && input.audience === "all";
+      const userFilter = includeDeleted
+        ? {}
+        : { user: { $in: users.map((u) => u._id) } };
       const [orders, tokenRequests] = await Promise.all([
-        Order.find({ user: { $in: userIds } })
-          .select("_id user menu order")
-          .lean(),
-        TokenRequest.find({ user: { $in: userIds } })
+        Order.find(userFilter).select("_id user menu order").lean(),
+        TokenRequest.find(userFilter)
           .select("user status createdAt completedAt")
           .lean(),
       ]);
+
+      if (includeDeleted) {
+        const knownIds = new Set(allUsers.map((u) => u._id.toString()));
+        const deletedIds = new Set<string>();
+        for (const doc of [...orders, ...tokenRequests]) {
+          const id = doc.user.toString();
+          if (!knownIds.has(id)) deletedIds.add(id);
+        }
+        for (const id of deletedIds) {
+          users.push({
+            _id: id,
+            displayName: "Törölt felhasználó",
+            email: "",
+            roles: [],
+            groups: [],
+            disabled: true,
+            deleted: true,
+          });
+        }
+      }
 
       const from = input.from ?? earliestMealDate(menus, orders) ?? input.to;
       if (from > input.to) {
