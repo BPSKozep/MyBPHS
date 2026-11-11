@@ -372,7 +372,6 @@ function LunchOrder() {
 
                           // biome-ignore lint/suspicious/useIterableCallbackReturn: todo review
                           Object.keys(newMenuDay).forEach(
-                            // biome-ignore lint/suspicious/noAssignInExpressions: todo review
                             (key) => (newMenuDay[key] = ""),
                           );
 

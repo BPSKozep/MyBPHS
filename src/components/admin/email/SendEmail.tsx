@@ -75,6 +75,29 @@ const GROUP_EMAILS = {
 type PresetKey = keyof typeof TEXT_PRESETS;
 type GroupEmail = keyof typeof GROUP_EMAILS;
 
+function ToolbarButton({
+  onClick,
+  title,
+  children,
+}: {
+  onClick: () => void;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      className="h-8 w-8 p-0 text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
+      title={title}
+    >
+      {children}
+    </Button>
+  );
+}
+
 export default function SendEmail() {
   const [preset, setPreset] = useState<PresetKey>("general_group");
   const [isGroupMode, setIsGroupMode] = useState(true);
@@ -251,28 +274,6 @@ export default function SendEmail() {
     // update link
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
-
-  // Toolbar button component
-  const ToolbarButton = ({
-    onClick,
-    title,
-    children,
-  }: {
-    onClick: () => void;
-    title: string;
-    children: React.ReactNode;
-  }) => (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      onClick={onClick}
-      className="h-8 w-8 p-0 text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
-      title={title}
-    >
-      {children}
-    </Button>
-  );
 
   const handleGroupModeChange = useCallback((newIsGroupMode: boolean) => {
     setIsGroupMode(newIsGroupMode);
