@@ -29,12 +29,14 @@ export default function ClosedOrderForm({
             !option ? (
               <div
                 className="hidden lg:block"
+                // biome-ignore lint/suspicious/noArrayIndexKey: days are fixed weekday positions
                 key={`option-${dayIndex + id}`}
               ></div>
             ) : (
               <button
                 type="button"
                 className={`overflow-auto rounded-lg bg-[#565e85] px-3 py-2 shadow-md`}
+                // biome-ignore lint/suspicious/noArrayIndexKey: days are fixed weekday positions
                 key={`option-${dayIndex + id}`}
               >
                 {option}
