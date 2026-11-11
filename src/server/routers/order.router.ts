@@ -1,7 +1,12 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import {
+  calculateLunchTokenAnalytics,
+  earliestMealDate,
+  filterUsersByAudience,
+} from "@/lib/lunchTokenAnalytics";
 import { calculateLunchTokenUsage } from "@/lib/lunchTokenUsage";
-import { Menu, Order, User } from "@/models";
+import { Group, Menu, Order, TokenRequest, User } from "@/models";
 import type { IOrder } from "@/models/Order.model";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 import { checkRoles } from "@/utils/authorization";
@@ -766,5 +771,73 @@ export const orderRouter = createTRPCRouter({
 
       const stats = calculateLunchTokenUsage(users, menus, orders, new Date());
       return stats;
+    }),
+  getLunchTokenAnalytics: protectedProcedure
+    .input(
+      z.strictObject({
+        // null = from the first ordered meal
+        from: z.iso.date().nullable(),
+        to: z.iso.date(),
+        granularity: z.enum(["week", "month"]),
+        audience: z.enum(["all", "student", "teacher"]),
+        includeInactive: z.boolean(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const authorized = await checkRoles(ctx.session, [
+        "administrator",
+        "lunch-system",
+      ]);
+
+      if (!authorized) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Nincs jogosultságod a statisztikák megtekintéséhez",
+        });
+      }
+
+      const [allUsers, groups, menus] = await Promise.all([
+        User.find()
+          .select(
+            "_id familyName givenName displayName email disabled roles groups",
+          )
+          .lean(),
+        Group.find().select("_id name").lean(),
+        Menu.find().select("_id year week options").lean(),
+      ]);
+
+      const activeUsers = input.includeInactive
+        ? allUsers
+        : allUsers.filter((u) => !u.disabled);
+      const users = filterUsersByAudience(activeUsers, input.audience);
+
+      const userIds = users.map((u) => u._id);
+      const [orders, tokenRequests] = await Promise.all([
+        Order.find({ user: { $in: userIds } })
+          .select("_id user menu order")
+          .lean(),
+        TokenRequest.find({ user: { $in: userIds } })
+          .select("user status createdAt completedAt")
+          .lean(),
+      ]);
+
+      const from = input.from ?? earliestMealDate(menus, orders) ?? input.to;
+      if (from > input.to) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "A kezdő dátum nem lehet a záró dátum után",
+        });
+      }
+
+      const analytics = calculateLunchTokenAnalytics(
+        users,
+        groups,
+        menus,
+        orders,
+        tokenRequests,
+        { from, to: input.to, granularity: input.granularity },
+      );
+
+      return analytics;
     }),
 });
